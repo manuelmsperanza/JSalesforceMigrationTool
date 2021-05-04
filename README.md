@@ -46,12 +46,24 @@ Add log4j<br>
 # Org Properties
 
 
-* **serverurl**=<Use 'https://login.salesforce.com' for production or developer edition (the default if not specified), use 'https://test.salesforce.com for sandbox.>
-* **user**=<target user>
-* **passwordType**=[encrypt: encrypt the value and add the new entry to keyStore |encrypted: keystore entry password |oneTimePassword: password is not stored, you must enter it every time] 
-* **password**=<target password when passwordType is encrypt or keystore entry password when passwordType is encrypted>
+* **sf.serverurl**=<Use 'https://login.salesforce.com' for production or developer edition (the default if not specified), use 'https://test.salesforce.com for sandbox.>
+* **sf.username**=<target user>
+* **passwordType**=[encrypt: encrypt the value and add the new entry to keyStore |encrypted: keystore entry password |oneTimePassword: password is not stored, you must enter it every time you try to connect] 
+* **sf.password**=<target password when passwordType is encrypt or keystore entry password when passwordType is encrypted>
 
 Please, refer to official documentation in case of org connection errors. [Entering Salesforce Connection Information | Ant Migration Tool Guide | Salesforce Developers](https://developer.salesforce.com/docs/atlas.en-us.daas.meta/daas/forcemigrationtool_connect.htm)
+
+## Get Org info
+
+	sfdx force:org:display
+
+Please, refer to official documentation for more information. [org Commands | Salesforce CLI Command Reference | Salesforce Developers](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_force_org.htm#cli_reference_force_org_display)
+
+## Get Scratch Org Password
+
+	sfdx force:user:password:generate
+
+Please, refer to official documentation for more information. [Salesforce CLI Command Reference | Salesforce CLI Command Reference | Salesforce Developers](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_force_user.htm#cli_reference_force_user_password_generate)
 
 # KeyStore
 For more information, please refer to official documentation [keytool - Oracle Help Center](https://docs.oracle.com/javase/8/docs/technotes/tools/windows/keytool.html)
