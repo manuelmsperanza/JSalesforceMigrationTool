@@ -22,6 +22,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.tools.ant.Project;
@@ -133,7 +134,7 @@ public class ExtractProfilesInformation {
 				}
 			}
 			
-			Files.delete(targetDirPath);
+			FileUtils.deleteDirectory(targetDirFile);
 			
 		} catch (IOException | IndexOutOfBoundsException | SaxonApiUncheckedException | SAXException | ParserConfigurationException | SaxonApiException e) {
 			logger.error(e.getMessage());
