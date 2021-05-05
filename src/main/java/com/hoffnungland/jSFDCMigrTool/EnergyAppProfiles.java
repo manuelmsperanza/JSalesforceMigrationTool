@@ -27,6 +27,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.tools.ant.Project;
@@ -366,8 +367,8 @@ public class EnergyAppProfiles {
 					switch(curDir.getName()) {
 					case"applications" :
 					case"layouts" :
-					case"objects" : 
-						Files.delete(curDir.toPath());
+					case"objects" :
+						FileUtils.deleteDirectory(curDir);
 					}
 				}
 			}
@@ -397,7 +398,7 @@ public class EnergyAppProfiles {
 			deployTask.execute();
 			logger.info("Retrieve deploy done");
 			
-			Files.delete(targetDirPath);
+			FileUtils.deleteDirectory(targetDirFile);
 			
 		} catch (IOException | IndexOutOfBoundsException | SaxonApiUncheckedException | SAXException | ParserConfigurationException | TransformerException | SaxonApiException e) {
 			logger.error(e.getMessage());
