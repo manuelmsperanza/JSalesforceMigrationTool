@@ -55,7 +55,9 @@ public class EnergyAppProfiles {
 		retrieveTask.setProject(retrieveTaskProject);
 		retrieveTask.setUsername(args[0]);
 		retrieveTask.setPassword(args[1]);
-		retrieveTask.setServerURL("https://test.salesforce.com");
+		if(args.length > 2) {
+			retrieveTask.setServerURL(args[2]);
+		}
 		retrieveTask.setTaskName("retrieveUnpackaged");
 		String targetDir = "retrieveUnpackaged";
 		try {
@@ -83,6 +85,7 @@ public class EnergyAppProfiles {
 				writer.write("<members>PriceBookEntry</members>");
 				writer.write("<members>Product2</members>");
 				writer.write("<name>CustomObject</name></types>");
+				writer.write("<types><members>*</members><name>CustomApplication</name></types>");
 				writer.write("<types><members>*</members><name>Layout</name></types>");
 				writer.write("<types><members>*</members><name>Profile</name></types>");
 				writer.write("<version>51.0</version>");
@@ -97,9 +100,7 @@ public class EnergyAppProfiles {
 			retrieveTask.execute();
 			logger.info("Retrieve task done");
 			Files.delete(Paths.get("package.xml"));
-			
-			XmlExtractor xmlExtractor = new XmlExtractor();
-			
+				
 			for(File curDir : targetDirFile.listFiles()) {
 				if(curDir.isDirectory() && curDir.getName().equals("profiles")) {
 					
@@ -220,9 +221,6 @@ public class EnergyAppProfiles {
 									transformer.transform(source, result);
 								}
 							}
-
-							//xmlExtractor.init(curProfileFile);
-							//xmlExtractor.extractNode("//layoutAssignments[contains(layout, 'EAP2_')]/concat('" + profileName + "', '\t', layout, '\t', recordType)", "xmlns=\"http://soap.sforce.com/2006/04/metadata\"");
 						}
 					}
 				}
