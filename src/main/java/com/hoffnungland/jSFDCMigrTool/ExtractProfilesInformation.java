@@ -120,6 +120,7 @@ public class ExtractProfilesInformation {
 									layoutAssignmentWriter.write(nodeItem.getStringValue());
 									layoutAssignmentWriter.newLine();
 								}
+								
 								XdmValue applicationNodes = xmlExtractor.extractNode("//applicationVisibilities[application='Force_com']/concat('" + profileName + "', '\t', application, '\t', default, '\t', visible)", "xmlns=\"http://soap.sforce.com/2006/04/metadata\"");
 								for (int nodeIdx = 0; nodeIdx < applicationNodes.size(); nodeIdx++){
 									XdmItem nodeItem = applicationNodes.itemAt(nodeIdx);
@@ -131,6 +132,9 @@ public class ExtractProfilesInformation {
 					}
 				}
 			}
+			
+			Files.delete(targetDirPath);
+			
 		} catch (IOException | IndexOutOfBoundsException | SaxonApiUncheckedException | SAXException | ParserConfigurationException | SaxonApiException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
