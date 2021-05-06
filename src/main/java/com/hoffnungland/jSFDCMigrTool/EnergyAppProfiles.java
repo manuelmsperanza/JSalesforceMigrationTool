@@ -110,6 +110,7 @@ public class EnergyAppProfiles {
 			List<String> listRecordTypes = new ArrayList<String>();
 			
 			for(File curDir : targetDirFile.listFiles()) {
+				
 				if(curDir.isDirectory() && curDir.getName().equals("objects")) {
 					
 					for(File curObjectFile : curDir.listFiles()) {
@@ -243,6 +244,7 @@ public class EnergyAppProfiles {
 												visibleNode = appVisibilityChild;
 											}
 										}
+										
 										if(appName.equals(appNode.getTextContent())) {
 											logger.debug("update " + appNode.getTextContent());
 											defaultNode.setTextContent(defaultFlag);
@@ -396,7 +398,7 @@ public class EnergyAppProfiles {
 			
 			logger.info("Run deploy task");
 			deployTask.execute();
-			logger.info("Retrieve deploy done");
+			logger.info("Deploy task done");
 			
 			FileUtils.deleteDirectory(targetDirFile);
 			
