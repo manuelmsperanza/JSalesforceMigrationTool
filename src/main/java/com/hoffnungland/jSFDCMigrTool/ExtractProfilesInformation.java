@@ -103,10 +103,27 @@ public class ExtractProfilesInformation {
 			XmlExtractor xmlExtractor = new XmlExtractor();
 			
 			try(BufferedWriter layoutAssignmentWriter = new BufferedWriter(new FileWriter("LayoutAssignments.txt", false));
-					BufferedWriter appVisibilitiesWriter = new BufferedWriter(new FileWriter("ApplicationVisibilities.txt", false));){
+					BufferedWriter appVisibilitiesWriter = new BufferedWriter(new FileWriter("ApplicationVisibilities.txt", false));
+					BufferedWriter profileActionOverridesWriter = new BufferedWriter(new FileWriter("ProfileActionOverrides.txt", false));){
 				
 				for(File curDir : targetDirFile.listFiles()) {
-					if(curDir.isDirectory() && curDir.getName().equals("profiles")) {
+					if(curDir.isDirectory() && curDir.getName().equals("applications")) {
+						for(File curApplicationFile : curDir.listFiles()) {
+							if(curApplicationFile.isFile() && curApplicationFile.getName().endsWith(".app")){
+								
+								String applicationName = curApplicationFile.getName().substring(0, curApplicationFile.getName().length() - 4 );
+								logger.debug(applicationName);
+															
+								xmlExtractor.init(curApplicationFile);
+								XdmValue profileActionsNodes = xmlExtractor.extractNode("//profileActionOverrides[contains(content, 'EAP2_')]/concat('" + applicationName + "', '\t', actionName, '\t', content, '\t', formFactor, '\t', pageOrSobjectType, '\t', recordType, '\t', type, '\t', profile)", "xmlns=\"http://soap.sforce.com/2006/04/metadata\"");
+								for (int nodeIdx = 0; nodeIdx < profileActionsNodes.size(); nodeIdx++){
+									XdmItem nodeItem = profileActionsNodes.itemAt(nodeIdx);
+									profileActionOverridesWriter.write(nodeItem.getStringValue());
+									profileActionOverridesWriter.newLine();
+								}
+							}
+						}
+					} else if(curDir.isDirectory() && curDir.getName().equals("profiles")) {
 						
 						for(File curProfileFile : curDir.listFiles()) {
 							if(curProfileFile.isFile() && curProfileFile.getName().endsWith(".profile")){
