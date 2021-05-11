@@ -134,8 +134,163 @@ public class EnergyAppProfiles {
 				}				
 			}
 			
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			factory.setNamespaceAware(true);
+			DocumentBuilder builder = factory.newDocumentBuilder();
+			
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			
 			for(File curDir : targetDirFile.listFiles()) {
-				if(curDir.isDirectory() && curDir.getName().equals("profiles")) {
+				if(curDir.isDirectory() && curDir.getName().equals("applications")) {
+					
+					logger.info("Loading ProfileActionOverrides.txt");
+					
+					Map<String, List<String>> mapProfileActionOverride = new HashMap<String, List<String>>();
+					try(BufferedReader reader = new BufferedReader(new FileReader("ProfileActionOverrides.txt"));) {
+						while(reader.ready()) {
+							String profileActionOverrideRow = reader.readLine();
+							String[] profileActionOverrideMetadata = profileActionOverrideRow.split("\t");
+							String applicationName = profileActionOverrideMetadata[0];
+							
+							String recordType = profileActionOverrideMetadata[5];
+							boolean addRecordType = true;
+							if(recordType != null && !"".equals(recordType)) {
+								addRecordType = listRecordTypes.contains(recordType);
+							}
+							
+							if(addRecordType) {
+								List<String> listOverrides = null;
+								if(mapProfileActionOverride.containsKey(applicationName)) {
+									listOverrides = mapProfileActionOverride.get(applicationName);
+								} else {
+									listOverrides = new ArrayList<String>();
+									mapProfileActionOverride.put(applicationName, listOverrides);
+								}
+								listOverrides.add(profileActionOverrideRow);
+							}
+						}
+					}
+					
+					for(File curApplicationFile : curDir.listFiles()) {
+						if(curApplicationFile.isFile() && curApplicationFile.getName().endsWith(".app")){
+							
+							String appName = curApplicationFile.getName().substring(0, curApplicationFile.getName().length() - 4 );
+							logger.trace(appName);
+							if(mapProfileActionOverride.containsKey(appName)) {
+								
+								Document doc = builder.parse(curApplicationFile);
+								Element root = doc.getDocumentElement();
+								
+								logger.info("Manage profileActionOverrides for " + appName);
+								for(String curPofileActionOverrideRow : mapProfileActionOverride.get(appName)) {
+									
+									String[] profileActionOverrideMetadata = curPofileActionOverrideRow.split("\t");
+									String actionName = profileActionOverrideMetadata[1];
+									String content = profileActionOverrideMetadata[2];
+									String formFactor = profileActionOverrideMetadata[3];
+									String pageOrSobjectType = profileActionOverrideMetadata[4];
+									String recordType = profileActionOverrideMetadata[5];
+									if(recordType == null) {
+										recordType = "";
+									}
+									String type = profileActionOverrideMetadata[6];
+									String profile = profileActionOverrideMetadata[7];
+									
+									NodeList profileActionOverridesNodes = root.getElementsByTagNameNS(root.getNamespaceURI(), "profileActionOverrides");
+									Node firstProfileActionOverride = null;
+									if(profileActionOverridesNodes.getLength() > 0) {
+										firstProfileActionOverride = profileActionOverridesNodes.item(0);
+									}
+									
+									boolean doInsert = true;
+									for(int profileActionOverridesNodeIdx = 0; profileActionOverridesNodeIdx < profileActionOverridesNodes.getLength(); profileActionOverridesNodeIdx++) {
+										Node profileActionOverride = profileActionOverridesNodes.item(profileActionOverridesNodeIdx);
+										
+										Node pageOrSobjectTypeNode = null;
+										Node recordTypeNode = null;
+										String recordTypeNodeValue = "";
+										Node profileNode = null;
+										Node contentNode = null;
+										NodeList profileActionOverrideChildren = profileActionOverride.getChildNodes();
+										
+										for(int profileActionOverrideChildrenIdx = 0; profileActionOverrideChildrenIdx < profileActionOverrideChildren.getLength(); profileActionOverrideChildrenIdx++ ) {
+											Node profileActionOverrideChild = profileActionOverrideChildren.item(profileActionOverrideChildrenIdx);
+											if(profileActionOverrideChild.getNodeName().equals("pageOrSobjectType")) {
+												pageOrSobjectTypeNode = profileActionOverrideChild;
+											} else if(profileActionOverrideChild.getNodeName().equals("recordType")) {
+												recordTypeNode = profileActionOverrideChild;
+												recordTypeNodeValue = recordTypeNode.getTextContent();
+											} else if(profileActionOverrideChild.getNodeName().equals("profile")) {
+												profileNode = profileActionOverrideChild;
+											} else if(profileActionOverrideChild.getNodeName().equals("content")) {
+												contentNode = profileActionOverrideChild;
+											}
+										}
+										
+										if(pageOrSobjectType.equals(pageOrSobjectTypeNode.getTextContent()) 
+												&& profile.equals(profileNode.getTextContent())
+												&& recordType.equals(recordTypeNodeValue)) {
+											logger.debug("update " + pageOrSobjectType + "-" + recordType + "-" + profile);
+											contentNode.setTextContent(content);
+											doInsert = false;
+										}
+										
+									}
+									if(doInsert) {
+										logger.debug("Insert applicationVisibilities for " + appName);
+										Element profileActionOverride = doc.createElementNS(root.getNamespaceURI(), "profileActionOverrides");
+										
+										Element actionNameNode = doc.createElementNS(root.getNamespaceURI(), "actionName");
+										actionNameNode.setTextContent(actionName);
+										profileActionOverride.appendChild(actionNameNode);
+										
+										Element contentNode = doc.createElementNS(root.getNamespaceURI(), "content");
+										contentNode.setTextContent(content);
+										profileActionOverride.appendChild(contentNode);
+										
+										Element formFactorNode = doc.createElementNS(root.getNamespaceURI(), "formFactor");
+										formFactorNode.setTextContent(formFactor);
+										profileActionOverride.appendChild(formFactorNode);
+										
+										Element pageOrSobjectTypeNode = doc.createElementNS(root.getNamespaceURI(), "pageOrSobjectType");
+										pageOrSobjectTypeNode.setTextContent(pageOrSobjectType);
+										profileActionOverride.appendChild(pageOrSobjectTypeNode);
+										
+										if(!"".equals(recordType)) {
+											Element recordTypeNode = doc.createElementNS(root.getNamespaceURI(), "recordType");
+											recordTypeNode.setTextContent(recordType);
+											profileActionOverride.appendChild(recordTypeNode);
+										}
+										
+										Element typeNode = doc.createElementNS(root.getNamespaceURI(), "type");
+										typeNode.setTextContent(type);
+										profileActionOverride.appendChild(typeNode);
+										
+										Element profileNode = doc.createElementNS(root.getNamespaceURI(), "profile");
+										profileNode.setTextContent(profile);
+										profileActionOverride.appendChild(profileNode);
+										
+										if(firstProfileActionOverride == null) {
+											root.appendChild(profileActionOverride);
+										} else {
+											root.insertBefore(profileActionOverride, firstProfileActionOverride);
+										}
+									}
+								}
+								
+								DOMSource source = new DOMSource(doc);
+								
+								try(FileWriter writer = new FileWriter(curApplicationFile)){
+									
+									StreamResult result = new StreamResult(writer);
+									transformer.transform(source, result);
+								}
+								
+							}
+						}
+					}
+				} else if(curDir.isDirectory() && curDir.getName().equals("profiles")) {
 					
 					logger.info("Loading ApplicationVisibilities.txt");
 					
@@ -188,12 +343,7 @@ public class EnergyAppProfiles {
 						}
 					}
 					
-					DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-					factory.setNamespaceAware(true);
-					DocumentBuilder builder = factory.newDocumentBuilder();
 					
-					TransformerFactory transformerFactory = TransformerFactory.newInstance();
-					Transformer transformer = transformerFactory.newTransformer();
 					
 					for(File curProfileFile : curDir.listFiles()) {
 						if(curProfileFile.isFile() && curProfileFile.getName().endsWith(".profile")){
@@ -367,7 +517,7 @@ public class EnergyAppProfiles {
 			for(File curDir : targetDirFile.listFiles()) {
 				if(curDir.isDirectory()) {
 					switch(curDir.getName()) {
-					case"applications" :
+					//case"applications" :
 					case"layouts" :
 					case"objects" :
 						FileUtils.deleteDirectory(curDir);
@@ -378,6 +528,7 @@ public class EnergyAppProfiles {
 			try(BufferedWriter writer = new BufferedWriter(new FileWriter("retrieveUnpackaged\\package.xml", false))){
 				writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 				writer.write("<Package xmlns=\"http://soap.sforce.com/2006/04/metadata\">");
+				writer.write("<types><members>*</members><name>CustomApplication</name></types>");
 				writer.write("<types><members>*</members><name>Profile</name></types>");
 				writer.write("<version>51.0</version>");
 				writer.write("</Package>");
