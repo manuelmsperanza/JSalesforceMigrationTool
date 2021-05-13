@@ -1,24 +1,18 @@
 package com.hoffnungland.jSFDCMigrTool;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -37,11 +31,6 @@ import org.xml.sax.SAXException;
 import com.hoffnungland.xpath.XmlExtractor;
 import com.salesforce.ant.DeployTask;
 import com.salesforce.ant.RetrieveTask;
-
-import net.sf.saxon.s9api.SaxonApiException;
-import net.sf.saxon.s9api.SaxonApiUncheckedException;
-import net.sf.saxon.s9api.XdmItem;
-import net.sf.saxon.s9api.XdmValue;
 
 public class ProcessClickMaMeS {
 	private static final Logger logger = LogManager.getLogger(ProcessClickMaMeS.class);
@@ -314,7 +303,7 @@ public class ProcessClickMaMeS {
 			
 			FileUtils.deleteDirectory(targetDirFile);
 			
-		} catch (IOException | IndexOutOfBoundsException | SaxonApiUncheckedException | ParserConfigurationException | TransformerException | SAXException e) {
+		} catch (IOException | ParserConfigurationException | SAXException | TransformerException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
 		}
