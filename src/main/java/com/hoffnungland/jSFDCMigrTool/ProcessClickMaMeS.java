@@ -129,14 +129,23 @@ public class ProcessClickMaMeS {
 								if("sidebar".equals(nameNode.getTextContent()) && "Region".equals(typeNode.getTextContent())) {
 									boolean doInsert = true;
 									if(firstItemInstancesNode != null) {
-										Node componentInstanceNode = firstItemInstancesNode.getFirstChild();
-										Node componentNameNode = componentInstanceNode.getLastChild();
-										if("wrts_prcgvr:ServiceCatalogLtgCmp_1_1".equals(componentNameNode.getTextContent())) {
-											doInsert = false;
-											logger.warn("wrts_prcgvr:ServiceCatalogLtgCmp_1_1 already set");
+										NodeList firstItemInstancesChildren = firstItemInstancesNode.getChildNodes();
+										for(int firstItemInstancesChildrenIdx = 0; firstItemInstancesChildrenIdx < firstItemInstancesChildren.getLength(); firstItemInstancesChildrenIdx++) {
+											Node firstItemInstancesChild = firstItemInstancesChildren.item(firstItemInstancesChildrenIdx);
+											if("componentInstance".equals(firstItemInstancesChild.getNodeName())) {
+												NodeList componentInstanceChildren = firstItemInstancesChild.getChildNodes();
+												for(int componentInstanceChildrenIdx = 0; componentInstanceChildrenIdx < componentInstanceChildren.getLength(); componentInstanceChildrenIdx++) {
+													Node componentInstanceChild = componentInstanceChildren.item(componentInstanceChildrenIdx);
+													if("componentName".equals(componentInstanceChild.getNodeName()) && "wrts_prcgvr:ServiceCatalogLtgCmp_1_1".equals(componentInstanceChild.getTextContent())) {
+														doInsert = false;
+														logger.warn("wrts_prcgvr:ServiceCatalogLtgCmp_1_1 already set");
+													}
+												}
+											}
 										}
 									}
 									if(doInsert) {
+										logger.info("Update EAP2_Account_Page");
 										Element itemInstancesEl = doc.createElementNS(root.getNamespaceURI(), "itemInstances");
 										Element componentInstanceEl = doc.createElementNS(root.getNamespaceURI(), "componentInstance");
 										itemInstancesEl.appendChild(componentInstanceEl);
@@ -189,9 +198,6 @@ public class ProcessClickMaMeS {
 								
 								Node fullNameNode = null;
 								Node valueSetNode = null;
-								String recordTypeNodeValue = "";
-								Node profileNode = null;
-								Node contentNode = null;
 								NodeList fieldChildren = fieldNode.getChildNodes();
 								
 								for(int fieldChildrenIdx = 0; fieldChildrenIdx < fieldChildren.getLength(); fieldChildrenIdx++ ) {
@@ -207,7 +213,7 @@ public class ProcessClickMaMeS {
 									if(valueSetNode == null) {
 										logger.warn("valueSet is null");
 									} else {
-										logger.debug("update " + fullNameNode);
+										logger.info("update wrts_prcgvr__ServiceLink__c.wrts_prcgvr__Category__c");
 										NodeList valueSetChildren = valueSetNode.getChildNodes();
 										
 										for(int valueSetChildrenIdx = 0; valueSetChildrenIdx < valueSetChildren.getLength(); valueSetChildrenIdx++ ) {
