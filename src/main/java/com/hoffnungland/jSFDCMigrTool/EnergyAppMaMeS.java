@@ -47,9 +47,9 @@ import net.sf.saxon.s9api.SaxonApiUncheckedException;
 import net.sf.saxon.s9api.XdmItem;
 import net.sf.saxon.s9api.XdmValue;
 
-public class EnergyAppProfiles {
+public class EnergyAppMaMeS {
 	
-	private static final Logger logger = LogManager.getLogger(EnergyAppProfiles.class);
+	private static final Logger logger = LogManager.getLogger(EnergyAppMaMeS.class);
 	
 	public static void main(String[] args) {
 		
@@ -142,7 +142,16 @@ public class EnergyAppProfiles {
 			Transformer transformer = transformerFactory.newTransformer();
 			
 			for(File curDir : targetDirFile.listFiles()) {
-				if(curDir.isDirectory() && curDir.getName().equals("applications")) {
+				
+				if(curDir.isDirectory() && curDir.getName().equals("objects")) {
+					
+					for(File curObjectFile : curDir.listFiles()) {
+						if(curObjectFile.isFile() && curObjectFile.getName().equals("wrts_prcgvr__ServiceLink__c.object")){
+							
+						}
+					}
+					
+				} else if(curDir.isDirectory() && curDir.getName().equals("applications")) {
 					
 					logger.info("Loading ProfileActionOverrides.txt");
 					
