@@ -192,6 +192,11 @@
 		</dependency>
 		<dependency>
 			<groupId>com.hoffnungland</groupId>
+			<artifactId>OrcXlsReport</artifactId>
+			<version>0.0.30</version>
+		</dependency>
+		<dependency>
+			<groupId>com.hoffnungland</groupId>
 			<artifactId>JAppKeyStoreManager</artifactId>
 			<version>1.0.1</version>
 		</dependency>
@@ -211,13 +216,19 @@
 		<dependency>
 			<groupId>com.hoffnungland</groupId>
 			<artifactId>SaxonXPathUtils</artifactId>
-			<version>1.0.22</version>
+			<version>1.0.23</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.ant/ant -->
 		<dependency>
 		    <groupId>org.apache.ant</groupId>
 		    <artifactId>ant</artifactId>
 		    <version>1.10.10</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.xmlbeans/xmlbeans -->
+		<dependency>
+		    <groupId>org.apache.xmlbeans</groupId>
+		    <artifactId>xmlbeans</artifactId>
+		    <version>5.0.0</version>
 		</dependency>
 	</dependencies>
 </project>
