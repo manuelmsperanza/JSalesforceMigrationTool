@@ -2,3 +2,7 @@
 /logs/
 /retrieveUnpackaged/
 /*.txt
+/package.xml
+/scratchOrg/
+/ea2/
+/OrgMetadata.xlsx

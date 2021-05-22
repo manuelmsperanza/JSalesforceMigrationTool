@@ -122,9 +122,9 @@ public class EnergyAppMaMeS {
 							XmlExtractor xmlExtractor = new XmlExtractor();
 							
 							xmlExtractor.init(curObjectFile);
-							XdmValue layoutNodes = xmlExtractor.extractNode("//recordTypes[active='true']/concat('" + objectName + ".', fullName)", "xmlns=\"http://soap.sforce.com/2006/04/metadata\"");
-							for (int nodeIdx = 0; nodeIdx < layoutNodes.size(); nodeIdx++){
-								XdmItem nodeItem = layoutNodes.itemAt(nodeIdx);
+							XdmValue recordTypesNodes = xmlExtractor.extractNode("//recordTypes[active='true']/concat('" + objectName + ".', fullName)", "xmlns=\"http://soap.sforce.com/2006/04/metadata\"");
+							for (int nodeIdx = 0; nodeIdx < recordTypesNodes.size(); nodeIdx++){
+								XdmItem nodeItem = recordTypesNodes.itemAt(nodeIdx);
 								listRecordTypes.add(nodeItem.getStringValue());
 							}
 						}
