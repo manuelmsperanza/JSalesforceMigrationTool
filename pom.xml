@@ -188,6 +188,11 @@
 		    <scope>test</scope>
 		</dependency>
 		<dependency>
+		 	<groupId>salesforce</groupId>
+		  	<artifactId>ant-salesforce</artifactId>
+		  	<version>51.0</version>
+		</dependency>
+		<dependency>
 			<groupId>com.hoffnungland</groupId>
 			<artifactId>Log4j</artifactId>
 			<version>1.0.8</version>
