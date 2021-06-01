@@ -104,7 +104,8 @@ public class ExtractProfilesInformation {
 			
 			try(BufferedWriter layoutAssignmentWriter = new BufferedWriter(new FileWriter("LayoutAssignments.txt", false));
 					BufferedWriter appVisibilitiesWriter = new BufferedWriter(new FileWriter("ApplicationVisibilities.txt", false));
-					BufferedWriter profileActionOverridesWriter = new BufferedWriter(new FileWriter("ProfileActionOverrides.txt", false));){
+					BufferedWriter profileActionOverridesWriter = new BufferedWriter(new FileWriter("ProfileActionOverrides.txt", false));
+					BufferedWriter recordTypeVisibilitiesWriter = new BufferedWriter(new FileWriter("RecordTypeVisibilities.txt", false));){
 				
 				for(File curDir : targetDirFile.listFiles()) {
 					if(curDir.isDirectory() && curDir.getName().equals("applications")) {
@@ -145,6 +146,14 @@ public class ExtractProfilesInformation {
 									appVisibilitiesWriter.write(nodeItem.getStringValue());
 									appVisibilitiesWriter.newLine();
 								}
+								
+								XdmValue recordTypeNodes = xmlExtractor.extractNode("//recordTypeVisibilities[visible='true']/concat('" + profileName + "', '\t', default, '\t', personAccountDefault, '\t', recordType)", "xmlns=\"http://soap.sforce.com/2006/04/metadata\"");
+								for (int nodeIdx = 0; nodeIdx < recordTypeNodes.size(); nodeIdx++){
+									XdmItem nodeItem = recordTypeNodes.itemAt(nodeIdx);
+									recordTypeVisibilitiesWriter.write(nodeItem.getStringValue());
+									recordTypeVisibilitiesWriter.newLine();
+								}
+								
 							}
 						}
 					}
