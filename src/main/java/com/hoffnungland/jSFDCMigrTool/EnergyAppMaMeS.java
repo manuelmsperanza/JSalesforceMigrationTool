@@ -94,6 +94,7 @@ public class EnergyAppMaMeS {
 				writer.write("<types><members>*</members><name>CustomApplication</name></types>");
 				writer.write("<types><members>*</members><name>Layout</name></types>");
 				writer.write("<types><members>*</members><name>Profile</name></types>");
+				writer.write("<types><members>Case</members><name>Settings</name></types>");
 				writer.write("<version>51.0</version>");
 				writer.write("</Package>");
 			}
@@ -352,8 +353,6 @@ public class EnergyAppMaMeS {
 						}
 					}
 					
-					
-					
 					for(File curProfileFile : curDir.listFiles()) {
 						if(curProfileFile.isFile() && curProfileFile.getName().endsWith(".profile")){
 							
@@ -520,6 +519,37 @@ public class EnergyAppMaMeS {
 							}
 						}
 					}
+				} else if(curDir.isDirectory() && curDir.getName().equals("settings")) {
+					for(File curSettingFile : curDir.listFiles()) {
+						if(curSettingFile.isFile() && curSettingFile.getName().equals("Case.settings")){
+							
+							String settingName = curSettingFile.getName().substring(0, curSettingFile.getName().length() - 9 );
+							logger.trace(settingName);
+								
+							Document doc = builder.parse(curSettingFile);
+							Element root = doc.getDocumentElement();
+							
+							NodeList closeCaseThroughStatusChangeNodes = root.getElementsByTagNameNS(root.getNamespaceURI(), "closeCaseThroughStatusChange");
+							
+							if(closeCaseThroughStatusChangeNodes.getLength() > 0) {
+								Node firstCloseCaseThroughStatusChangeAssignment = closeCaseThroughStatusChangeNodes.item(0);
+								firstCloseCaseThroughStatusChangeAssignment.setTextContent("true");
+							} else {
+								Element closeCaseThroughStatusChangeEl = doc.createElementNS(root.getNamespaceURI(), "closeCaseThroughStatusChange");
+								closeCaseThroughStatusChangeEl.setTextContent("true");
+								root.appendChild(closeCaseThroughStatusChangeEl);
+							}
+							
+							DOMSource source = new DOMSource(doc);
+							
+							try(FileWriter writer = new FileWriter(curSettingFile)){
+								
+								StreamResult result = new StreamResult(writer);
+								transformer.transform(source, result);
+							}
+							
+						}
+					}
 				}
 			}
 			
@@ -539,6 +569,7 @@ public class EnergyAppMaMeS {
 				writer.write("<Package xmlns=\"http://soap.sforce.com/2006/04/metadata\">");
 				writer.write("<types><members>*</members><name>CustomApplication</name></types>");
 				writer.write("<types><members>*</members><name>Profile</name></types>");
+				writer.write("<types><members>*</members><name>Settings</name></types>");
 				writer.write("<version>51.0</version>");
 				writer.write("</Package>");
 			}
