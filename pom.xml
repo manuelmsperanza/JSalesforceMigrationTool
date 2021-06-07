@@ -15,6 +15,9 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.source.version>1.8</java.source.version>
 		<java.target.version>1.8</java.target.version>
+		<salesforce.ant.zip>salesforce_ant_51.0.zip</salesforce.ant.zip>
+		<salesforce.ant.jar>ant-salesforce-51.0.jar</salesforce.ant.jar>
+		<salesforce.ant.pom>ant-salesforce-51.0.pom</salesforce.ant.pom>
 	</properties>
 	<build>
 		<pluginManagement><!-- lock down plugins versions to avoid using Maven 
@@ -56,6 +59,7 @@
 					</configuration>
 				</plugin>
 				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-install-plugin</artifactId>
 					<version>3.0.0-M1</version>
 				</plugin>
@@ -77,6 +81,16 @@
 					<artifactId>maven-jarsigner-plugin</artifactId>
 					<version>3.0.0</version>
 				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+				    <artifactId>wagon-maven-plugin</artifactId>
+				    <version>2.0.2</version>
+				</plugin>
+				<plugin>
+			        <groupId>org.apache.maven.plugins</groupId>
+			        <artifactId>maven-antrun-plugin</artifactId>
+			        <version>3.0.0</version>
+			     </plugin>
 			</plugins>
 		</pluginManagement>
 		<plugins>
@@ -108,6 +122,64 @@
 				<version>1.6.0</version>
 				<!-- <configuration> <async>true</async> <mainClass>com.hoffnungland.jSFDCMigrTool.App</mainClass> 
 					</configuration> -->
+			</plugin>
+			<plugin>
+			    <groupId>org.codehaus.mojo</groupId>
+			    <artifactId>wagon-maven-plugin</artifactId>
+			    <executions>
+			        <execution>
+			            <id>download-ant-migration-tool</id>
+			            <phase>initialize</phase>
+			            <goals>
+			                <goal>download-single</goal>
+			            </goals>
+			            <configuration>
+			                <url>https://gs0.salesforce.com</url>
+			                <fromFile>dwnld/SfdcAnt/${salesforce.ant.zip}</fromFile>
+			                <toDir>./salesforce</toDir>
+			            </configuration>
+			        </execution>
+			    </executions>
+			</plugin>
+			<plugin>
+			    <groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-antrun-plugin</artifactId>
+			    <executions>
+			        <execution>
+			        	<id>unzip-ant-migration-tool</id>
+			            <phase>initialize</phase>
+			            <goals>
+			            	<goal>run</goal>
+			            </goals>
+			            <configuration>
+			                <target>
+			                    <unzip src="./salesforce/${salesforce.ant.zip}" dest="./salesforce/">
+			                        <patternset>
+			                            <include name="ant-salesforce.jar"/>
+			                        </patternset>
+			                    </unzip>
+			                    <move file="./salesforce/ant-salesforce.jar" tofile="./salesforce/${salesforce.ant.jar}"/>
+			                </target>
+			            </configuration>
+			        </execution>
+			    </executions>
+			</plugin>
+			<plugin>
+			    <groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-install-plugin</artifactId>
+			    <executions>
+			        <execution>
+			            <id>install-ant-migration-tool</id>
+			            <phase>initialize</phase>
+			            <goals>
+			                <goal>install-file</goal>
+			            </goals>
+			            <configuration>
+			                <file>./salesforce/${salesforce.ant.jar}</file>
+			               	<pomFile>./salesforce/${salesforce.ant.pom}</pomFile>
+			            </configuration>
+			        </execution>
+			    </executions>
 			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
