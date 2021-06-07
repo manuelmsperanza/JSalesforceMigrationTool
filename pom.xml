@@ -124,24 +124,6 @@
 					</configuration> -->
 			</plugin>
 			<plugin>
-			    <groupId>org.codehaus.mojo</groupId>
-			    <artifactId>wagon-maven-plugin</artifactId>
-			    <executions>
-			        <execution>
-			            <id>download-ant-migration-tool</id>
-			            <phase>initialize</phase>
-			            <goals>
-			                <goal>download-single</goal>
-			            </goals>
-			            <configuration>
-			                <url>https://gs0.salesforce.com</url>
-			                <fromFile>dwnld/SfdcAnt/${salesforce.ant.zip}</fromFile>
-			                <toDir>./salesforce</toDir>
-			            </configuration>
-			        </execution>
-			    </executions>
-			</plugin>
-			<plugin>
 			    <groupId>org.apache.maven.plugins</groupId>
 			    <artifactId>maven-antrun-plugin</artifactId>
 			    <executions>
@@ -152,8 +134,12 @@
 			            	<goal>run</goal>
 			            </goals>
 			            <configuration>
-			                <target>
-			                    <unzip src="./salesforce/${salesforce.ant.zip}" dest="./salesforce/">
+			            	<target>
+			            		<echo>target 1</echo>
+			            	</target>
+			            	<target>
+				            	<get skipexisting="true" src="https://gs0.salesforce.com/dwnld/SfdcAnt/${salesforce.ant.zip}" dest="./salesforce"></get>
+				                <unzip src="./salesforce/${salesforce.ant.zip}" dest="./salesforce/">
 			                        <patternset>
 			                            <include name="ant-salesforce.jar"/>
 			                        </patternset>
