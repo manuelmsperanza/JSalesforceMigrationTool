@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
@@ -28,15 +29,20 @@ import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.tools.ant.Project;
+import org.xml.sax.SAXException;
 
 import com.hoffnungland.jAppKs.AppKeyStoreManager;
 import com.hoffnungland.jAppKs.JksFilter;
 import com.hoffnungland.jAppKs.PasswordPanel;
 import com.salesforce.ant.DeployTask;
 import com.salesforce.ant.RetrieveTask;
+
+import net.sf.saxon.s9api.SaxonApiException;
+import net.sf.saxon.s9api.SaxonApiUncheckedException;
 
 import javax.swing.JLabel;
 import javax.swing.SpringLayout;
@@ -48,6 +54,8 @@ import java.awt.Dimension;
 import javax.swing.JTree;
 import java.awt.Rectangle;
 import javax.swing.tree.DefaultTreeModel;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
@@ -68,6 +76,7 @@ public class App implements ActionListener {
 	private JTextArea sourcePackageTextArea;
 	private JTextArea targetPackageTextArea;
 	private JTextField textField;
+	private JLabel progressLabel;
 	/**
 	 * Launch the application.
 	 */
@@ -178,7 +187,7 @@ public class App implements ActionListener {
 
 			JPanel commandPanelRetrieve = new JPanel();
 			springLayout.putConstraint(SpringLayout.NORTH, commandPanelRetrieve, 0, SpringLayout.NORTH, frame.getContentPane());
-			springLayout.putConstraint(SpringLayout.SOUTH, commandPanelRetrieve, 0, SpringLayout.SOUTH, frame.getContentPane());
+			springLayout.putConstraint(SpringLayout.SOUTH, commandPanelRetrieve, 550, SpringLayout.NORTH, frame.getContentPane());
 			springLayout.putConstraint(SpringLayout.EAST, commandPanelRetrieve, 500, SpringLayout.WEST, frame.getContentPane());
 			commandPanelRetrieve.setMaximumSize(new Dimension(500, 200));
 			springLayout.putConstraint(SpringLayout.WEST, commandPanelRetrieve, 0, SpringLayout.WEST, frame.getContentPane());
@@ -229,7 +238,7 @@ public class App implements ActionListener {
 			JPanel commandPanelDeploy = new JPanel();
 			springLayout.putConstraint(SpringLayout.NORTH, commandPanelDeploy, 0, SpringLayout.NORTH, frame.getContentPane());
 			springLayout.putConstraint(SpringLayout.WEST, commandPanelDeploy, 0, SpringLayout.EAST, commandPanelRetrieve);
-			springLayout.putConstraint(SpringLayout.SOUTH, commandPanelDeploy, 0, SpringLayout.SOUTH, frame.getContentPane());
+			springLayout.putConstraint(SpringLayout.SOUTH, commandPanelDeploy, 550, SpringLayout.NORTH, frame.getContentPane());
 			springLayout.putConstraint(SpringLayout.EAST, commandPanelDeploy, 500, SpringLayout.EAST, commandPanelRetrieve);
 			frame.getContentPane().add(commandPanelDeploy);
 			SpringLayout sl_commandPanelDeploy = new SpringLayout();
@@ -276,6 +285,30 @@ public class App implements ActionListener {
 			targetPackageTextArea = new JTextArea();
 			targetPackageTextArea.setEditable(false);
 			targetPackageScrollPane.setViewportView(targetPackageTextArea);
+			
+			progressLabel = new JLabel("New label");
+			progressLabel.setVisible(false);
+			springLayout.putConstraint(SpringLayout.WEST, progressLabel, 10, SpringLayout.WEST, frame.getContentPane());
+			springLayout.putConstraint(SpringLayout.SOUTH, progressLabel, -10, SpringLayout.SOUTH, frame.getContentPane());
+			frame.getContentPane().add(progressLabel);
+			
+			JButton btnUtilityAppMaMeS = new JButton("Utility App MaMeS");
+			btnUtilityAppMaMeS.addActionListener(this);
+			springLayout.putConstraint(SpringLayout.NORTH, btnUtilityAppMaMeS, 10, SpringLayout.SOUTH, commandPanelRetrieve);
+			springLayout.putConstraint(SpringLayout.WEST, btnUtilityAppMaMeS, 10, SpringLayout.WEST, frame.getContentPane());
+			frame.getContentPane().add(btnUtilityAppMaMeS);
+			
+			JButton btnProcessClickMaMeSButton = new JButton("Process Click MaMeS");
+			btnProcessClickMaMeSButton.addActionListener(this);
+			springLayout.putConstraint(SpringLayout.WEST, btnProcessClickMaMeSButton, 10, SpringLayout.EAST, btnUtilityAppMaMeS);
+			springLayout.putConstraint(SpringLayout.SOUTH, btnProcessClickMaMeSButton, 0, SpringLayout.SOUTH, btnUtilityAppMaMeS);
+			frame.getContentPane().add(btnProcessClickMaMeSButton);
+			
+			JButton btnExcelMetadataButton = new JButton("Excel Org Info");
+			btnExcelMetadataButton.addActionListener(this);
+			springLayout.putConstraint(SpringLayout.WEST, btnExcelMetadataButton, 6, SpringLayout.EAST, btnProcessClickMaMeSButton);
+			springLayout.putConstraint(SpringLayout.SOUTH, btnExcelMetadataButton, 0, SpringLayout.SOUTH, btnUtilityAppMaMeS);
+			frame.getContentPane().add(btnExcelMetadataButton);
 			
 			this.jSalesforceMigrationToolProperties = new Properties();
 			File JSalesforceMigrationToolPropFile = new File("." + fileSeparator + "etc" + fileSeparator + "JSalesforceMigrationTool.properties");
@@ -414,11 +447,23 @@ public class App implements ActionListener {
 			case "Deploy":
 				this.deployAction();
 				break;
+			case "Utility App MaMeS":
+				new EnergyAppMaMeS().executeChanges();
+				break;
+			case "Process Click MaMeS":
+				new ProcessClickMaMeS().executeChanges();
+				break;
+			case "Excel Org Info":
+				String sourceOrg = this.jSalesforceMigrationToolProperties.getProperty("selectedSourceOrg");
+				new OrgMetadataToExcel().generateExcel(sourceOrg);
+				break;
 			}
 
-		} catch (IOException | NoSuchAlgorithmException | UnrecoverableEntryException | KeyStoreException | InvalidKeySpecException e) {
+		} catch (IOException | NoSuchAlgorithmException | UnrecoverableEntryException | KeyStoreException | InvalidKeySpecException | IndexOutOfBoundsException | SaxonApiUncheckedException | SaxonApiException | SAXException | ParserConfigurationException | TransformerException e) {
 			logger.error(e);
 			JOptionPane.showMessageDialog(this.frame, e.getMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
+		}finally {
+			this.progressLabel.setVisible(false);
 		}
 		logger.traceExit();
 	}
@@ -438,7 +483,8 @@ public class App implements ActionListener {
 	private void retrieveAction() throws IOException, NoSuchAlgorithmException, UnrecoverableEntryException, KeyStoreException, InvalidKeySpecException {
 		
 		logger.traceEntry();
-		
+		this.progressLabel.setVisible(true);
+		this.progressLabel.setText("Retrieve metadata in progress");
 		String selectedSourceOrg = this.jSalesforceMigrationToolProperties.getProperty("selectedSourceOrg");
 		Properties sourceOrgProperties = new Properties();
 		File sourceOrgPropertiesFile = new File("." + fileSeparator + "etc" + fileSeparator + "orgs" + fileSeparator + selectedSourceOrg + ".properties");
@@ -493,12 +539,15 @@ public class App implements ActionListener {
 		retrieveTask.execute();
 		logger.info("Retrieve task done");
 		
+		JOptionPane.showMessageDialog(null, "Metadata retrieve is completed", "Retrieve completed", JOptionPane.INFORMATION_MESSAGE);
+		
 	}
 	
 	private void deployAction() throws IOException, NoSuchAlgorithmException, UnrecoverableEntryException, KeyStoreException, InvalidKeySpecException {
 		
 		logger.traceEntry();
-		
+		this.progressLabel.setVisible(true);
+		this.progressLabel.setText("Deploy metadata in progress");
 		String selectedTargetOrg = this.jSalesforceMigrationToolProperties.getProperty("selectedTargetOrg");
 		Properties targetOrgProperties = new Properties();
 		File sourceOrgPropertiesFile = new File("." + fileSeparator + "etc" + fileSeparator + "orgs" + fileSeparator + selectedTargetOrg + ".properties");
@@ -538,13 +587,24 @@ public class App implements ActionListener {
 			deployTask.setServerURL(targetOrgProperties.getProperty("sf.serverurl"));
 		}
 		deployTask.setTaskName("deployUnpackaged");
-				
-		deployTask.setDeployRoot("retrieveUnpackaged");
+		
+		String targetDir = "retrieveUnpackaged";
+		deployTask.setDeployRoot(targetDir);
+		
+		String targetPackageName = this.jSalesforceMigrationToolProperties.getProperty("selectedTargetPackage");
+		
+		Files.copy(Paths.get("." + fileSeparator + "etc" + fileSeparator + "packages"  + fileSeparator + targetPackageName), Paths.get("." + fileSeparator + "retrieveUnpackaged" + fileSeparator + "package.xml"), StandardCopyOption.REPLACE_EXISTING);
 		
 		logger.info("Run deploy task");
 		deployTask.execute();
 		logger.info("Deploy task done");
+		int option = JOptionPane.showConfirmDialog(this.frame, "Would you like to remove " + targetDir + " directory?", "Deploy completed", JOptionPane.YES_NO_OPTION);
+		
+		if(option == JOptionPane.YES_OPTION) {			
+			Path targetDirPath = Paths.get(targetDir);
+			File targetDirFile = targetDirPath.toFile();
+			FileUtils.deleteDirectory(targetDirFile);
+		}
 		
 	}
-	
 }
