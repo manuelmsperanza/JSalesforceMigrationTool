@@ -318,4 +318,279 @@ public class OrgXlsMgr extends ExcelManager {
 		
 	}
 
+	public void createSheetProfilAction(List<ProfileActionOverride> listProfileActionMetadata) {
+		logger.traceEntry();
+		org.apache.poi.xssf.usermodel.XSSFSheet workSheet = this.wb.createSheet("Profile Actions");
+		
+		String[] columnsList = {"applicationName", "actionName", "content", "formFactor", "pageOrSobjectType", "recordType", "type", "profile"};
+		
+		this.createMetadataHeader(workSheet, "Metadata Profile Actions", columnsList.length, 0, 0);
+		this.createSheetHeader(workSheet, columnsList, 1, 0);
+		int rowId = 2;
+		listProfileActionMetadata.sort(Comparator.naturalOrder());
+		for(ProfileActionOverride entry : listProfileActionMetadata) {
+			org.apache.poi.xssf.usermodel.XSSFRow bodyRow = workSheet.getRow(rowId);
+			if(bodyRow == null) {
+				bodyRow = workSheet.createRow(rowId);
+			}
+			
+			org.apache.poi.xssf.usermodel.XSSFCell applicationNameCell = bodyRow.getCell(0);
+
+			if(applicationNameCell == null) {
+				applicationNameCell = bodyRow.createCell(0);
+			}
+
+			applicationNameCell.setCellStyle(this.defaultCellStyle);
+			applicationNameCell.setCellValue(entry.applicationName);
+
+			org.apache.poi.xssf.usermodel.XSSFCell actionNameCell = bodyRow.getCell(1);
+
+			if(actionNameCell == null) {
+				actionNameCell = bodyRow.createCell(1);
+			}
+
+			actionNameCell.setCellStyle(this.defaultCellStyle);
+			actionNameCell.setCellValue(entry.actionName);
+
+			org.apache.poi.xssf.usermodel.XSSFCell contentCell = bodyRow.getCell(2);
+
+			if(contentCell == null) {
+				contentCell = bodyRow.createCell(2);
+			}
+
+			contentCell.setCellStyle(this.defaultCellStyle);
+			contentCell.setCellValue(entry.content);
+
+			org.apache.poi.xssf.usermodel.XSSFCell formFactorCell = bodyRow.getCell(3);
+
+			if(formFactorCell == null) {
+				formFactorCell = bodyRow.createCell(3);
+			}
+
+			formFactorCell.setCellStyle(this.defaultCellStyle);
+			formFactorCell.setCellValue(entry.formFactor);
+
+			org.apache.poi.xssf.usermodel.XSSFCell pageOrSobjectTypeCell = bodyRow.getCell(4);
+
+			if(pageOrSobjectTypeCell == null) {
+				pageOrSobjectTypeCell = bodyRow.createCell(4);
+			}
+
+			pageOrSobjectTypeCell.setCellStyle(this.defaultCellStyle);
+			pageOrSobjectTypeCell.setCellValue(entry.pageOrSobjectType);
+
+			org.apache.poi.xssf.usermodel.XSSFCell recordTypeCell = bodyRow.getCell(5);
+
+			if(recordTypeCell == null) {
+				recordTypeCell = bodyRow.createCell(5);
+			}
+
+			recordTypeCell.setCellStyle(this.defaultCellStyle);
+			recordTypeCell.setCellValue(entry.recordType);
+			
+			org.apache.poi.xssf.usermodel.XSSFCell typeCell = bodyRow.getCell(6);
+
+			if(typeCell == null) {
+				typeCell = bodyRow.createCell(6);
+			}
+
+			typeCell.setCellStyle(this.defaultCellStyle);
+			typeCell.setCellValue(entry.type);
+			
+			org.apache.poi.xssf.usermodel.XSSFCell profileCell = bodyRow.getCell(7);
+
+			if(profileCell == null) {
+				profileCell = bodyRow.createCell(7);
+			}
+
+			profileCell.setCellStyle(this.defaultCellStyle);
+			profileCell.setCellValue(entry.profile);
+
+			rowId++;
+		}
+		
+		workSheet.createFreezePane(0, 2);
+		workSheet.setZoom(85);
+		
+		logger.traceExit();
+		
+	}
+
+	public void createSheetLayoutAssignment(List<LayoutAssignment> listLayoutAssignmentMetadata) {
+		logger.traceEntry();
+		org.apache.poi.xssf.usermodel.XSSFSheet workSheet = this.wb.createSheet("Layout Assignments");
+		
+		String[] columnsList = {"profileName", "layout", "recordType"};
+		
+		this.createMetadataHeader(workSheet, "Metadata Layout Assignments", columnsList.length, 0, 0);
+		this.createSheetHeader(workSheet, columnsList, 1, 0);
+		int rowId = 2;
+		listLayoutAssignmentMetadata.sort(Comparator.naturalOrder());
+		for(LayoutAssignment entry : listLayoutAssignmentMetadata) {
+			org.apache.poi.xssf.usermodel.XSSFRow bodyRow = workSheet.getRow(rowId);
+			if(bodyRow == null) {
+				bodyRow = workSheet.createRow(rowId);
+			}
+			
+			org.apache.poi.xssf.usermodel.XSSFCell profileNameCell = bodyRow.getCell(0);
+
+			if(profileNameCell == null) {
+				profileNameCell = bodyRow.createCell(0);
+			}
+
+			profileNameCell.setCellStyle(this.defaultCellStyle);
+			profileNameCell.setCellValue(entry.profileName);
+
+			org.apache.poi.xssf.usermodel.XSSFCell layoutCell = bodyRow.getCell(1);
+
+			if(layoutCell == null) {
+				layoutCell = bodyRow.createCell(1);
+			}
+
+			layoutCell.setCellStyle(this.defaultCellStyle);
+			layoutCell.setCellValue(entry.layout);
+
+			org.apache.poi.xssf.usermodel.XSSFCell recordTypeCell = bodyRow.getCell(2);
+
+			if(recordTypeCell == null) {
+				recordTypeCell = bodyRow.createCell(2);
+			}
+
+			recordTypeCell.setCellStyle(this.defaultCellStyle);
+			recordTypeCell.setCellValue(entry.recordType);
+
+			rowId++;
+		}
+		
+		workSheet.createFreezePane(0, 2);
+		workSheet.setZoom(85);
+		
+		logger.traceExit();
+		
+	}
+
+	public void createSheetApplicationVisibility(List<ApplicationVisibility> listApplicationVisibilityMetadata) {
+		logger.traceEntry();
+		org.apache.poi.xssf.usermodel.XSSFSheet workSheet = this.wb.createSheet("Application Visibilities");
+		
+		String[] columnsList = {"profileName", "application", "default", "visible"};
+		
+		this.createMetadataHeader(workSheet, "Metadata Application Visibilities", columnsList.length, 0, 0);
+		this.createSheetHeader(workSheet, columnsList, 1, 0);
+		int rowId = 2;
+		listApplicationVisibilityMetadata.sort(Comparator.naturalOrder());
+		for(ApplicationVisibility entry : listApplicationVisibilityMetadata) {
+			org.apache.poi.xssf.usermodel.XSSFRow bodyRow = workSheet.getRow(rowId);
+			if(bodyRow == null) {
+				bodyRow = workSheet.createRow(rowId);
+			}
+			
+			org.apache.poi.xssf.usermodel.XSSFCell profileNameCell = bodyRow.getCell(0);
+
+			if(profileNameCell == null) {
+				profileNameCell = bodyRow.createCell(0);
+			}
+
+			profileNameCell.setCellStyle(this.defaultCellStyle);
+			profileNameCell.setCellValue(entry.profileName);
+
+			org.apache.poi.xssf.usermodel.XSSFCell applicationCell = bodyRow.getCell(1);
+
+			if(applicationCell == null) {
+				applicationCell = bodyRow.createCell(1);
+			}
+
+			applicationCell.setCellStyle(this.defaultCellStyle);
+			applicationCell.setCellValue(entry.application);
+
+			org.apache.poi.xssf.usermodel.XSSFCell defaultCell = bodyRow.getCell(2);
+
+			if(defaultCell == null) {
+				defaultCell = bodyRow.createCell(2);
+			}
+
+			defaultCell.setCellStyle(this.defaultCellStyle);
+			defaultCell.setCellValue(entry.defaultFlag);
+			
+			org.apache.poi.xssf.usermodel.XSSFCell visibleCell = bodyRow.getCell(3);
+
+			if(visibleCell == null) {
+				visibleCell = bodyRow.createCell(3);
+			}
+
+			visibleCell.setCellStyle(this.defaultCellStyle);
+			visibleCell.setCellValue(entry.visible);
+
+			rowId++;
+		}
+		
+		workSheet.createFreezePane(0, 2);
+		workSheet.setZoom(85);
+		
+		logger.traceExit();
+		
+	}
+
+	public void createSheetRecordTypeVisibility(List<RecordTypeVisibility> listRecordTypeVisibilityMetadata) {
+		logger.traceEntry();
+		org.apache.poi.xssf.usermodel.XSSFSheet workSheet = this.wb.createSheet("Record Type Visibilities");
+		
+		String[] columnsList = {"profileName", "default", "personAccountDefault", "recordType"};
+		
+		this.createMetadataHeader(workSheet, "Metadata Record Type Visibilities", columnsList.length, 0, 0);
+		this.createSheetHeader(workSheet, columnsList, 1, 0);
+		int rowId = 2;
+		listRecordTypeVisibilityMetadata.sort(Comparator.naturalOrder());
+		for(RecordTypeVisibility entry : listRecordTypeVisibilityMetadata) {
+			org.apache.poi.xssf.usermodel.XSSFRow bodyRow = workSheet.getRow(rowId);
+			if(bodyRow == null) {
+				bodyRow = workSheet.createRow(rowId);
+			}
+			
+			org.apache.poi.xssf.usermodel.XSSFCell profileNameCell = bodyRow.getCell(0);
+
+			if(profileNameCell == null) {
+				profileNameCell = bodyRow.createCell(0);
+			}
+
+			profileNameCell.setCellStyle(this.defaultCellStyle);
+			profileNameCell.setCellValue(entry.profileName);
+
+			org.apache.poi.xssf.usermodel.XSSFCell defaultCell = bodyRow.getCell(1);
+
+			if(defaultCell == null) {
+				defaultCell = bodyRow.createCell(1);
+			}
+
+			defaultCell.setCellStyle(this.defaultCellStyle);
+			defaultCell.setCellValue(entry.defaultFlag);
+
+			org.apache.poi.xssf.usermodel.XSSFCell personAccountDefaultCell = bodyRow.getCell(2);
+
+			if(personAccountDefaultCell == null) {
+				personAccountDefaultCell = bodyRow.createCell(2);
+			}
+
+			personAccountDefaultCell.setCellStyle(this.defaultCellStyle);
+			personAccountDefaultCell.setCellValue(entry.personAccountDefault);
+			
+			org.apache.poi.xssf.usermodel.XSSFCell recordTypeCell = bodyRow.getCell(3);
+
+			if(recordTypeCell == null) {
+				recordTypeCell = bodyRow.createCell(3);
+			}
+
+			recordTypeCell.setCellStyle(this.defaultCellStyle);
+			recordTypeCell.setCellValue(entry.recordType);
+
+			rowId++;
+		}
+		
+		workSheet.createFreezePane(0, 2);
+		workSheet.setZoom(85);
+		
+		logger.traceExit();
+		
+	}
+
 }
