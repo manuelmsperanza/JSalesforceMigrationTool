@@ -184,7 +184,7 @@
 							<finalName>${project.artifactId}</finalName>
 							<archive>
 								<manifest>
-									<mainClass>com.hoffnungland.jTunneling.App</mainClass>
+									<mainClass>com.hoffnungland.jSFDCMigrTool.App</mainClass>
 								</manifest>
 							</archive>
 						</configuration>
