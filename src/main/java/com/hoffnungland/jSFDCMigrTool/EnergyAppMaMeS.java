@@ -55,58 +55,12 @@ public class EnergyAppMaMeS {
 		
 		logger.traceEntry();
 		
-		RetrieveTask retrieveTask = new RetrieveTask();
-		Project retrieveTaskProject = new Project();
-		retrieveTaskProject.setBasedir(".");
-		retrieveTask.setProject(retrieveTaskProject);
-		retrieveTask.setUsername(args[0]);
-		retrieveTask.setPassword(args[1]);
-		if(args.length > 2) {
-			retrieveTask.setServerURL(args[2]);
-		}
-		retrieveTask.setTaskName("retrieveUnpackaged");
 		String targetDir = "retrieveUnpackaged";
 		try {
 			
 			Path targetDirPath = Paths.get(targetDir);
 			
-			File targetDirFile = null;
-			if(Files.exists(targetDirPath)) {
-				targetDirFile = targetDirPath.toFile();
-			} else {
-				targetDirFile = Files.createDirectory(targetDirPath).toFile();				
-			}
-			
-			try(BufferedWriter writer = new BufferedWriter(new FileWriter("package.xml", false))){
-				writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-				writer.write("<Package xmlns=\"http://soap.sforce.com/2006/04/metadata\">");
-				writer.write("<types><members>*</members>");
-				writer.write("<members>Account</members>");
-				writer.write("<members>AccountContactRelation</members>");
-				writer.write("<members>Contact</members>");
-				writer.write("<members>Individual</members>");
-				writer.write("<members>Opportunity</members>");
-				writer.write("<members>PersonAccount</members>");
-				writer.write("<members>PriceBook2</members>");
-				writer.write("<members>PriceBookEntry</members>");
-				writer.write("<members>Product2</members>");
-				writer.write("<name>CustomObject</name></types>");
-				writer.write("<types><members>*</members><name>CustomApplication</name></types>");
-				writer.write("<types><members>*</members><name>Layout</name></types>");
-				writer.write("<types><members>*</members><name>Profile</name></types>");
-				writer.write("<types><members>Case</members><name>Settings</name></types>");
-				writer.write("<version>51.0</version>");
-				writer.write("</Package>");
-			}
-			
-			retrieveTask.setRetrieveTarget(targetDir);
-			
-			retrieveTask.setUnpackaged("package.xml");
-			
-			logger.info("Run retrieve task");
-			retrieveTask.execute();
-			logger.info("Retrieve task done");
-			Files.delete(Paths.get("package.xml"));
+			File targetDirFile = targetDirPath.toFile();
 			
 			List<String> listRecordTypes = new ArrayList<String>();
 			
@@ -556,42 +510,15 @@ public class EnergyAppMaMeS {
 			for(File curDir : targetDirFile.listFiles()) {
 				if(curDir.isDirectory()) {
 					switch(curDir.getName()) {
-					//case"applications" :
-					case"layouts" :
-					case"objects" :
+					case"applications" :
+					case"profiles" :
+					case"settings" :
+						break;
+					default:
 						FileUtils.deleteDirectory(curDir);
 					}
 				}
 			}
-			
-			try(BufferedWriter writer = new BufferedWriter(new FileWriter("retrieveUnpackaged\\package.xml", false))){
-				writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-				writer.write("<Package xmlns=\"http://soap.sforce.com/2006/04/metadata\">");
-				writer.write("<types><members>*</members><name>CustomApplication</name></types>");
-				writer.write("<types><members>*</members><name>Profile</name></types>");
-				writer.write("<types><members>*</members><name>Settings</name></types>");
-				writer.write("<version>51.0</version>");
-				writer.write("</Package>");
-			}
-			
-			DeployTask deployTask = new DeployTask();
-					
-			Project deployTaskProject = new Project();
-			deployTaskProject.setBasedir(".");
-			deployTask.setProject(deployTaskProject);
-			deployTask.setUsername(args[0]);
-			deployTask.setPassword(args[1]);
-			if(args.length > 2) {
-				deployTask.setServerURL(args[2]);
-			}
-			deployTask.setTaskName("deployUnpackaged");
-			deployTask.setDeployRoot(targetDir);
-			
-			logger.info("Run deploy task");
-			deployTask.execute();
-			logger.info("Deploy task done");
-			
-			FileUtils.deleteDirectory(targetDirFile);
 			
 		} catch (IOException | IndexOutOfBoundsException | SaxonApiUncheckedException | SAXException | ParserConfigurationException | TransformerException | SaxonApiException e) {
 			logger.error(e.getMessage());
