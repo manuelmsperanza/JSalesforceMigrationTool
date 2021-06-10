@@ -3,12 +3,10 @@ package com.hoffnungland.jSFDCMigrTool;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -20,7 +18,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Enumeration;
 import java.util.Properties;
 import java.util.stream.Stream;
 
@@ -32,6 +29,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.xml.sax.SAXException;
 
@@ -51,15 +49,11 @@ import javax.swing.JFileChooser;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import java.awt.Dimension;
-import javax.swing.JTree;
 import java.awt.Rectangle;
-import javax.swing.tree.DefaultTreeModel;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 
 public class App implements ActionListener {
 
@@ -75,7 +69,6 @@ public class App implements ActionListener {
 	private JComboBox<String> targetPackagesComboBox;
 	private JTextArea sourcePackageTextArea;
 	private JTextArea targetPackageTextArea;
-	private JTextField textField;
 	private JLabel progressLabel;
 	/**
 	 * Launch the application.
@@ -89,7 +82,7 @@ public class App implements ActionListener {
 				| UnsupportedLookAndFeelException e) {
 			logger.error(e);
 		}
-		
+
 
 
 		EventQueue.invokeLater(new Runnable() {
@@ -140,7 +133,7 @@ public class App implements ActionListener {
 						if(option == JOptionPane.OK_OPTION) { // pressing OK button
 							char[] passwd = passwordPanel.getPasswordField().getPassword();
 							passwordKs = new String(passwd);
-						} else {
+						} else {	
 							logger.traceExit();
 							return;
 						}
@@ -169,8 +162,8 @@ public class App implements ActionListener {
 	 */
 	private void initialize(String keyStorePath, String passwordKs) {
 		logger.traceEntry();
-		
-		
+
+
 		this.appKsManager = new AppKeyStoreManager(keyStorePath, passwordKs);
 		try {
 
@@ -214,7 +207,7 @@ public class App implements ActionListener {
 			sl_commandPanelRetrieve.putConstraint(SpringLayout.EAST, btnRetrieve, -10, SpringLayout.EAST, commandPanelRetrieve);
 			sl_commandPanelRetrieve.putConstraint(SpringLayout.EAST, sourceOrgComboBox, -10, SpringLayout.WEST, btnRetrieve);
 			commandPanelRetrieve.add(btnRetrieve);
-			
+
 			sourcePackagesComboBox = new JComboBox<String>();
 			sourcePackagesComboBox.setActionCommand("sourcePackageComboBoxChanged");
 			sourcePackagesComboBox.addActionListener(this);
@@ -222,7 +215,7 @@ public class App implements ActionListener {
 			sl_commandPanelRetrieve.putConstraint(SpringLayout.WEST, sourcePackagesComboBox, 10, SpringLayout.WEST, commandPanelRetrieve);
 			sl_commandPanelRetrieve.putConstraint(SpringLayout.EAST, sourcePackagesComboBox, -10, SpringLayout.EAST, commandPanelRetrieve);
 			commandPanelRetrieve.add(sourcePackagesComboBox);
-			
+
 			JScrollPane sourcePackageScrollPane = new JScrollPane();
 			sourcePackageScrollPane.setAutoscrolls(true);
 			sl_commandPanelRetrieve.putConstraint(SpringLayout.NORTH, sourcePackageScrollPane, 15, SpringLayout.SOUTH, sourcePackagesComboBox);
@@ -230,11 +223,11 @@ public class App implements ActionListener {
 			sl_commandPanelRetrieve.putConstraint(SpringLayout.SOUTH, sourcePackageScrollPane, 550, SpringLayout.NORTH, commandPanelRetrieve);
 			sl_commandPanelRetrieve.putConstraint(SpringLayout.EAST, sourcePackageScrollPane, -10, SpringLayout.EAST, commandPanelRetrieve);
 			commandPanelRetrieve.add(sourcePackageScrollPane);
-			
+
 			sourcePackageTextArea = new JTextArea();
 			sourcePackageTextArea.setEditable(false);
 			sourcePackageScrollPane.setViewportView(sourcePackageTextArea);
-			
+
 			JPanel commandPanelDeploy = new JPanel();
 			springLayout.putConstraint(SpringLayout.NORTH, commandPanelDeploy, 0, SpringLayout.NORTH, frame.getContentPane());
 			springLayout.putConstraint(SpringLayout.WEST, commandPanelDeploy, 0, SpringLayout.EAST, commandPanelRetrieve);
@@ -273,7 +266,7 @@ public class App implements ActionListener {
 			sl_commandPanelDeploy.putConstraint(SpringLayout.WEST, targetPackagesComboBox, 10, SpringLayout.WEST, commandPanelDeploy);
 			sl_commandPanelDeploy.putConstraint(SpringLayout.EAST, targetPackagesComboBox, -10, SpringLayout.EAST, commandPanelDeploy);
 			commandPanelDeploy.add(targetPackagesComboBox);
-			
+
 			JScrollPane targetPackageScrollPane = new JScrollPane();
 			targetPackageScrollPane.setAutoscrolls(true);
 			sl_commandPanelDeploy.putConstraint(SpringLayout.NORTH, targetPackageScrollPane, 15, SpringLayout.SOUTH, targetPackagesComboBox);
@@ -281,35 +274,35 @@ public class App implements ActionListener {
 			sl_commandPanelDeploy.putConstraint(SpringLayout.SOUTH, targetPackageScrollPane, 550, SpringLayout.NORTH, commandPanelDeploy);
 			sl_commandPanelDeploy.putConstraint(SpringLayout.EAST, targetPackageScrollPane, -10, SpringLayout.EAST, commandPanelDeploy);
 			commandPanelDeploy.add(targetPackageScrollPane);
-			
+
 			targetPackageTextArea = new JTextArea();
 			targetPackageTextArea.setEditable(false);
 			targetPackageScrollPane.setViewportView(targetPackageTextArea);
-			
+
 			progressLabel = new JLabel("New label");
 			progressLabel.setVisible(false);
 			springLayout.putConstraint(SpringLayout.WEST, progressLabel, 10, SpringLayout.WEST, frame.getContentPane());
 			springLayout.putConstraint(SpringLayout.SOUTH, progressLabel, -10, SpringLayout.SOUTH, frame.getContentPane());
 			frame.getContentPane().add(progressLabel);
-			
+
 			JButton btnUtilityAppMaMeS = new JButton("Utility App MaMeS");
 			btnUtilityAppMaMeS.addActionListener(this);
 			springLayout.putConstraint(SpringLayout.NORTH, btnUtilityAppMaMeS, 10, SpringLayout.SOUTH, commandPanelRetrieve);
 			springLayout.putConstraint(SpringLayout.WEST, btnUtilityAppMaMeS, 10, SpringLayout.WEST, frame.getContentPane());
 			frame.getContentPane().add(btnUtilityAppMaMeS);
-			
+
 			JButton btnProcessClickMaMeSButton = new JButton("Process Click MaMeS");
 			btnProcessClickMaMeSButton.addActionListener(this);
 			springLayout.putConstraint(SpringLayout.WEST, btnProcessClickMaMeSButton, 10, SpringLayout.EAST, btnUtilityAppMaMeS);
 			springLayout.putConstraint(SpringLayout.SOUTH, btnProcessClickMaMeSButton, 0, SpringLayout.SOUTH, btnUtilityAppMaMeS);
 			frame.getContentPane().add(btnProcessClickMaMeSButton);
-			
+
 			JButton btnExcelMetadataButton = new JButton("Excel Org Info");
 			btnExcelMetadataButton.addActionListener(this);
 			springLayout.putConstraint(SpringLayout.WEST, btnExcelMetadataButton, 6, SpringLayout.EAST, btnProcessClickMaMeSButton);
 			springLayout.putConstraint(SpringLayout.SOUTH, btnExcelMetadataButton, 0, SpringLayout.SOUTH, btnUtilityAppMaMeS);
 			frame.getContentPane().add(btnExcelMetadataButton);
-			
+
 			this.jSalesforceMigrationToolProperties = new Properties();
 			File JSalesforceMigrationToolPropFile = new File("." + fileSeparator + "etc" + fileSeparator + "JSalesforceMigrationTool.properties");
 			if(JSalesforceMigrationToolPropFile.exists()) {
@@ -317,7 +310,7 @@ public class App implements ActionListener {
 					jSalesforceMigrationToolProperties.load(configFile);
 				}
 			}
-			
+
 			this.loadProperties();
 
 		} catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException | InvalidKeySpecException e) {
@@ -332,7 +325,7 @@ public class App implements ActionListener {
 		logger.traceEntry();
 		String selectedSourceOrg = this.jSalesforceMigrationToolProperties.getProperty("selectedSourceOrg");
 		String selectedTargetOrg = this.jSalesforceMigrationToolProperties.getProperty("selectedTargetOrg");
-		
+
 		File orgPropertiesDir = new File("." + fileSeparator + "etc" + fileSeparator + "orgs");
 		for (File curPropFile : orgPropertiesDir.listFiles()) {
 			if(curPropFile.isFile() && curPropFile.getName().endsWith(".properties")) {
@@ -360,23 +353,23 @@ public class App implements ActionListener {
 					}
 
 				}
-				
+
 				this.sourceOrgComboBox.addItem(orgName);
 				this.targetOrgComboBox.addItem(orgName);
-				
-				
+
+
 			}
 		}
-		
+
 		if(selectedSourceOrg != null) {
 			this.sourceOrgComboBox.setSelectedItem(selectedSourceOrg);
 		}
-		
+
 		if(selectedTargetOrg != null) {
 			this.targetOrgComboBox.setSelectedItem(selectedTargetOrg);
 		}
-		
-		
+
+
 		String selectedSourcePackage = this.jSalesforceMigrationToolProperties.getProperty("selectedSourcePackage");
 		String selectedTargetPackage = this.jSalesforceMigrationToolProperties.getProperty("selectedTargetPackage");
 		File packagePropertiesDir = new File("." + fileSeparator + "etc" + fileSeparator + "packages");
@@ -390,22 +383,22 @@ public class App implements ActionListener {
 
 			}
 		}
-		
+
 		if(selectedSourcePackage != null) {
 			this.sourcePackagesComboBox.setSelectedItem(selectedSourcePackage);
 		}
-		
+
 		if(selectedTargetPackage != null) {
 			this.targetPackagesComboBox.setSelectedItem(selectedTargetPackage);
 		}
-		
+
 		logger.traceExit();
 
 	}
-	
+
 	private void saveJSfMigrToolProperties() throws FileNotFoundException, IOException {
 		logger.traceEntry();
-		
+
 		File JSalesforceMigrationToolPropFile = new File("." + fileSeparator + "etc" + fileSeparator + "JSalesforceMigrationTool.properties");
 		try (FileOutputStream configFile = new FileOutputStream(JSalesforceMigrationToolPropFile)) {
 			this.jSalesforceMigrationToolProperties.store(configFile, null);
@@ -462,26 +455,42 @@ public class App implements ActionListener {
 		} catch (IOException | NoSuchAlgorithmException | UnrecoverableEntryException | KeyStoreException | InvalidKeySpecException | IndexOutOfBoundsException | SaxonApiUncheckedException | SaxonApiException | SAXException | ParserConfigurationException | TransformerException e) {
 			logger.error(e);
 			JOptionPane.showMessageDialog(this.frame, e.getMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
+		} catch (BuildException e) {
+			logger.fatal(e);
+			this.showErrorList(e.getMessage());
 		}finally {
 			this.progressLabel.setVisible(false);
 		}
 		logger.traceExit();
 	}
-	
-	private void showPackage(String packageName, JTextArea targetTextArea) throws IOException {
-		
-		StringBuilder contentBuilder = new StringBuilder();
-		 
-        try (Stream<String> stream = Files.lines( Paths.get("." + fileSeparator + "etc" + fileSeparator + "packages"  + fileSeparator + packageName), StandardCharsets.UTF_8)) 
-        {
-            stream.forEach(s -> contentBuilder.append(s).append("\n"));
-        }
-        
-        targetTextArea.setText(contentBuilder.toString());		
+
+	private void showErrorList(String message) {
+		JScrollPane scrollpane = new JScrollPane(); 
+
+		JTextArea textArea = new JTextArea(message);
+		textArea.setRows(20);
+		textArea.setColumns(60);
+		JPanel panel = new JPanel(); 
+		panel.add(scrollpane);
+
+		scrollpane.getViewport().add(textArea);
+		JOptionPane.showMessageDialog(this.frame, scrollpane, "Error List", JOptionPane.ERROR_MESSAGE);
 	}
-	
+
+	private void showPackage(String packageName, JTextArea targetTextArea) throws IOException {
+
+		StringBuilder contentBuilder = new StringBuilder();
+
+		try (Stream<String> stream = Files.lines( Paths.get("." + fileSeparator + "etc" + fileSeparator + "packages"  + fileSeparator + packageName), StandardCharsets.UTF_8)) 
+		{
+			stream.forEach(s -> contentBuilder.append(s).append("\n"));
+		}
+
+		targetTextArea.setText(contentBuilder.toString());		
+	}
+
 	private void retrieveAction() throws IOException, NoSuchAlgorithmException, UnrecoverableEntryException, KeyStoreException, InvalidKeySpecException {
-		
+
 		logger.traceEntry();
 		this.progressLabel.setVisible(true);
 		this.progressLabel.setText("Retrieve metadata in progress");
@@ -491,7 +500,7 @@ public class App implements ActionListener {
 		try (FileInputStream configFile = new FileInputStream(sourceOrgPropertiesFile)) {
 			sourceOrgProperties.load(configFile);
 		}
-		
+
 		String passwordType = sourceOrgProperties.getProperty("passwordType");
 		String passwd = null;
 		switch(passwordType) {
@@ -503,15 +512,15 @@ public class App implements ActionListener {
 			PasswordPanel passwordPanel = new PasswordPanel();
 			int option = JOptionPane.showOptionDialog(this.frame, passwordPanel, selectedSourceOrg, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 			if(option == JOptionPane.OK_OPTION) { // pressing OK button
-			    char[] passwdChr = passwordPanel.getPasswordField().getPassword();
-			    passwd = new String(passwdChr);
+				char[] passwdChr = passwordPanel.getPasswordField().getPassword();
+				passwd = new String(passwdChr);
 			} else {
 				logger.traceExit();
 				return;
 			}
 			break;
 		}
-		
+
 		RetrieveTask retrieveTask = new RetrieveTask();
 		Project retrieveTaskProject = new Project();
 		retrieveTaskProject.setBasedir(".");
@@ -524,27 +533,27 @@ public class App implements ActionListener {
 		}
 		retrieveTask.setTaskName("retrieveUnpackaged");
 		String targetDir = "retrieveUnpackaged";
-			
+
 		Path targetDirPath = Paths.get(targetDir);
-		
+
 		if(!Files.exists(targetDirPath)) {
 			Files.createDirectory(targetDirPath).toFile();				
 		}
-		
+
 		retrieveTask.setRetrieveTarget(targetDir);
 		String sourcePackageName = this.jSalesforceMigrationToolProperties.getProperty("selectedSourcePackage");
 		retrieveTask.setUnpackaged("." + fileSeparator + "etc" + fileSeparator + "packages"  + fileSeparator + sourcePackageName);
-		
+		retrieveTask.setTrace(logger.isTraceEnabled());
 		logger.info("Run retrieve task");
 		retrieveTask.execute();
 		logger.info("Retrieve task done");
-		
-		JOptionPane.showMessageDialog(null, "Metadata retrieve is completed", "Retrieve completed", JOptionPane.INFORMATION_MESSAGE);
-		
+
+		JOptionPane.showMessageDialog(this.frame, "Metadata retrieve is completed", "Retrieve completed", JOptionPane.INFORMATION_MESSAGE);
+
 	}
-	
+
 	private void deployAction() throws IOException, NoSuchAlgorithmException, UnrecoverableEntryException, KeyStoreException, InvalidKeySpecException {
-		
+
 		logger.traceEntry();
 		this.progressLabel.setVisible(true);
 		this.progressLabel.setText("Deploy metadata in progress");
@@ -554,7 +563,7 @@ public class App implements ActionListener {
 		try (FileInputStream configFile = new FileInputStream(sourceOrgPropertiesFile)) {
 			targetOrgProperties.load(configFile);
 		}
-		
+
 		String passwordType = targetOrgProperties.getProperty("passwordType");
 		String passwd = null;
 		switch(passwordType) {
@@ -566,17 +575,17 @@ public class App implements ActionListener {
 			PasswordPanel passwordPanel = new PasswordPanel();
 			int option = JOptionPane.showOptionDialog(this.frame, passwordPanel, selectedTargetOrg, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 			if(option == JOptionPane.OK_OPTION) { // pressing OK button
-			    char[] passwdChr = passwordPanel.getPasswordField().getPassword();
-			    passwd = new String(passwdChr);
+				char[] passwdChr = passwordPanel.getPasswordField().getPassword();
+				passwd = new String(passwdChr);
 			} else {
 				logger.traceExit();
 				return;
 			}
 			break;
 		}
-		
+
 		DeployTask deployTask = new DeployTask();
-		
+
 		Project deployTaskProject = new Project();
 		deployTaskProject.setBasedir(".");
 		deployTask.setProject(deployTaskProject);
@@ -587,24 +596,25 @@ public class App implements ActionListener {
 			deployTask.setServerURL(targetOrgProperties.getProperty("sf.serverurl"));
 		}
 		deployTask.setTaskName("deployUnpackaged");
-		
+
 		String targetDir = "retrieveUnpackaged";
 		deployTask.setDeployRoot(targetDir);
-		
+
 		String targetPackageName = this.jSalesforceMigrationToolProperties.getProperty("selectedTargetPackage");
-		
+
 		Files.copy(Paths.get("." + fileSeparator + "etc" + fileSeparator + "packages"  + fileSeparator + targetPackageName), Paths.get("." + fileSeparator + "retrieveUnpackaged" + fileSeparator + "package.xml"), StandardCopyOption.REPLACE_EXISTING);
-		
+
+		deployTask.setTrace(logger.isTraceEnabled());
 		logger.info("Run deploy task");
-		deployTask.execute();
+		deployTask.execute();		
 		logger.info("Deploy task done");
 		int option = JOptionPane.showConfirmDialog(this.frame, "Would you like to remove " + targetDir + " directory?", "Deploy completed", JOptionPane.YES_NO_OPTION);
-		
+
 		if(option == JOptionPane.YES_OPTION) {			
 			Path targetDirPath = Paths.get(targetDir);
 			File targetDirFile = targetDirPath.toFile();
 			FileUtils.deleteDirectory(targetDirFile);
 		}
-		
+
 	}
 }
