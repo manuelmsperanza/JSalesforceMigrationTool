@@ -191,7 +191,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
+			<!-- plugin>
 				<artifactId>maven-jarsigner-plugin</artifactId>
 				<executions>
 					<execution>
@@ -217,7 +217,7 @@
 					</configuration>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin-->
 		</plugins>
 		<resources>
 			<resource>
@@ -244,6 +244,12 @@
 		    <artifactId>junit</artifactId>
 		    <version>4.13.2</version>
 		    <scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.xmlbeans/xmlbeans -->
+		<dependency>
+		    <groupId>org.apache.xmlbeans</groupId>
+		    <artifactId>xmlbeans</artifactId>
+		    <version>5.0.0</version>
 		</dependency>
 		<dependency>
 		 	<groupId>salesforce</groupId>
@@ -289,11 +295,6 @@
 		    <artifactId>ant</artifactId>
 		    <version>1.10.10</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.apache.xmlbeans/xmlbeans -->
-		<dependency>
-		    <groupId>org.apache.xmlbeans</groupId>
-		    <artifactId>xmlbeans</artifactId>
-		    <version>5.0.0</version>
-		</dependency>
+		
 	</dependencies>
 </project>
