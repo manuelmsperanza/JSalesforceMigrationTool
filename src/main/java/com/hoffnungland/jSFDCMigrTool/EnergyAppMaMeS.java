@@ -97,15 +97,7 @@ public class EnergyAppMaMeS {
 		
 		for(File curDir : targetDirFile.listFiles()) {
 			
-			if(curDir.isDirectory() && curDir.getName().equals("objects")) {
-				
-				for(File curObjectFile : curDir.listFiles()) {
-					if(curObjectFile.isFile() && curObjectFile.getName().equals("wrts_prcgvr__ServiceLink__c.object")){
-						
-					}
-				}
-				
-			} else if(curDir.isDirectory() && curDir.getName().equals("applications")) {
+			if(curDir.isDirectory() && curDir.getName().equals("applications")) {
 				
 				logger.info("Loading ProfileActionOverrides.txt");
 				
