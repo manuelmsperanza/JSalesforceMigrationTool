@@ -27,12 +27,14 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.xml.sax.SAXException;
 
+import com.google.appengine.repackaged.com.google.common.base.Strings;
 import com.hoffnungland.jAppKs.AppKeyStoreManager;
 import com.hoffnungland.jAppKs.JksFilter;
 import com.hoffnungland.jAppKs.PasswordPanel;
@@ -341,7 +343,7 @@ public class App implements ActionListener {
 
 				String passwordType = orgProperties.getProperty("passwordType");
 
-				if("encrypt".equals(passwordType)) {
+				if(StringUtils.isBlank(passwordType) || "encrypt".equals(passwordType)) {
 
 					String password = this.appKsManager.writePasswordToKeyStore(orgName + ".password", orgProperties.getProperty("sf.password"));
 
@@ -442,13 +444,16 @@ public class App implements ActionListener {
 				break;
 			case "Utility App MaMeS":
 				new EnergyAppMaMeS().executeChanges();
+				JOptionPane.showMessageDialog(this.frame, "Metadata update is completed", "Update completed", JOptionPane.INFORMATION_MESSAGE);
 				break;
 			case "Process Click MaMeS":
 				new ProcessClickMaMeS().executeChanges();
+				JOptionPane.showMessageDialog(this.frame, "Metadata update is completed", "Update completed", JOptionPane.INFORMATION_MESSAGE);
 				break;
 			case "Excel Org Info":
 				String sourceOrg = this.jSalesforceMigrationToolProperties.getProperty("selectedSourceOrg");
 				new OrgMetadataToExcel().generateExcel(sourceOrg);
+				JOptionPane.showMessageDialog(this.frame, "Excel file created", "Excel ready", JOptionPane.INFORMATION_MESSAGE);
 				break;
 			}
 
