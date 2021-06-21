@@ -211,18 +211,17 @@ public class App implements ActionListener {
 			commandPanelRetrieve.add(btnRetrieve);
 
 			sourcePackagesComboBox = new JComboBox<String>();
+			sl_commandPanelRetrieve.putConstraint(SpringLayout.WEST, sourcePackagesComboBox, 10, SpringLayout.EAST, lblSourceOrg);
 			sourcePackagesComboBox.setActionCommand("sourcePackageComboBoxChanged");
 			sourcePackagesComboBox.addActionListener(this);
 			sl_commandPanelRetrieve.putConstraint(SpringLayout.NORTH, sourcePackagesComboBox, 15, SpringLayout.SOUTH, lblSourceOrg);
-			sl_commandPanelRetrieve.putConstraint(SpringLayout.WEST, sourcePackagesComboBox, 10, SpringLayout.WEST, commandPanelRetrieve);
 			sl_commandPanelRetrieve.putConstraint(SpringLayout.EAST, sourcePackagesComboBox, -10, SpringLayout.EAST, commandPanelRetrieve);
 			commandPanelRetrieve.add(sourcePackagesComboBox);
 
 			JScrollPane sourcePackageScrollPane = new JScrollPane();
+			sl_commandPanelRetrieve.putConstraint(SpringLayout.SOUTH, sourcePackageScrollPane, 0, SpringLayout.SOUTH, commandPanelRetrieve);
 			sourcePackageScrollPane.setAutoscrolls(true);
-			sl_commandPanelRetrieve.putConstraint(SpringLayout.NORTH, sourcePackageScrollPane, 15, SpringLayout.SOUTH, sourcePackagesComboBox);
 			sl_commandPanelRetrieve.putConstraint(SpringLayout.WEST, sourcePackageScrollPane, 10, SpringLayout.WEST, commandPanelRetrieve);
-			sl_commandPanelRetrieve.putConstraint(SpringLayout.SOUTH, sourcePackageScrollPane, 550, SpringLayout.NORTH, commandPanelRetrieve);
 			sl_commandPanelRetrieve.putConstraint(SpringLayout.EAST, sourcePackageScrollPane, -10, SpringLayout.EAST, commandPanelRetrieve);
 			commandPanelRetrieve.add(sourcePackageScrollPane);
 
@@ -265,21 +264,27 @@ public class App implements ActionListener {
 			targetPackagesComboBox.setActionCommand("targetPackageComboBoxChanged");
 			targetPackagesComboBox.addActionListener(this);
 			sl_commandPanelDeploy.putConstraint(SpringLayout.NORTH, targetPackagesComboBox, 15, SpringLayout.SOUTH, lblTargetOrg);
-			sl_commandPanelDeploy.putConstraint(SpringLayout.WEST, targetPackagesComboBox, 10, SpringLayout.WEST, commandPanelDeploy);
 			sl_commandPanelDeploy.putConstraint(SpringLayout.EAST, targetPackagesComboBox, -10, SpringLayout.EAST, commandPanelDeploy);
 			commandPanelDeploy.add(targetPackagesComboBox);
 
 			JScrollPane targetPackageScrollPane = new JScrollPane();
+			sl_commandPanelDeploy.putConstraint(SpringLayout.SOUTH, targetPackageScrollPane, 0, SpringLayout.SOUTH, commandPanelDeploy);
 			targetPackageScrollPane.setAutoscrolls(true);
-			sl_commandPanelDeploy.putConstraint(SpringLayout.NORTH, targetPackageScrollPane, 15, SpringLayout.SOUTH, targetPackagesComboBox);
 			sl_commandPanelDeploy.putConstraint(SpringLayout.WEST, targetPackageScrollPane, 10, SpringLayout.WEST, commandPanelDeploy);
-			sl_commandPanelDeploy.putConstraint(SpringLayout.SOUTH, targetPackageScrollPane, 550, SpringLayout.NORTH, commandPanelDeploy);
 			sl_commandPanelDeploy.putConstraint(SpringLayout.EAST, targetPackageScrollPane, -10, SpringLayout.EAST, commandPanelDeploy);
 			commandPanelDeploy.add(targetPackageScrollPane);
 
 			targetPackageTextArea = new JTextArea();
 			targetPackageTextArea.setEditable(false);
 			targetPackageScrollPane.setViewportView(targetPackageTextArea);
+			
+			JLabel lblTargetPkg = new JLabel("Target Pkg");
+			lblTargetPkg.setLabelFor(targetPackagesComboBox);
+			sl_commandPanelDeploy.putConstraint(SpringLayout.WEST, targetPackagesComboBox, 10, SpringLayout.EAST, lblTargetPkg);
+			sl_commandPanelDeploy.putConstraint(SpringLayout.NORTH, targetPackageScrollPane, 11, SpringLayout.SOUTH, lblTargetPkg);
+			sl_commandPanelDeploy.putConstraint(SpringLayout.NORTH, lblTargetPkg, 4, SpringLayout.NORTH, targetPackagesComboBox);
+			sl_commandPanelDeploy.putConstraint(SpringLayout.WEST, lblTargetPkg, 0, SpringLayout.WEST, lblTargetOrg);
+			commandPanelDeploy.add(lblTargetPkg);
 
 			progressLabel = new JLabel("New label");
 			progressLabel.setVisible(false);
@@ -290,6 +295,13 @@ public class App implements ActionListener {
 			JButton btnUtilityAppMaMeS = new JButton("Utility App MaMeS");
 			btnUtilityAppMaMeS.addActionListener(this);
 			springLayout.putConstraint(SpringLayout.NORTH, btnUtilityAppMaMeS, 10, SpringLayout.SOUTH, commandPanelRetrieve);
+			
+			JLabel lblSourcePkg = new JLabel("Source Pkg");
+			lblSourcePkg.setLabelFor(sourcePackagesComboBox);
+			sl_commandPanelRetrieve.putConstraint(SpringLayout.NORTH, sourcePackageScrollPane, 11, SpringLayout.SOUTH, lblSourcePkg);
+			sl_commandPanelRetrieve.putConstraint(SpringLayout.NORTH, lblSourcePkg, 4, SpringLayout.NORTH, sourcePackagesComboBox);
+			sl_commandPanelRetrieve.putConstraint(SpringLayout.WEST, lblSourcePkg, 0, SpringLayout.WEST, lblSourceOrg);
+			commandPanelRetrieve.add(lblSourcePkg);
 			springLayout.putConstraint(SpringLayout.WEST, btnUtilityAppMaMeS, 10, SpringLayout.WEST, frame.getContentPane());
 			frame.getContentPane().add(btnUtilityAppMaMeS);
 
@@ -477,8 +489,7 @@ public class App implements ActionListener {
 		textArea.setColumns(60);
 		JPanel panel = new JPanel(); 
 		panel.add(scrollpane);
-
-		scrollpane.getViewport().add(textArea);
+		scrollpane.setViewportView(textArea);
 		JOptionPane.showMessageDialog(this.frame, scrollpane, "Error List", JOptionPane.ERROR_MESSAGE);
 	}
 
