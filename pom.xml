@@ -5,12 +5,27 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.hoffnungland</groupId>
-	<artifactId>JSalesforceMigrationTool</artifactId>
+	<artifactId>jsalesforcemigrationtool</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
 	<name>JSalesforceMigrationTool</name>
 	<url>http://hoffnungland.com</url>
-
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>GitHub manuelmsperanza Apache Maven Packages</name>
+			<url>https://maven.pkg.github.com/manuelmsperanza/JSalesforceMigrationTool</url>
+		</repository>
+	</distributionManagement>
+	<scm>
+		<connection>scm:git:https://github.com/manuelmsperanza/JSalesforceMigrationTool.git</connection>
+		<developerConnection>scm:git:git@github.com:manuelmsperanza/JSalesforceMigrationTool.git</developerConnection>     
+		<tag>HEAD</tag>
+	</scm>
+	<issueManagement>
+		<system>GitHub</system>
+		<url>https://github.com/manuelmsperanza/JSalesforceMigrationTool/issues</url>
+	</issueManagement>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.source.version>1.8</java.source.version>
@@ -258,17 +273,17 @@
 		</dependency>
 		<dependency>
 			<groupId>com.hoffnungland</groupId>
-			<artifactId>Log4j</artifactId>
+			<artifactId>log4j</artifactId>
 			<version>1.0.9</version>
 		</dependency>
 		<dependency>
 			<groupId>com.hoffnungland</groupId>
-			<artifactId>OrcXlsReport</artifactId>
+			<artifactId>orcxlsreport</artifactId>
 			<version>0.0.30</version>
 		</dependency>
 		<dependency>
 			<groupId>com.hoffnungland</groupId>
-			<artifactId>JAppKeyStoreManager</artifactId>
+			<artifactId>jappkeystoremanager</artifactId>
 			<version>1.0.1</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
@@ -286,7 +301,7 @@
 		<!-- https://mvnrepository.com/artifact/net.sf.saxon/Saxon-HE -->
 		<dependency>
 			<groupId>com.hoffnungland</groupId>
-			<artifactId>SaxonXPathUtils</artifactId>
+			<artifactId>saxonxpathutils</artifactId>
 			<version>1.0.23</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.ant/ant -->
