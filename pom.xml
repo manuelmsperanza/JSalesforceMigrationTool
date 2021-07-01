@@ -67,7 +67,7 @@
 						<archive>
 							<manifest>
 								<addClasspath>true</addClasspath>
-								<classpathPrefix>JTunneling_lib/</classpathPrefix>
+								<classpathPrefix>JSalesforceMigrationTool_lib/</classpathPrefix>
 								<mainClass>com.hoffnungland.jSFDCMigrTool.App</mainClass>
 							</manifest>
 						</archive>
