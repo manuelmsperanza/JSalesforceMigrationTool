@@ -23,13 +23,16 @@
 		<members>*</members>
 		<members>Account</members>
 		<members>AccountContactRelation</members>
+		<members>Case</members>
 		<members>Contact</members>
+		<members>Contract</members>
 		<members>Individual</members>
 		<members>Opportunity</members>
 		<members>PersonAccount</members>
 		<members>PriceBook2</members>
 		<members>PriceBookEntry</members>
 		<members>Product2</members>
+		<members>User</members>
 		<name>CustomObject</name>
 	</types>
 	<types><members>*</members><name>ReportType</name></types>
