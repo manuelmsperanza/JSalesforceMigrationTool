@@ -19,10 +19,7 @@ public class BundleMetadata implements Comparable<BundleMetadata> {
 		boolean result = false;
 		if(obj instanceof BundleMetadata) {
 			BundleMetadata o = (BundleMetadata) obj;
-			result = (this.bundleName.equals(o.bundleName));
-			if(result) {
-				result = this.componentName.equals(o.componentName);
-			}
+			result = (this.compareTo(o) == 0);
 		}
 		return result;
 	}
