@@ -187,7 +187,7 @@
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
 					<appendAssemblyId>false</appendAssemblyId>
-					<finalName>${project.artifactId}</finalName>
+					<finalName>${project.name}</finalName>
 					<archive>
 						<manifest>
 							<mainClass>com.hoffnungland.jSFDCMigrTool.App</mainClass>
