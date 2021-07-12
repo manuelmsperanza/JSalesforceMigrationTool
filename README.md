@@ -93,7 +93,7 @@ Update to java 1.8<br>
 				<descriptorRef>jar-with-dependencies</descriptorRef>
 			</descriptorRefs>
 			<appendAssemblyId>false</appendAssemblyId>
-			<finalName>${project.artifactId}</finalName>
+			<finalName>${project.name}</finalName>
 			<archive>
 				<manifest>
 					<mainClass>com.hoffnungland.jSFDCMigrTool.App</mainClass>
@@ -104,4 +104,4 @@ Update to java 1.8<br>
 
 ## Execute the maven assembly single
 
-	mvn assembly:single
+	mvn install assembly:single
