@@ -26,6 +26,9 @@ You can see the password again by running
 	
 	sfdx force:user:display
 
+## Get Salesforce WSDL for SOAP Api
+
+[SOAP API Developer Guide | Step 2: Generate or Obtain the Web Service WSDL (salesforce.com)](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_quickstart_steps_generate_wsdl.htm)
 
 # KeyStore
 For more information, please refer to official documentation [keytool - Oracle Help Center](https://docs.oracle.com/javase/8/docs/technotes/tools/windows/keytool.html)
