@@ -4,5 +4,5 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>salesforce</groupId>
   <artifactId>ant-salesforce</artifactId>
-  <version>51.0</version>
+  <version>52.0</version>
 </project>
