@@ -169,6 +169,22 @@
 				<artifactId>exec-maven-plugin</artifactId>
 				<executions>
 					<execution>
+						<id>generate-Lightning_Platform_Enterprise</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>java</goal>
+						</goals>
+						<configuration>
+							<mainClass>com.sforce.ws.tools.wsdlc</mainClass>
+							<arguments>
+								<argument>-nc</argument>
+								<argument>src/wsdl/Lightning_Platform_Enterprise.wsdl</argument>
+								<argument>Lightning_Platform_Enterprise.jar</argument>
+								<argument>codegen/src</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
 						<id>generate-Lightning_Platform_Partner</id>
 						<phase>initialize</phase>
 						<goals>
