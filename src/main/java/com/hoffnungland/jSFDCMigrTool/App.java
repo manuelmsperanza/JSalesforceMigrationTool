@@ -34,7 +34,6 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.xml.sax.SAXException;
 
-import com.google.appengine.repackaged.com.google.common.base.Strings;
 import com.hoffnungland.jAppKs.AppKeyStoreManager;
 import com.hoffnungland.jAppKs.JksFilter;
 import com.hoffnungland.jAppKs.PasswordPanel;
