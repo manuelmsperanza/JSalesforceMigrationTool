@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.hoffnungland</groupId>
@@ -17,7 +19,7 @@
 	</distributionManagement>
 	<scm>
 		<connection>scm:git:https://github.com/manuelmsperanza/JSalesforceMigrationTool.git</connection>
-		<developerConnection>scm:git:git@github.com:manuelmsperanza/JSalesforceMigrationTool.git</developerConnection>     
+		<developerConnection>scm:git:git@github.com:manuelmsperanza/JSalesforceMigrationTool.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
 	<issueManagement>
@@ -28,9 +30,9 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.source.version>1.8</java.source.version>
 		<java.target.version>1.8</java.target.version>
-		<salesforce.ant.zip>salesforce_ant_51.0.zip</salesforce.ant.zip>
-		<salesforce.ant.jar>ant-salesforce-51.0.jar</salesforce.ant.jar>
-		<salesforce.ant.pom>ant-salesforce-51.0.pom</salesforce.ant.pom>
+		<salesforce.ant.zip>salesforce_ant_52.0.zip</salesforce.ant.zip>
+		<salesforce.ant.jar>ant-salesforce-52.0.jar</salesforce.ant.jar>
+		<salesforce.ant.pom>ant-salesforce-52.0.pom</salesforce.ant.pom>
 	</properties>
 	<build>
 		<pluginManagement><!-- lock down plugins versions to avoid using Maven 
@@ -96,17 +98,50 @@
 				</plugin>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
-				    <artifactId>wagon-maven-plugin</artifactId>
-				    <version>2.0.2</version>
+					<artifactId>wagon-maven-plugin</artifactId>
+					<version>2.0.2</version>
 				</plugin>
 				<plugin>
-			        <groupId>org.apache.maven.plugins</groupId>
-			        <artifactId>maven-antrun-plugin</artifactId>
-			        <version>3.0.0</version>
-			     </plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-antrun-plugin</artifactId>
+					<version>3.0.0</version>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>jaxws-maven-plugin</artifactId>
+					<version>2.6</version>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>exec-maven-plugin</artifactId>
+					<version>3.0.0</version>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>build-helper-maven-plugin</artifactId>
+					<version>3.2.0</version>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>codegen/src/</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
@@ -132,53 +167,121 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.6.0</version>
-				<!-- <configuration> <async>true</async> <mainClass>com.hoffnungland.jSFDCMigrTool.App</mainClass> 
-					</configuration> -->
+				<executions>
+					<execution>
+						<id>generate-Lightning_Platform_Enterprise</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>java</goal>
+						</goals>
+						<configuration>
+							<mainClass>com.sforce.ws.tools.wsdlc</mainClass>
+							<arguments>
+								<argument>-nc</argument>
+								<argument>src/wsdl/Lightning_Platform_Enterprise.wsdl</argument>
+								<argument>Lightning_Platform_Enterprise.jar</argument>
+								<argument>codegen/src</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>generate-Lightning_Platform_Partner</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>java</goal>
+						</goals>
+						<configuration>
+							<mainClass>com.sforce.ws.tools.wsdlc</mainClass>
+							<arguments>
+								<argument>-nc</argument>
+								<argument>src/wsdl/Lightning_Platform_Partner.wsdl</argument>
+								<argument>Lightning_Platform_Partner.jar</argument>
+								<argument>codegen/src</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>generate-Metadata</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>java</goal>
+						</goals>
+						<configuration>
+							<mainClass>com.sforce.ws.tools.wsdlc</mainClass>
+							<arguments>
+								<argument>-nc</argument>
+								<argument>src/wsdl/metadata.wsdl</argument>
+								<argument>metadata.jar</argument>
+								<argument>codegen/src</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>generate-Tooling_strict</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>java</goal>
+						</goals>
+						<configuration>
+							<mainClass>com.sforce.ws.tools.wsdlc</mainClass>
+							<arguments>
+								<argument>-nc</argument>
+								<argument>src/wsdl/tooling_strict.wsdl</argument>
+								<argument>tooling_strict.jar</argument>
+								<argument>codegen/src</argument>
+							</arguments>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
-			    <groupId>org.apache.maven.plugins</groupId>
-			    <artifactId>maven-antrun-plugin</artifactId>
-			    <executions>
-			        <execution>
-			        	<id>unzip-ant-migration-tool</id>
-			            <phase>initialize</phase>
-			            <goals>
-			            	<goal>run</goal>
-			            </goals>
-			            <configuration>
-			            	<target>
-			            		<echo>target 1</echo>
-			            	</target>
-			            	<target>
-				            	<get skipexisting="true" src="https://gs0.salesforce.com/dwnld/SfdcAnt/${salesforce.ant.zip}" dest="./salesforce" />
-				                <unzip src="./salesforce/${salesforce.ant.zip}" dest="./salesforce/">
-			                        <patternset>
-			                            <include name="ant-salesforce.jar" />
-			                        </patternset>
-			                    </unzip>
-			                    <move file="./salesforce/ant-salesforce.jar" tofile="./salesforce/${salesforce.ant.jar}" />
-			                </target>
-			            </configuration>
-			        </execution>
-			    </executions>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>unzip-ant-migration-tool</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<echo>target 1</echo>
+							</target>
+							<target>
+								<get skipexisting="true"
+									src="https://gs0.salesforce.com/dwnld/SfdcAnt/${salesforce.ant.zip}"
+									dest="./salesforce" />
+								<unzip src="./salesforce/${salesforce.ant.zip}"
+									dest="./salesforce/">
+									<patternset>
+										<include name="ant-salesforce.jar" />
+									</patternset>
+								</unzip>
+								<move file="./salesforce/ant-salesforce.jar"
+									tofile="./salesforce/${salesforce.ant.jar}" />
+							</target>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
+
 			<plugin>
-			    <groupId>org.apache.maven.plugins</groupId>
-			    <artifactId>maven-install-plugin</artifactId>
-			    <executions>
-			        <execution>
-			            <id>install-ant-migration-tool</id>
-			            <phase>initialize</phase>
-			            <goals>
-			                <goal>install-file</goal>
-			            </goals>
-			            <configuration>
-			                <file>./salesforce/${salesforce.ant.jar}</file>
-			               	<pomFile>./salesforce/${salesforce.ant.pom}</pomFile>
-			            </configuration>
-			        </execution>
-			    </executions>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>install-ant-migration-tool</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<configuration>
+							<file>./salesforce/${salesforce.ant.jar}</file>
+							<pomFile>./salesforce/${salesforce.ant.pom}</pomFile>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -199,26 +302,26 @@
 				<artifactId>maven-jarsigner-plugin</artifactId>
 				<executions>
 					<execution>
-					<id>sign</id>
-					<goals>
-						<goal>sign</goal>
-					</goals>
-					<configuration>
-          					<keystore>${hoffnunglandJksPath}</keystore>
-          					<alias>${hoffnunglandJksEntry}</alias>
-          					<storepass>${hoffnunglandJksPasswd}</storepass>
-          					<keypass>${hoffnunglandKeyPasswd}</keypass>
-          					<tsa>${hoffnunglandTsaUrl}</tsa>
-					</configuration>
+						<id>sign</id>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+						<configuration>
+							<keystore>${hoffnunglandJksPath}</keystore>
+							<alias>${hoffnunglandJksEntry}</alias>
+							<storepass>${hoffnunglandJksPasswd}</storepass>
+							<keypass>${hoffnunglandKeyPasswd}</keypass>
+							<tsa>${hoffnunglandTsaUrl}</tsa>
+						</configuration>
 					</execution>
 					<execution>
-					<id>verify</id>
-					<goals>
-						<goal>verify</goal>
-					</goals>
-					<configuration>
-						<certs>true</certs>
-					</configuration>
+						<id>verify</id>
+						<goals>
+							<goal>verify</goal>
+						</goals>
+						<configuration>
+							<certs>true</certs>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -244,21 +347,21 @@
 	<dependencies>
 		<!-- https://mvnrepository.com/artifact/junit/junit -->
 		<dependency>
-		    <groupId>junit</groupId>
-		    <artifactId>junit</artifactId>
-		    <version>4.13.2</version>
-		    <scope>test</scope>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.13.2</version>
+			<scope>test</scope>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.xmlbeans/xmlbeans -->
 		<dependency>
-		    <groupId>org.apache.xmlbeans</groupId>
-		    <artifactId>xmlbeans</artifactId>
-		    <version>5.0.1</version>
+			<groupId>org.apache.xmlbeans</groupId>
+			<artifactId>xmlbeans</artifactId>
+			<version>5.0.1</version>
 		</dependency>
 		<dependency>
-		 	<groupId>salesforce</groupId>
-		  	<artifactId>ant-salesforce</artifactId>
-		  	<version>51.0</version>
+			<groupId>salesforce</groupId>
+			<artifactId>ant-salesforce</artifactId>
+			<version>52.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.hoffnungland</groupId>
@@ -283,9 +386,9 @@
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
 		<dependency>
-		    <groupId>commons-io</groupId>
-		    <artifactId>commons-io</artifactId>
-		    <version>2.11.0</version>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.11.0</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/net.sf.saxon/Saxon-HE -->
 		<dependency>
@@ -295,10 +398,21 @@
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.ant/ant -->
 		<dependency>
-		    <groupId>org.apache.ant</groupId>
-		    <artifactId>ant</artifactId>
-		    <version>1.10.11</version>
+			<groupId>org.apache.ant</groupId>
+			<artifactId>ant</artifactId>
+			<version>1.10.11</version>
 		</dependency>
-		
+		<!-- https://mvnrepository.com/artifact/com.force.api/force-wsc -->
+		<dependency>
+			<groupId>com.force.api</groupId>
+			<artifactId>force-wsc</artifactId>
+			<version>52.2.0</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-java</artifactId>
+			<version>3.141.59</version>
+		</dependency>
 	</dependencies>
 </project>
