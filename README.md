@@ -26,9 +26,27 @@ You can see the password again by running
 	
 	sfdx force:user:display
 
-## Get Salesforce WSDL for SOAP Api
+## SOAP API & Metadata API
+
+[SOAP API Developer Guide | Introducing SOAP API (salesforce.com)](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_quickstart_intro.htm)
+
+[Metadata API Developer Guide | Understanding Metadata API (salesforce.com)](https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_intro.htm)
+
+### Get Salesforce WSDL for SOAP Api
 
 [SOAP API Developer Guide | Step 2: Generate or Obtain the Web Service WSDL (salesforce.com)](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_quickstart_steps_generate_wsdl.htm)
+
+### Force.com Web Service Connector
+
+clone the https://github.com/forcedotcom/wsc repository
+
+Create the executable jar
+
+	mvn clean package "-Dgpg.skip" "-Dmaven.test.skip"
+
+Generate stub from WSDL
+
+	java -jar target/force-wsc-52.2.0-uber.jar <inputwsdlfile> <outputjarfile>
 
 # KeyStore
 For more information, please refer to official documentation [keytool - Oracle Help Center](https://docs.oracle.com/javase/8/docs/technotes/tools/windows/keytool.html)
