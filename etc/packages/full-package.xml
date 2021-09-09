@@ -68,6 +68,7 @@
 		<members>PaymentGroup</members>
 		<members>PaymentLineInvoice</members>
 		<members>PaymentMethod</members>
+		<members>PersonAccount</members>
 		<members>Pricebook2</members>
 		<members>PricebookEntry</members>
 		<members>Product2</members>
