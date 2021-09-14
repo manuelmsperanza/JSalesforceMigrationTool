@@ -98,6 +98,7 @@
 	<types><members>*</members><name>Flow</name></types>
 	<types><members>*</members><name>FlowDefinition</name></types>
 	<types><members>*</members><name>ContentAsset</name></types>
+	<types><members>*</members><name>Network</name></types>
 	<types><members>*</members><name>Workflow</name></types>
 	<types><members>*</members><name>AssignmentRules</name></types>
 	<types><members>*</members><name>AutoResponseRules</name></types>
