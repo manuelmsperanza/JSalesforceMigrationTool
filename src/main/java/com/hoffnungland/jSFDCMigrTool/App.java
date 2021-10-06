@@ -300,6 +300,7 @@ public class App implements ActionListener {
 			JButton btnClearMetadata = new JButton("Clear Metadata");
 			springLayout.putConstraint(SpringLayout.SOUTH, btnClearMetadata, 0, SpringLayout.SOUTH, btnExcelMetadataButton);
 			springLayout.putConstraint(SpringLayout.WEST, btnClearMetadata, 10, SpringLayout.EAST, btnExcelMetadataButton);
+			btnClearMetadata.addActionListener(this);
 			frame.getContentPane().add(btnClearMetadata);
 
 			JButton btnUtilityAppMaMeS = new JButton("Utility App MaMeS");
