@@ -290,10 +290,22 @@ public class App implements ActionListener {
 			springLayout.putConstraint(SpringLayout.WEST, progressLabel, 10, SpringLayout.WEST, frame.getContentPane());
 			springLayout.putConstraint(SpringLayout.SOUTH, progressLabel, -10, SpringLayout.SOUTH, frame.getContentPane());
 			frame.getContentPane().add(progressLabel);
+			
+			JButton btnExcelMetadataButton = new JButton("Excel Org Info");
+			springLayout.putConstraint(SpringLayout.NORTH, btnExcelMetadataButton, 10, SpringLayout.SOUTH, commandPanelRetrieve);
+			springLayout.putConstraint(SpringLayout.WEST, btnExcelMetadataButton, 10, SpringLayout.WEST, commandPanelRetrieve);
+			btnExcelMetadataButton.addActionListener(this);
+			frame.getContentPane().add(btnExcelMetadataButton);
+			
+			JButton btnClearMetadata = new JButton("Clear Metadata");
+			springLayout.putConstraint(SpringLayout.SOUTH, btnClearMetadata, 0, SpringLayout.SOUTH, btnExcelMetadataButton);
+			springLayout.putConstraint(SpringLayout.WEST, btnClearMetadata, 10, SpringLayout.EAST, btnExcelMetadataButton);
+			frame.getContentPane().add(btnClearMetadata);
 
 			JButton btnUtilityAppMaMeS = new JButton("Utility App MaMeS");
+			springLayout.putConstraint(SpringLayout.NORTH, btnUtilityAppMaMeS, 10, SpringLayout.SOUTH, btnExcelMetadataButton);
+			springLayout.putConstraint(SpringLayout.WEST, btnUtilityAppMaMeS, 0, SpringLayout.WEST, btnExcelMetadataButton);
 			btnUtilityAppMaMeS.addActionListener(this);
-			springLayout.putConstraint(SpringLayout.NORTH, btnUtilityAppMaMeS, 10, SpringLayout.SOUTH, commandPanelRetrieve);
 			
 			JLabel lblSourcePkg = new JLabel("Source Pkg");
 			lblSourcePkg.setLabelFor(sourcePackagesComboBox);
@@ -301,20 +313,15 @@ public class App implements ActionListener {
 			sl_commandPanelRetrieve.putConstraint(SpringLayout.NORTH, lblSourcePkg, 4, SpringLayout.NORTH, sourcePackagesComboBox);
 			sl_commandPanelRetrieve.putConstraint(SpringLayout.WEST, lblSourcePkg, 0, SpringLayout.WEST, lblSourceOrg);
 			commandPanelRetrieve.add(lblSourcePkg);
-			springLayout.putConstraint(SpringLayout.WEST, btnUtilityAppMaMeS, 10, SpringLayout.WEST, frame.getContentPane());
 			frame.getContentPane().add(btnUtilityAppMaMeS);
 
 			JButton btnProcessClickMaMeSButton = new JButton("Process Click MaMeS");
-			btnProcessClickMaMeSButton.addActionListener(this);
-			springLayout.putConstraint(SpringLayout.WEST, btnProcessClickMaMeSButton, 10, SpringLayout.EAST, btnUtilityAppMaMeS);
 			springLayout.putConstraint(SpringLayout.SOUTH, btnProcessClickMaMeSButton, 0, SpringLayout.SOUTH, btnUtilityAppMaMeS);
+			springLayout.putConstraint(SpringLayout.WEST, btnProcessClickMaMeSButton, 10, SpringLayout.EAST, btnUtilityAppMaMeS);
+			btnProcessClickMaMeSButton.addActionListener(this);
 			frame.getContentPane().add(btnProcessClickMaMeSButton);
 
-			JButton btnExcelMetadataButton = new JButton("Excel Org Info");
-			btnExcelMetadataButton.addActionListener(this);
-			springLayout.putConstraint(SpringLayout.WEST, btnExcelMetadataButton, 6, SpringLayout.EAST, btnProcessClickMaMeSButton);
-			springLayout.putConstraint(SpringLayout.SOUTH, btnExcelMetadataButton, 0, SpringLayout.SOUTH, btnUtilityAppMaMeS);
-			frame.getContentPane().add(btnExcelMetadataButton);
+			
 
 			this.jSalesforceMigrationToolProperties = new Properties();
 			File JSalesforceMigrationToolPropFile = new File("." + fileSeparator + "etc" + fileSeparator + "JSalesforceMigrationTool.properties");
@@ -464,7 +471,10 @@ public class App implements ActionListener {
 			case "Excel Org Info":
 				String sourceOrg = this.jSalesforceMigrationToolProperties.getProperty("selectedSourceOrg");
 				new OrgMetadataToExcel().generateExcel(sourceOrg);
-				JOptionPane.showMessageDialog(this.frame, "Excel file created", "Excel ready", JOptionPane.INFORMATION_MESSAGE);
+				this.postActionClearMetadataDir("Excel ready");
+				break;
+			case "Clear Metadata":
+				this.postActionClearMetadataDir("Clear Metadata Directory");
 				break;
 			}
 
@@ -623,13 +633,21 @@ public class App implements ActionListener {
 		logger.info("Run deploy task");
 		deployTask.execute();		
 		logger.info("Deploy task done");
-		int option = JOptionPane.showConfirmDialog(this.frame, "Would you like to remove " + targetDir + " directory?", "Deploy completed", JOptionPane.YES_NO_OPTION);
+		
+		this.postActionClearMetadataDir("Deploy completed");
+		logger.traceExit();
+	}
+		
+	private void postActionClearMetadataDir(String title) throws IOException {
+		logger.traceEntry();
+		String targetDir = "retrieveUnpackaged";
+		int option = JOptionPane.showConfirmDialog(this.frame, "Would you like to remove " + targetDir + " directory?", title, JOptionPane.YES_NO_OPTION);
 
 		if(option == JOptionPane.YES_OPTION) {			
 			Path targetDirPath = Paths.get(targetDir);
 			File targetDirFile = targetDirPath.toFile();
 			FileUtils.deleteDirectory(targetDirFile);
 		}
-
+		logger.traceExit();
 	}
 }
