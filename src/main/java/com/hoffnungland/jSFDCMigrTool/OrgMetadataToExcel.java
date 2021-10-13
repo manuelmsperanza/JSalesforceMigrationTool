@@ -125,7 +125,7 @@ public class OrgMetadataToExcel {
 								if(orgXlsProperties.containsKey("baseXpath")) {									
 									String orgXlsBaseXpath = orgXlsProperties.getProperty("baseXpath");
 									
-									xmlExtractorBinding.init(curOrgXmlFile, "xmlns=\"http://soap.sforce.com/2006/04/metadata\"", qNameList);
+									xmlExtractorBinding.init(curOrgXmlFile, "xmlns=\"http://soap.sforce.com/2006/04/metadata\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"", qNameList);
 									XdmValue countItemsNode = extractNode("count(" + orgXlsBaseXpath +")", xmlExtractorBinding, qNameList, listBindingValuesFields);
 									int countItems = Integer.parseInt(countItemsNode.toString());
 									
