@@ -22,8 +22,6 @@ public class CheckUtilityAppDataModel {
 	
 	private static final String sfMetadataNs = "xmlns=\"http://soap.sforce.com/2006/04/metadata\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"";
 	
-	
-	
 	/**
 	 * Launch the application.
 	 */
@@ -463,7 +461,7 @@ public class CheckUtilityAppDataModel {
 						if(StringUtils.isBlank(entityName)) {
 							logger.warn("Missing entity name. Skip " + dmSheet.getSheetName() + " sheet.");
 						} else {
-							logger.trace("entityName: " + entityName);
+							logger.debug("entityName: " + entityName);
 							if(dmRowIter.hasNext()) {
 								dmColsRow = dmRowIter.next();	
 							}
@@ -542,7 +540,7 @@ public class CheckUtilityAppDataModel {
 									
 									org.apache.poi.ss.usermodel.Cell entityNameItalianCell = dmHeadRow.getCell(italianPos);
 									String entityNameItalian = entityNameCell == null ? null : entityNameItalianCell.getStringCellValue();
-									logger.trace("entityNameItalian: " + entityNameItalian);
+									logger.debug("entityNameItalian: " + entityNameItalian);
 									
 									if(objTranslationSheet != null) {
 										Iterator<org.apache.poi.ss.usermodel.Row> objTranslationRowIter = objTranslationSheet.rowIterator();
@@ -557,7 +555,7 @@ public class CheckUtilityAppDataModel {
 													
 													org.apache.poi.ss.usermodel.Cell valueCell = objTranslationRow.getCell(2);
 													String orgObjectTranslation = (valueCell == null ? null : valueCell.getStringCellValue());
-													logger.trace("orgObjectTranslation: " + orgObjectTranslation);
+													logger.debug("orgObjectTranslation: " + orgObjectTranslation);
 													if(!StringUtils.isBlank(entityNameItalian)) {
 														if(entityNameItalian.equals(orgObjectTranslation)) {
 															insertTranslation = false;
@@ -600,19 +598,19 @@ public class CheckUtilityAppDataModel {
 											if(listSources.contains(sourceValue)) {
 												boolean rowHasError = false;
 												String fieldName = getCellValue(dmRow, namePos);
-												logger.trace("fieldName :" + fieldName);
+												logger.debug("fieldName: " + fieldName);
 												if(StringUtils.isBlank(fieldName)) {
 													logger.error(entityName + ": name is empty for row " + dmRow.getRowNum());
 													rowHasError = true;
 												}
 												String fieldLabel = getCellValue(dmRow, labelPos);
-												logger.trace("fieldLabel :" + fieldLabel);
+												logger.debug("fieldLabel: " + fieldLabel);
 												if(StringUtils.isBlank(fieldLabel)) {
 													logger.error(entityName + ": label is empty for row " + dmRow.getRowNum());
 													rowHasError = true;
 												}
 												String fieldStatus = getCellValue(dmRow, statusPos);
-												logger.trace("fieldStatus :" + fieldStatus);
+												logger.debug("fieldStatus: " + fieldStatus);
 												if(StringUtils.isBlank(fieldStatus)) {
 													logger.error(entityName + ": status is empty for row " + dmRow.getRowNum());
 													rowHasError = true;
@@ -623,9 +621,9 @@ public class CheckUtilityAppDataModel {
 												} else {
 												
 													String fieldItalianTranslation = getCellValue(dmRow, italianPos);
-													logger.trace("fieldItalianTranslation :" + fieldItalianTranslation);
+													logger.debug("fieldItalianTranslation: " + fieldItalianTranslation);
 													String fieldValueSetName = getCellValue(dmRow, valueSetNamePos);
-													logger.trace("fieldValueSetName :" + fieldValueSetName);
+													logger.debug("fieldValueSetName: " + fieldValueSetName);
 													
 													boolean insertField = true;
 													Iterator<org.apache.poi.ss.usermodel.Row> orgFieldsIter = fieldSheet.rowIterator();
@@ -643,7 +641,7 @@ public class CheckUtilityAppDataModel {
 																insertField = false;
 																org.apache.poi.ss.usermodel.Cell orgFieldLabelCell = null;
 																String orgFieldLabel = (orgFieldLabelCell = orgFieldRow.getCell(2)) == null ? null : orgFieldLabelCell.getStringCellValue();
-																logger.trace("orgFieldLabel :" + orgFieldLabel);
+																logger.debug("orgFieldLabel: " + orgFieldLabel);
 																if(fieldLabel.equals(orgFieldLabel)) {
 																	orgFieldLabelCell.setCellStyle(existingCellStyle);
 																	if(!"active".equalsIgnoreCase(fieldStatus)) {
@@ -657,7 +655,7 @@ public class CheckUtilityAppDataModel {
 																
 																org.apache.poi.ss.usermodel.Cell orgFieldValueSetsNameCell = null;
 																String orgFieldValueSetsName = (orgFieldValueSetsNameCell = orgFieldRow.getCell(21)) == null ? null : orgFieldValueSetsNameCell.getStringCellValue();
-																logger.trace("orgFieldValueSetsName :" + orgFieldValueSetsName);
+																logger.debug("orgFieldValueSetsName: " + orgFieldValueSetsName);
 																if(StringUtils.isBlank(fieldValueSetName)) {
 																	if(!StringUtils.isBlank(orgFieldValueSetsName)) {
 																		if(orgFieldValueSetsNameCell == null) {
@@ -708,7 +706,7 @@ public class CheckUtilityAppDataModel {
 																insertFieldTranslation = false;
 																org.apache.poi.ss.usermodel.Cell orgFieldLabelTranslationCell = null;
 																String orgFieldLabelTranslation = (orgFieldLabelTranslationCell = orgFieldTranslationRow.getCell(2)) == null ? null : orgFieldLabelTranslationCell.getStringCellValue();
-																logger.trace("orgFieldLabelTranslation :" + orgFieldLabelTranslation);
+																logger.debug("orgFieldLabelTranslation: " + orgFieldLabelTranslation);
 																if(StringUtils.isBlank(fieldItalianTranslation)) {
 																	if(!StringUtils.isBlank(orgFieldLabelTranslation)) {
 																		if(orgFieldLabelTranslationCell == null) {
@@ -755,7 +753,7 @@ public class CheckUtilityAppDataModel {
 				
 			}
 			
-			logger.trace("Writing diff");
+			logger.debug("Writing diff");
 			FileOutputStream fileOut = new FileOutputStream("diff.xlsx");
 			orgWb.write(fileOut);
 			fileOut.close();
