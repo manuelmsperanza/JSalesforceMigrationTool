@@ -93,16 +93,27 @@ public class CheckUtilityAppDataModel {
 			errorCellStyle.setFont(boldFont);
 			
 			org.apache.poi.ss.usermodel.Sheet objTranslationSheet = orgWb.getSheet("Object translation");
+			int objTranslationSheetLastRow = objTranslationSheet.getLastRowNum();
 			org.apache.poi.ss.usermodel.Sheet fieldSheet = orgWb.getSheet("Fields");
+			int fieldSheetLastRow = fieldSheet.getLastRowNum();
 			org.apache.poi.ss.usermodel.Sheet fieldTranslationSheet = orgWb.getSheet("Field translation");
+			int fieldTranslationSheetLastRow = fieldTranslationSheet.getLastRowNum();
 			org.apache.poi.ss.usermodel.Sheet fieldValueSetsSheet = orgWb.getSheet("Fields valueSets");
+			int fieldValueSetsSheetLastRow = fieldValueSetsSheet.getLastRowNum();
 			org.apache.poi.ss.usermodel.Sheet fieldValueSetTranslationSheet = orgWb.getSheet("Field valueSets translation");
+			int fieldValueSetTranslationSheetLastRow = fieldValueSetTranslationSheet.getLastRowNum();
 			org.apache.poi.ss.usermodel.Sheet globalValueSetSheet = orgWb.getSheet("Global ValueSet");
+			int globalValueSetSheetLastRow = globalValueSetSheet.getLastRowNum();
 			org.apache.poi.ss.usermodel.Sheet globalValueSetTranslation = orgWb.getSheet("Global ValueSet Translation");
+			int globalValueSetTranslationLastRow = globalValueSetTranslation.getLastRowNum();
 			org.apache.poi.ss.usermodel.Sheet labelSheet = orgWb.getSheet("Labels");
+			int labelSheetLastRow = labelSheet.getLastRowNum();
 			org.apache.poi.ss.usermodel.Sheet labelSheetTranslation = orgWb.getSheet("Label translation");
+			int labelSheetTranslationLastRow = labelSheetTranslation.getLastRowNum();
 			org.apache.poi.ss.usermodel.Sheet recordTypeSheet = orgWb.getSheet("RecordTypes");
+			int recordTypeSheetLastRow = recordTypeSheet.getLastRowNum();
 			org.apache.poi.ss.usermodel.Sheet recordTypeTranslationSheet = orgWb.getSheet("RecordTypes translation");
+			int recordTypeTranslationSheetLastRow = recordTypeTranslationSheet.getLastRowNum();
 			
 			org.apache.poi.ss.usermodel.Workbook dmWb = new org.apache.poi.xssf.usermodel.XSSFWorkbook(dmExcelPath);
 			Iterator<org.apache.poi.ss.usermodel.Sheet> wsIter = dmWb.sheetIterator();
@@ -223,7 +234,7 @@ public class CheckUtilityAppDataModel {
 											
 											org.apache.poi.ss.usermodel.Cell fileNameCell = null;
 											if((fileNameCell = objTranslationRow.getCell(0)) != null) {
-												if((entityName + "-it").equals(fileNameCell)) {
+												if((entityName + "-it").equals(fileNameCell.getStringCellValue())) {
 													
 													org.apache.poi.ss.usermodel.Cell valueCell = objTranslationRow.getCell(2);
 													String orgObjectTranslation = valueCell == null ? null : valueCell.getStringCellValue();
@@ -249,10 +260,10 @@ public class CheckUtilityAppDataModel {
 											}
 											
 											if(insertTranslation) {
-												org.apache.poi.ss.usermodel.Row newObjTranslationRow = objTranslationSheet.createRow(objTranslationSheet.getLastRowNum()+1);
-												newObjTranslationRow.setRowStyle(newCellStyle);
+												org.apache.poi.ss.usermodel.Row newObjTranslationRow = objTranslationSheet.createRow(++objTranslationSheetLastRow);
 												newObjTranslationRow.createCell(0).setCellValue(entityName + "-it");
 												newObjTranslationRow.createCell(2).setCellValue(entityNameItalian);
+												newObjTranslationRow.setRowStyle(newCellStyle);
 											}
 										}
 										
@@ -266,23 +277,91 @@ public class CheckUtilityAppDataModel {
 											logger.error(entityName + ": source is empty for row " + dmRow.getRowNum());
 										} else {
 											if(listSources.contains(sourceValue)) {
-												
+												boolean rowHasError = false;
 												String fieldName = getCellValue(dmRow, namePos);
 												if(StringUtils.isBlank(fieldName)) {
 													logger.error(entityName + ": name is empty for row " + dmRow.getRowNum());
+													rowHasError = true;
 												}
 												String fieldLabel = getCellValue(dmRow, labelPos);
 												if(StringUtils.isBlank(fieldLabel)) {
 													logger.error(entityName + ": label is empty for row " + dmRow.getRowNum());
+													rowHasError = true;
 												}
 												String fieldStatus = getCellValue(dmRow, statusPos);
 												if(StringUtils.isBlank(fieldStatus)) {
 													logger.error(entityName + ": status is empty for row " + dmRow.getRowNum());
+													rowHasError = true;
 												}
 												
-												String fieldItalianTranslation = getCellValue(dmRow, italianPos);
+												if(rowHasError) {
+													logger.error(entityName + ": missing useful value(s). Skip row #" + dmRow.getRowNum());
+												} else {
 												
-												String fieldValueSetName = getCellValue(dmRow, valueSetNamePos);
+													String fieldItalianTranslation = getCellValue(dmRow, italianPos);
+													
+													String fieldValueSetName = getCellValue(dmRow, valueSetNamePos);
+													
+													boolean insertField = true;
+													Iterator<org.apache.poi.ss.usermodel.Row> orgFieldsIter = fieldSheet.rowIterator();
+													while(orgFieldsIter.hasNext()) {
+														
+														org.apache.poi.ss.usermodel.Row orgFieldRow = orgFieldsIter.next();
+														
+														String orgFieldFilename = getCellValue(orgFieldRow, 0);
+														
+														if(entityName.equals(orgFieldFilename)) {
+														
+															String orgFieldFullname = getCellValue(orgFieldRow, 1);
+															if(fieldName.equals(orgFieldFullname)) {
+																insertField = false;
+																org.apache.poi.ss.usermodel.Cell orgFieldLabelCell = null;
+																String orgFieldLabel = (orgFieldLabelCell = orgFieldRow.getCell(2)) == null ? null : orgFieldLabelCell.getStringCellValue();
+																
+																if(fieldLabel.equals(orgFieldLabel)) {
+																	orgFieldLabelCell.setCellStyle(existingCellStyle);
+																} else {
+																	insertField = true;
+																	logger.error(entityName + "." + fieldName + ": Label mismatch. Data Model: " + fieldLabel + " Org: " + orgFieldLabel);
+																	orgFieldLabelCell.setCellStyle(errorCellStyle);
+																}
+																
+																org.apache.poi.ss.usermodel.Cell orgFieldValueSetsNameCell = null;
+																String orgFieldValueSetsName = (orgFieldValueSetsNameCell = orgFieldRow.getCell(23)) == null ? null : orgFieldValueSetsNameCell.getStringCellValue();
+																if(fieldValueSetName == null) {
+																	if(orgFieldValueSetsName != null) {
+																		if(orgFieldValueSetsNameCell == null) {
+																			orgFieldValueSetsNameCell = orgFieldRow.createCell(23);
+																		}
+																		orgFieldValueSetsNameCell.setCellStyle(errorCellStyle);
+																		logger.error("Missing valueSetName in data model design for " + entityName  + "." + fieldName + ": " + orgFieldValueSetsName);
+																	}
+																} else {
+																	if(fieldValueSetName.equals(orgFieldValueSetsName)) {
+																		orgFieldValueSetsNameCell.setCellStyle(existingCellStyle);
+																	} else {
+																		insertField = true;
+																		logger.error(entityName + "." + fieldName + ": valueSetName mismatch. Data Model: " + fieldValueSetName + " Org: " + orgFieldValueSetsName);
+																		orgFieldValueSetsNameCell.setCellStyle(errorCellStyle);
+																	}
+																}
+																
+															}
+														}
+														
+													}
+													if(insertField) {
+														
+														org.apache.poi.ss.usermodel.Row newFieldRow = fieldSheet.createRow(++fieldSheetLastRow);
+														newFieldRow.createCell(0).setCellValue(entityName);
+														newFieldRow.createCell(1).setCellValue(fieldName);
+														newFieldRow.createCell(2).setCellValue(fieldLabel);
+														if(!StringUtils.isBlank(fieldValueSetName)) {
+															newFieldRow.createCell(23).setCellValue(fieldValueSetName);
+														}
+														newFieldRow.setRowStyle(newCellStyle);
+													}
+												}
 													
 											}
 										}	
