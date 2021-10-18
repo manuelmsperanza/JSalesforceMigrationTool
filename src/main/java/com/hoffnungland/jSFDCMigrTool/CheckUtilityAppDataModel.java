@@ -37,13 +37,13 @@ public class CheckUtilityAppDataModel {
 		
 		//Read Excel
 		String dmExcelPath = "C:\\Users\\msperanza\\OneDrive - Engineering Ingegneria Informatica S.p.A\\Documenti condivisi\\General\\Analisi\\UAPP Data Model v01.xlsx";
-		//String orgExcelPath = "wrtsuapp";
-		String orgExcelPath = "eng.msperanza - teaspa.it.release1";
-		//String orgExcelPath = "eng.msperanza - teaspa.it.dev";
+		//String orgExcelPath = "wrtsuapp.xlsx";
+		String orgExcelPath = "eng.msperanza - teaspa.it.release1.xlsx";
+		//String orgExcelPath = "eng.msperanza - teaspa.it.dev.xlsx";
 		
 		try {
 			
-			org.apache.poi.xssf.usermodel.XSSFWorkbook orgWb = new org.apache.poi.xssf.usermodel.XSSFWorkbook(orgExcelPath + ".xlsx");
+			org.apache.poi.xssf.usermodel.XSSFWorkbook orgWb = new org.apache.poi.xssf.usermodel.XSSFWorkbook(orgExcelPath);
 			
 			org.apache.poi.xssf.usermodel.XSSFCellStyle existingCellStyle = orgWb.createCellStyle();
 			
@@ -91,27 +91,27 @@ public class CheckUtilityAppDataModel {
 			errorCellStyle.setFont(boldFont);
 			
 			org.apache.poi.ss.usermodel.Sheet objTranslationSheet = orgWb.getSheet("Object translation");
-			int objTranslationSheetLastRow = objTranslationSheet.getLastRowNum();
+			int objTranslationSheetLastRow = (objTranslationSheet == null ? -1 : objTranslationSheet.getLastRowNum());
 			org.apache.poi.ss.usermodel.Sheet fieldSheet = orgWb.getSheet("Fields");
-			int fieldSheetLastRow = fieldSheet.getLastRowNum();
+			int fieldSheetLastRow = (fieldSheet == null ? -1 : fieldSheet.getLastRowNum());
 			org.apache.poi.ss.usermodel.Sheet fieldTranslationSheet = orgWb.getSheet("Field translation");
-			int fieldTranslationSheetLastRow = fieldTranslationSheet.getLastRowNum();
+			int fieldTranslationSheetLastRow = (fieldTranslationSheet == null ? -1 : fieldTranslationSheet.getLastRowNum());
 			org.apache.poi.ss.usermodel.Sheet fieldValueSetsSheet = orgWb.getSheet("Fields valueSets");
-			int fieldValueSetsSheetLastRow = fieldValueSetsSheet.getLastRowNum();
+			int fieldValueSetsSheetLastRow = (fieldValueSetsSheet == null ? -1 : fieldValueSetsSheet.getLastRowNum());
 			org.apache.poi.ss.usermodel.Sheet fieldValueSetTranslationSheet = orgWb.getSheet("Field valueSets translation");
-			int fieldValueSetTranslationSheetLastRow = fieldValueSetTranslationSheet.getLastRowNum();
+			int fieldValueSetTranslationSheetLastRow = (fieldValueSetTranslationSheet == null ? -1 : fieldValueSetTranslationSheet.getLastRowNum());
 			org.apache.poi.ss.usermodel.Sheet globalValueSetSheet = orgWb.getSheet("Global ValueSet");
-			int globalValueSetSheetLastRow = globalValueSetSheet.getLastRowNum();
+			int globalValueSetSheetLastRow = (globalValueSetSheet == null ? -1 : globalValueSetSheet.getLastRowNum());
 			org.apache.poi.ss.usermodel.Sheet globalValueSetTranslationSheet = orgWb.getSheet("Global ValueSet Translation");
-			int globalValueSetTranslationSheetLastRow = globalValueSetTranslationSheet.getLastRowNum();
+			int globalValueSetTranslationSheetLastRow = (globalValueSetTranslationSheet == null ? -1 : globalValueSetTranslationSheet.getLastRowNum());
 			org.apache.poi.ss.usermodel.Sheet labelSheet = orgWb.getSheet("Labels");
-			int labelSheetLastRow = labelSheet.getLastRowNum();
+			int labelSheetLastRow = (labelSheet == null ? -1 : labelSheet.getLastRowNum());
 			org.apache.poi.ss.usermodel.Sheet labelSheetTranslation = orgWb.getSheet("Label translation");
-			int labelSheetTranslationLastRow = labelSheetTranslation.getLastRowNum();
+			int labelSheetTranslationLastRow = (labelSheetTranslation == null ? -1 : labelSheetTranslation.getLastRowNum());
 			org.apache.poi.ss.usermodel.Sheet recordTypeSheet = orgWb.getSheet("RecordTypes");
-			int recordTypeSheetLastRow = recordTypeSheet.getLastRowNum();
-			/*org.apache.poi.ss.usermodel.Sheet recordTypeTranslationSheet = orgWb.getSheet("RecordTypes translation");
-			int recordTypeTranslationSheetLastRow = recordTypeTranslationSheet.getLastRowNum();*/
+			int recordTypeSheetLastRow = (recordTypeSheet == null ? -1 : recordTypeSheet.getLastRowNum());
+			org.apache.poi.ss.usermodel.Sheet recordTypeTranslationSheet = orgWb.getSheet("RecordTypes translation");
+			int recordTypeTranslationSheetLastRow = (recordTypeTranslationSheet == null ? -1 : recordTypeTranslationSheet.getLastRowNum());
 			
 			org.apache.poi.ss.usermodel.Workbook dmWb = new org.apache.poi.xssf.usermodel.XSSFWorkbook(dmExcelPath);
 			Iterator<org.apache.poi.ss.usermodel.Sheet> wsIter = dmWb.sheetIterator();
@@ -305,8 +305,8 @@ public class CheckUtilityAppDataModel {
 															org.apache.poi.ss.usermodel.Cell orgGlobalVsLabelCell = null;
 															String orgGlobalVsLabel = (orgGlobalVsLabelCell = orgGlobalValueSetTranslationRow.getCell(2)) == null ? null : orgGlobalVsLabelCell.getStringCellValue();
 															
-															if(fieldItalianTranslation == null) {
-																if(orgGlobalVsLabel != null) {
+															if(StringUtils.isBlank(fieldItalianTranslation)) {
+																if(!StringUtils.isBlank(orgGlobalVsLabel)) {
 																	
 																	orgGlobalVsLabelCell.setCellStyle(errorCellStyle);
 																	logger.error("Missing Global Value Set Translation in data model design for " + fieldName + "." + fieldValue + ": " + orgGlobalVsLabel);
@@ -399,8 +399,8 @@ public class CheckUtilityAppDataModel {
 															org.apache.poi.ss.usermodel.Cell orgValueTranslationCell = null;
 															String orgValueTranslation = (orgValueTranslationCell = orgValueSetTranslationRow.getCell(4)) == null ? null : orgValueTranslationCell.getStringCellValue();
 															
-															if(fieldItalianTranslation == null) {
-																if(orgValueTranslation != null) {
+															if(StringUtils.isBlank(fieldItalianTranslation)) {
+																if(!StringUtils.isBlank(orgValueTranslation)) {
 																	
 																	orgValueTranslationCell.setCellStyle(errorCellStyle);
 																	logger.error("Missing Value Set Translation in data model design for " + entityName + "." + fieldName + "." + fieldValue + ": " + orgValueTranslation);
@@ -463,7 +463,7 @@ public class CheckUtilityAppDataModel {
 						if(StringUtils.isBlank(entityName)) {
 							logger.warn("Missing entity name. Skip " + dmSheet.getSheetName() + " sheet.");
 						} else {
-							
+							logger.trace("entityName: " + entityName);
 							if(dmRowIter.hasNext()) {
 								dmColsRow = dmRowIter.next();	
 							}
@@ -542,6 +542,7 @@ public class CheckUtilityAppDataModel {
 									
 									org.apache.poi.ss.usermodel.Cell entityNameItalianCell = dmHeadRow.getCell(italianPos);
 									String entityNameItalian = entityNameCell == null ? null : entityNameItalianCell.getStringCellValue();
+									logger.trace("entityNameItalian: " + entityNameItalian);
 									
 									if(objTranslationSheet != null) {
 										Iterator<org.apache.poi.ss.usermodel.Row> objTranslationRowIter = objTranslationSheet.rowIterator();
@@ -555,8 +556,8 @@ public class CheckUtilityAppDataModel {
 												if((entityName + "-it").equals(fileNameCell.getStringCellValue())) {
 													
 													org.apache.poi.ss.usermodel.Cell valueCell = objTranslationRow.getCell(2);
-													String orgObjectTranslation = valueCell == null ? null : valueCell.getStringCellValue();
-													
+													String orgObjectTranslation = (valueCell == null ? null : valueCell.getStringCellValue());
+													logger.trace("orgObjectTranslation: " + orgObjectTranslation);
 													if(!StringUtils.isBlank(entityNameItalian)) {
 														if(entityNameItalian.equals(orgObjectTranslation)) {
 															insertTranslation = false;
@@ -580,7 +581,7 @@ public class CheckUtilityAppDataModel {
 										}
 										
 										if(insertTranslation) {
-											logger.error(entityName + ": translation missing.");
+											logger.error(entityName + ": italian translation missing.");
 											org.apache.poi.ss.usermodel.Row newObjTranslationRow = objTranslationSheet.createRow(++objTranslationSheetLastRow);
 											newObjTranslationRow.createCell(0).setCellValue(entityName + "-it");
 											newObjTranslationRow.createCell(2).setCellValue(entityNameItalian);
@@ -599,16 +600,19 @@ public class CheckUtilityAppDataModel {
 											if(listSources.contains(sourceValue)) {
 												boolean rowHasError = false;
 												String fieldName = getCellValue(dmRow, namePos);
+												logger.trace("fieldName :" + fieldName);
 												if(StringUtils.isBlank(fieldName)) {
 													logger.error(entityName + ": name is empty for row " + dmRow.getRowNum());
 													rowHasError = true;
 												}
 												String fieldLabel = getCellValue(dmRow, labelPos);
+												logger.trace("fieldLabel :" + fieldLabel);
 												if(StringUtils.isBlank(fieldLabel)) {
 													logger.error(entityName + ": label is empty for row " + dmRow.getRowNum());
 													rowHasError = true;
 												}
 												String fieldStatus = getCellValue(dmRow, statusPos);
+												logger.trace("fieldStatus :" + fieldStatus);
 												if(StringUtils.isBlank(fieldStatus)) {
 													logger.error(entityName + ": status is empty for row " + dmRow.getRowNum());
 													rowHasError = true;
@@ -619,8 +623,9 @@ public class CheckUtilityAppDataModel {
 												} else {
 												
 													String fieldItalianTranslation = getCellValue(dmRow, italianPos);
-													
+													logger.trace("fieldItalianTranslation :" + fieldItalianTranslation);
 													String fieldValueSetName = getCellValue(dmRow, valueSetNamePos);
+													logger.trace("fieldValueSetName :" + fieldValueSetName);
 													
 													boolean insertField = true;
 													Iterator<org.apache.poi.ss.usermodel.Row> orgFieldsIter = fieldSheet.rowIterator();
@@ -634,10 +639,11 @@ public class CheckUtilityAppDataModel {
 														
 															String orgFieldFullname = getCellValue(orgFieldRow, 1);
 															if(fieldName.equals(orgFieldFullname)) {
+																
 																insertField = false;
 																org.apache.poi.ss.usermodel.Cell orgFieldLabelCell = null;
 																String orgFieldLabel = (orgFieldLabelCell = orgFieldRow.getCell(2)) == null ? null : orgFieldLabelCell.getStringCellValue();
-																
+																logger.trace("orgFieldLabel :" + orgFieldLabel);
 																if(fieldLabel.equals(orgFieldLabel)) {
 																	orgFieldLabelCell.setCellStyle(existingCellStyle);
 																	if(!"active".equalsIgnoreCase(fieldStatus)) {
@@ -651,8 +657,9 @@ public class CheckUtilityAppDataModel {
 																
 																org.apache.poi.ss.usermodel.Cell orgFieldValueSetsNameCell = null;
 																String orgFieldValueSetsName = (orgFieldValueSetsNameCell = orgFieldRow.getCell(21)) == null ? null : orgFieldValueSetsNameCell.getStringCellValue();
-																if(fieldValueSetName == null) {
-																	if(orgFieldValueSetsName != null) {
+																logger.trace("orgFieldValueSetsName :" + orgFieldValueSetsName);
+																if(StringUtils.isBlank(fieldValueSetName)) {
+																	if(!StringUtils.isBlank(orgFieldValueSetsName)) {
 																		if(orgFieldValueSetsNameCell == null) {
 																			orgFieldValueSetsNameCell = orgFieldRow.createCell(21);
 																		}
@@ -701,9 +708,9 @@ public class CheckUtilityAppDataModel {
 																insertFieldTranslation = false;
 																org.apache.poi.ss.usermodel.Cell orgFieldLabelTranslationCell = null;
 																String orgFieldLabelTranslation = (orgFieldLabelTranslationCell = orgFieldTranslationRow.getCell(2)) == null ? null : orgFieldLabelTranslationCell.getStringCellValue();
-																
-																if(fieldItalianTranslation == null) {
-																	if(orgFieldLabelTranslation != null) {
+																logger.trace("orgFieldLabelTranslation :" + orgFieldLabelTranslation);
+																if(StringUtils.isBlank(fieldItalianTranslation)) {
+																	if(!StringUtils.isBlank(orgFieldLabelTranslation)) {
 																		if(orgFieldLabelTranslationCell == null) {
 																			orgFieldLabelTranslationCell = orgFieldTranslationRow.createCell(2);
 																		}
@@ -728,7 +735,7 @@ public class CheckUtilityAppDataModel {
 													if(insertFieldTranslation) {
 														logger.error(entityName + "." + fieldName + ": italian field translation missing. Translation: " + fieldItalianTranslation + " Status: " + fieldStatus + " Source: " + sourceValue);
 														org.apache.poi.ss.usermodel.Row newFieldTranslationRow = fieldTranslationSheet.createRow(++fieldTranslationSheetLastRow);
-														newFieldTranslationRow.createCell(0).setCellValue(entityName);
+														newFieldTranslationRow.createCell(0).setCellValue(entityName + "-it");
 														newFieldTranslationRow.createCell(1).setCellValue(fieldName);
 														newFieldTranslationRow.createCell(2).setCellValue(fieldItalianTranslation);
 														newFieldTranslationRow.createCell(8).setCellValue(fieldStatus);
@@ -748,8 +755,8 @@ public class CheckUtilityAppDataModel {
 				
 			}
 			
-			logger.trace("Writing " + orgExcelPath + "_diff.xlsx");
-			FileOutputStream fileOut = new FileOutputStream( orgExcelPath + "_diff.xlsx");
+			logger.trace("Writing diff");
+			FileOutputStream fileOut = new FileOutputStream("diff.xlsx");
 			orgWb.write(fileOut);
 			fileOut.close();
 			orgWb.close();
@@ -780,9 +787,18 @@ public class CheckUtilityAppDataModel {
 	
 	public static String getCellValue(org.apache.poi.ss.usermodel.Row inRow, int position) {
 		logger.traceEntry();
-		org.apache.poi.ss.usermodel.Cell workingCell = null;
-		String workingCellStringValue = (workingCell = inRow.getCell(position)) == null ? null : workingCell.getStringCellValue();
+		org.apache.poi.ss.usermodel.Cell workingCell = inRow.getCell(position);
 		
+		String workingCellStringValue = null;
+		if(workingCell != null) {
+			if(workingCell.getCellType() == org.apache.poi.ss.usermodel.CellType.NUMERIC) {
+				workingCellStringValue = Double.toString(workingCell.getNumericCellValue());
+			} else {
+				workingCellStringValue = workingCell.getStringCellValue();
+			}
+			
+		}
+			
 		return logger.traceExit(workingCellStringValue);
 	}
 	
