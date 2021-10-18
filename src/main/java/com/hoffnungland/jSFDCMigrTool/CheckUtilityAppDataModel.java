@@ -292,7 +292,7 @@ public class CheckUtilityAppDataModel {
 													newGlobalValueSet.setRowStyle(newCellStyle);
 												}
 												
-												boolean insertGlobalValueSetTranslation = true;
+												boolean insertGlobalValueSetTranslation = !StringUtils.isBlank(fieldItalianTranslation);
 												Iterator<org.apache.poi.ss.usermodel.Row> orgGlobalValueSetTranslationIter = globalValueSetTranslationSheet.rowIterator();
 												while(orgGlobalValueSetTranslationIter.hasNext()) {
 													org.apache.poi.ss.usermodel.Row orgGlobalValueSetTranslationRow = orgGlobalValueSetTranslationIter.next();
@@ -305,7 +305,7 @@ public class CheckUtilityAppDataModel {
 															
 															if(StringUtils.isBlank(fieldItalianTranslation)) {
 																if(!StringUtils.isBlank(orgGlobalVsLabel)) {
-																	
+																	insertGlobalValueSetTranslation = true;
 																	orgGlobalVsLabelCell.setCellStyle(errorCellStyle);
 																	logger.error("Missing Global Value Set Translation in data model design for " + fieldName + "." + fieldValue + ": " + orgGlobalVsLabel);
 																	
@@ -319,6 +319,7 @@ public class CheckUtilityAppDataModel {
 																		logger.error("Global Value Set " + fieldName + "." + fieldValue + ": Status is not Active");
 																	}
 																} else {
+																	insertGlobalValueSetTranslation = true;
 																	orgGlobalVsLabelCell.setCellStyle(errorCellStyle);
 																	logger.error("Global Value Set " + fieldName + "." + fieldValue + ": Label Translation mismatch. Data Model: " + fieldItalianTranslation + " Org: " + orgGlobalVsLabel);
 																}
@@ -383,7 +384,7 @@ public class CheckUtilityAppDataModel {
 													newFieldValueSet.setRowStyle(newCellStyle);
 												}
 												
-												boolean insertValueSetTranslation = true;
+												boolean insertValueSetTranslation = !StringUtils.isBlank(fieldItalianTranslation);
 												Iterator<org.apache.poi.ss.usermodel.Row> orgValueSetTranslationIter = fieldValueSetTranslationSheet.rowIterator();
 												while(orgValueSetTranslationIter.hasNext()) {
 													org.apache.poi.ss.usermodel.Row orgValueSetTranslationRow = orgValueSetTranslationIter.next();
@@ -398,7 +399,7 @@ public class CheckUtilityAppDataModel {
 																
 																if(StringUtils.isBlank(fieldItalianTranslation)) {
 																	if(!StringUtils.isBlank(orgValueTranslation)) {
-																		
+																		insertValueSetTranslation = true;
 																		orgValueTranslationCell.setCellStyle(errorCellStyle);
 																		logger.error("Missing Value Set Translation in data model design for " + entityName + "." + fieldName + "." + fieldValue + ": " + orgValueTranslation);
 																		
@@ -412,6 +413,7 @@ public class CheckUtilityAppDataModel {
 																			logger.error("Value Set " + entityName + "." + fieldName + "." + fieldValue + ": Status is not Active");
 																		}
 																	} else {
+																		insertValueSetTranslation = true;
 																		orgValueTranslationCell.setCellStyle(errorCellStyle);
 																		logger.error("Value Set " + entityName + "." + fieldName + "." + fieldValue + ": Label Translation mismatch. Data Model: " + fieldItalianTranslation + " Org: " + orgValueTranslation);
 																	}
