@@ -110,8 +110,8 @@ public class CheckUtilityAppDataModel {
 			int labelSheetTranslationLastRow = labelSheetTranslation.getLastRowNum();
 			org.apache.poi.ss.usermodel.Sheet recordTypeSheet = orgWb.getSheet("RecordTypes");
 			int recordTypeSheetLastRow = recordTypeSheet.getLastRowNum();
-			org.apache.poi.ss.usermodel.Sheet recordTypeTranslationSheet = orgWb.getSheet("RecordTypes translation");
-			int recordTypeTranslationSheetLastRow = recordTypeTranslationSheet.getLastRowNum();
+			/*org.apache.poi.ss.usermodel.Sheet recordTypeTranslationSheet = orgWb.getSheet("RecordTypes translation");
+			int recordTypeTranslationSheetLastRow = recordTypeTranslationSheet.getLastRowNum();*/
 			
 			org.apache.poi.ss.usermodel.Workbook dmWb = new org.apache.poi.xssf.usermodel.XSSFWorkbook(dmExcelPath);
 			Iterator<org.apache.poi.ss.usermodel.Sheet> wsIter = dmWb.sheetIterator();
@@ -273,18 +273,18 @@ public class CheckUtilityAppDataModel {
 																orgGlobalVsLabelCell.setCellStyle(existingCellStyle);
 																insertGlobalValueSet = false;
 																if(!"active".equalsIgnoreCase(fieldStatus)) {
-																	logger.error("Global Value Set + " + fieldName + "." + fieldValue + ": Status is not Active");
+																	logger.error("Global Value Set " + fieldName + "." + fieldValue + ": Status is not Active");
 																}
 															} else {
 																orgGlobalVsLabelCell.setCellStyle(errorCellStyle);
-																logger.error("Global Value Set + " + fieldName + "." + fieldValue + ": Label mismatch. Data Model: " + fieldLabel + " Org: " + orgGlobalVsLabel);
+																logger.error("Global Value Set " + fieldName + "." + fieldValue + ": Label mismatch. Data Model: " + fieldLabel + " Org: " + orgGlobalVsLabel);
 															}
 														}
 													}
 												}
 												
 												if(insertGlobalValueSet) {
-													logger.error("Global Value Set + " + fieldName + "." + fieldValue + ": value missing. Status: " + fieldStatus + " Source: " + sourceValue);
+													logger.error("Global Value Set " + fieldName + "." + fieldValue + ": value missing. Status: " + fieldStatus + " Source: " + sourceValue);
 													org.apache.poi.ss.usermodel.Row newGlobalValueSet = globalValueSetSheet.createRow(++globalValueSetSheetLastRow);
 													newGlobalValueSet.createCell(0).setCellValue(fieldName);
 													newGlobalValueSet.createCell(1).setCellValue(fieldValue);
@@ -318,11 +318,11 @@ public class CheckUtilityAppDataModel {
 																	orgGlobalVsLabelCell.setCellStyle(existingCellStyle);
 																	insertGlobalValueSet = false;
 																	if(!"active".equalsIgnoreCase(fieldStatus)) {
-																		logger.error("Global Value Set + " + fieldName + "." + fieldValue + ": Status is not Active");
+																		logger.error("Global Value Set " + fieldName + "." + fieldValue + ": Status is not Active");
 																	}
 																} else {
 																	orgGlobalVsLabelCell.setCellStyle(errorCellStyle);
-																	logger.error("Global Value Set + " + fieldName + "." + fieldValue + ": Label Translation mismatch. Data Model: " + fieldItalianTranslation + " Org: " + orgGlobalVsLabel);
+																	logger.error("Global Value Set " + fieldName + "." + fieldValue + ": Label Translation mismatch. Data Model: " + fieldItalianTranslation + " Org: " + orgGlobalVsLabel);
 																}
 															}
 														}
@@ -330,7 +330,7 @@ public class CheckUtilityAppDataModel {
 												}
 												
 												if(insertGlobalValueSetTranslation) {
-													logger.error("Global Value Set + " + fieldName + "." + fieldValue + ": value italian translation missing. Status: " + fieldStatus + " Source: " + sourceValue);
+													logger.error("Global Value Set " + fieldName + "." + fieldValue + ": value italian translation missing. Status: " + fieldStatus + " Source: " + sourceValue);
 													org.apache.poi.ss.usermodel.Row newGlobalValueSetTranslation = globalValueSetTranslationSheet.createRow(++globalValueSetTranslationSheetLastRow);
 													newGlobalValueSetTranslation.createCell(0).setCellValue(fieldName + "-it");
 													newGlobalValueSetTranslation.createCell(1).setCellValue(fieldValue);
@@ -361,11 +361,11 @@ public class CheckUtilityAppDataModel {
 																	orgFieldLabelCell.setCellStyle(existingCellStyle);
 																	insertFieldValueSet = false;
 																	if(!"active".equalsIgnoreCase(fieldStatus)) {
-																		logger.error("Value Set + " + entityName + "." + fieldName + "." + fieldValue + ": Status is not Active");
+																		logger.error("Value Set " + entityName + "." + fieldName + "." + fieldValue + ": Status is not Active");
 																	}
 																} else {
 																	orgFieldLabelCell.setCellStyle(errorCellStyle);
-																	logger.error("Value Set + " + entityName + "." + fieldName + "." + fieldValue + ": Label mismatch. Data Model: " + fieldLabel + " Org: " + orgFieldLabel);
+																	logger.error("Value Set " + entityName + "." + fieldName + "." + fieldValue + ": Label mismatch. Data Model: " + fieldLabel + " Org: " + orgFieldLabel);
 																}
 																
 															}
@@ -374,7 +374,7 @@ public class CheckUtilityAppDataModel {
 												}
 												
 												if(insertFieldValueSet) {
-													logger.error("Value Set + " + entityName + "." + fieldName + "." + fieldValue + ": value missing. Status: " + fieldStatus + " Source: " + sourceValue);
+													logger.error("Value Set " + entityName + "." + fieldName + "." + fieldValue + ": value missing. Status: " + fieldStatus + " Source: " + sourceValue);
 													org.apache.poi.ss.usermodel.Row newFieldValueSet = fieldValueSetsSheet.createRow(++fieldValueSetsSheetLastRow);
 													newFieldValueSet.createCell(0).setCellValue(entityName);
 													newFieldValueSet.createCell(1).setCellValue(fieldName);
@@ -412,11 +412,11 @@ public class CheckUtilityAppDataModel {
 																	orgValueTranslationCell.setCellStyle(existingCellStyle);
 																	insertValueSetTranslation = false;
 																	if(!"active".equalsIgnoreCase(fieldStatus)) {
-																		logger.error("Value Set + " + entityName + "." + fieldName + "." + fieldValue + ": Status is not Active");
+																		logger.error("Value Set " + entityName + "." + fieldName + "." + fieldValue + ": Status is not Active");
 																	}
 																} else {
 																	orgValueTranslationCell.setCellStyle(errorCellStyle);
-																	logger.error("Value Set + " + entityName + "." + fieldName + "." + fieldValue + ": Label Translation mismatch. Data Model: " + fieldItalianTranslation + " Org: " + orgValueTranslation);
+																	logger.error("Value Set " + entityName + "." + fieldName + "." + fieldValue + ": Label Translation mismatch. Data Model: " + fieldItalianTranslation + " Org: " + orgValueTranslation);
 																}
 															}
 														}
@@ -577,12 +577,14 @@ public class CheckUtilityAppDataModel {
 												}
 											}
 											
-											if(insertTranslation) {
-												org.apache.poi.ss.usermodel.Row newObjTranslationRow = objTranslationSheet.createRow(++objTranslationSheetLastRow);
-												newObjTranslationRow.createCell(0).setCellValue(entityName + "-it");
-												newObjTranslationRow.createCell(2).setCellValue(entityNameItalian);
-												newObjTranslationRow.setRowStyle(newCellStyle);
-											}
+										}
+										
+										if(insertTranslation) {
+											logger.error(entityName + ": translation missing.");
+											org.apache.poi.ss.usermodel.Row newObjTranslationRow = objTranslationSheet.createRow(++objTranslationSheetLastRow);
+											newObjTranslationRow.createCell(0).setCellValue(entityName + "-it");
+											newObjTranslationRow.createCell(2).setCellValue(entityNameItalian);
+											newObjTranslationRow.setRowStyle(newCellStyle);
 										}
 										
 									}
@@ -648,11 +650,11 @@ public class CheckUtilityAppDataModel {
 																}
 																
 																org.apache.poi.ss.usermodel.Cell orgFieldValueSetsNameCell = null;
-																String orgFieldValueSetsName = (orgFieldValueSetsNameCell = orgFieldRow.getCell(23)) == null ? null : orgFieldValueSetsNameCell.getStringCellValue();
+																String orgFieldValueSetsName = (orgFieldValueSetsNameCell = orgFieldRow.getCell(21)) == null ? null : orgFieldValueSetsNameCell.getStringCellValue();
 																if(fieldValueSetName == null) {
 																	if(orgFieldValueSetsName != null) {
 																		if(orgFieldValueSetsNameCell == null) {
-																			orgFieldValueSetsNameCell = orgFieldRow.createCell(23);
+																			orgFieldValueSetsNameCell = orgFieldRow.createCell(21);
 																		}
 																		orgFieldValueSetsNameCell.setCellStyle(errorCellStyle);
 																		logger.error("Missing valueSetName in data model design for " + entityName  + "." + fieldName + ": " + orgFieldValueSetsName);
@@ -673,14 +675,16 @@ public class CheckUtilityAppDataModel {
 													}
 													
 													if(insertField) {
-														logger.error(entityName + "." + fieldName + ": field missing. Status: " + fieldStatus);
+														logger.error(entityName + "." + fieldName + ": field missing. Status: " + fieldStatus + " Source: " + sourceValue);
 														org.apache.poi.ss.usermodel.Row newFieldRow = fieldSheet.createRow(++fieldSheetLastRow);
 														newFieldRow.createCell(0).setCellValue(entityName);
 														newFieldRow.createCell(1).setCellValue(fieldName);
 														newFieldRow.createCell(2).setCellValue(fieldLabel);
 														if(!StringUtils.isBlank(fieldValueSetName)) {
-															newFieldRow.createCell(23).setCellValue(fieldValueSetName);
+															newFieldRow.createCell(21).setCellValue(fieldValueSetName);
 														}
+														newFieldRow.createCell(23).setCellValue(fieldStatus);
+														newFieldRow.createCell(24).setCellValue(sourceValue);
 														newFieldRow.setRowStyle(newCellStyle);
 													}
 													
@@ -722,11 +726,13 @@ public class CheckUtilityAppDataModel {
 													}
 													
 													if(insertFieldTranslation) {
-														logger.error(entityName + "." + fieldName + ": italian field translation missing. Translation: " + fieldItalianTranslation + " Status: " + fieldStatus);
+														logger.error(entityName + "." + fieldName + ": italian field translation missing. Translation: " + fieldItalianTranslation + " Status: " + fieldStatus + " Source: " + sourceValue);
 														org.apache.poi.ss.usermodel.Row newFieldTranslationRow = fieldTranslationSheet.createRow(++fieldTranslationSheetLastRow);
 														newFieldTranslationRow.createCell(0).setCellValue(entityName);
 														newFieldTranslationRow.createCell(1).setCellValue(fieldName);
 														newFieldTranslationRow.createCell(2).setCellValue(fieldItalianTranslation);
+														newFieldTranslationRow.createCell(8).setCellValue(fieldStatus);
+														newFieldTranslationRow.createCell(9).setCellValue(sourceValue);
 														newFieldTranslationRow.setRowStyle(newCellStyle);
 													}
 												}
@@ -760,7 +766,6 @@ public class CheckUtilityAppDataModel {
 	
 	public static Map<String, File> getFileMap(String path) {
 		logger.traceEntry();
-		
 		Map<String, File> fileMap = new HashMap<String, File>();
 		
 		File fileMapDir = new File(path);
@@ -775,7 +780,6 @@ public class CheckUtilityAppDataModel {
 	
 	public static String getCellValue(org.apache.poi.ss.usermodel.Row inRow, int position) {
 		logger.traceEntry();
-		
 		org.apache.poi.ss.usermodel.Cell workingCell = null;
 		String workingCellStringValue = (workingCell = inRow.getCell(position)) == null ? null : workingCell.getStringCellValue();
 		
