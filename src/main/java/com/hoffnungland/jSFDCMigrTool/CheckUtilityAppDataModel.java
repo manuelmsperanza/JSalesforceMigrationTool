@@ -1,6 +1,7 @@
 package com.hoffnungland.jSFDCMigrTool;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,8 +21,6 @@ public class CheckUtilityAppDataModel {
 	
 	private static final Logger logger = LogManager.getLogger(CheckUtilityAppDataModel.class);
 	
-	private static final String sfMetadataNs = "xmlns=\"http://soap.sforce.com/2006/04/metadata\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"";
-	
 	/**
 	 * Launch the application.
 	 */
@@ -31,17 +30,22 @@ public class CheckUtilityAppDataModel {
 		List<String> listSources = new ArrayList<String>();
 		listSources.add("EAP2");
 		listSources.add("UAPP");
-		listSources.add("TEA");
+		//listSources.add("TEA");
 		
 		//Read Excel
 		String dmExcelPath = "C:\\Users\\msperanza\\OneDrive - Engineering Ingegneria Informatica S.p.A\\Documenti condivisi\\General\\Analisi\\UAPP Data Model v01.xlsx";
-		//String orgExcelPath = "wrtsuapp.xlsx";
-		String orgExcelPath = "eng.msperanza - teaspa.it.release1.xlsx";
+		String orgExcelPath = "wrtsuapp.xlsx";
+		//String orgExcelPath = "eng.msperanza - teaspa.it.release1.xlsx";
 		//String orgExcelPath = "eng.msperanza - teaspa.it.dev.xlsx";
 		
+		FileInputStream fis = null;
+		FileOutputStream fileOut = null;
+		org.apache.poi.xssf.usermodel.XSSFWorkbook orgWb = null;
 		try {
+			File orgExcel = new File(orgExcelPath);
+			fis = new FileInputStream(orgExcel);
 			
-			org.apache.poi.xssf.usermodel.XSSFWorkbook orgWb = new org.apache.poi.xssf.usermodel.XSSFWorkbook(orgExcelPath);
+			orgWb = new org.apache.poi.xssf.usermodel.XSSFWorkbook(fis);
 			
 			org.apache.poi.xssf.usermodel.XSSFCellStyle existingCellStyle = orgWb.createCellStyle();
 			
@@ -760,14 +764,37 @@ public class CheckUtilityAppDataModel {
 				
 			}
 			
-			logger.debug("Writing diff");
-			FileOutputStream fileOut = new FileOutputStream("diff.xlsx");
+			logger.debug("Writing " + orgExcelPath);
+			fileOut  = new FileOutputStream(orgExcel);
 			orgWb.write(fileOut);
-			fileOut.close();
-			orgWb.close();
 			
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
+		} finally {
+			if(fis != null) {
+				try {
+					fis.close();
+				} catch (IOException e) {
+					logger.error(e.getMessage(), e);
+				}
+			}
+			
+			if(fileOut != null) {
+				try {
+					fileOut.close();
+				} catch (IOException e) {
+					logger.error(e.getMessage(), e);
+				}
+			}
+			
+			if(orgWb != null) {
+				try {
+					orgWb.close();
+				} catch (IOException e) {
+					logger.error(e.getMessage(), e);
+				}
+			}
+			
 		}
 		
 		//Read retrieved metadata
