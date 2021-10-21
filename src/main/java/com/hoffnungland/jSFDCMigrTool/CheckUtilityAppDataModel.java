@@ -31,6 +31,8 @@ public class CheckUtilityAppDataModel {
 	
 	private org.apache.poi.xssf.usermodel.XSSFSheet objTranslationSheet;
 	private int objTranslationSheetLastRow;
+	private org.apache.poi.xssf.usermodel.XSSFSheet nameFieldSheet;
+	private int nameFieldSheetLastRow;
 	private org.apache.poi.xssf.usermodel.XSSFSheet fieldSheet;
 	private int fieldSheetLastRow;
 	private org.apache.poi.xssf.usermodel.XSSFSheet fieldTranslationSheet;
@@ -99,18 +101,28 @@ public class CheckUtilityAppDataModel {
 		
 		this.orgWb = new org.apache.poi.xssf.usermodel.XSSFWorkbook(this.orgExcelFis);
 		
+		byte[] blackRgb = new byte[3];
+		blackRgb[0] = (byte) 0; // red
+		blackRgb[1] = (byte) 0; // green
+		blackRgb[2] = (byte) 0; // blue
+		org.apache.poi.xssf.usermodel.XSSFColor blackColor = new org.apache.poi.xssf.usermodel.XSSFColor(blackRgb, new org.apache.poi.xssf.usermodel.DefaultIndexedColorMap()); // #000000
+		
 		this.existingCellStyle = this.orgWb.createCellStyle();	
 		byte[] yellowRgb = new byte[3];
 		yellowRgb[0] = (byte) 255; // red
 		yellowRgb[1] = (byte) 255; // green
 		yellowRgb[2] = (byte) 0; // blue
-		org.apache.poi.xssf.usermodel.XSSFColor yellowForeGroundcolor = new org.apache.poi.xssf.usermodel.XSSFColor(yellowRgb, new org.apache.poi.xssf.usermodel.DefaultIndexedColorMap()); // #FFFF00
-		this.existingCellStyle.setFillForegroundColor(yellowForeGroundcolor);
+		org.apache.poi.xssf.usermodel.XSSFColor yellowColor = new org.apache.poi.xssf.usermodel.XSSFColor(yellowRgb, new org.apache.poi.xssf.usermodel.DefaultIndexedColorMap()); // #FFFF00
+		this.existingCellStyle.setFillForegroundColor(yellowColor);
 		this.existingCellStyle.setFillPattern(org.apache.poi.ss.usermodel.FillPatternType.SOLID_FOREGROUND);
 		this.existingCellStyle.setBorderBottom(org.apache.poi.ss.usermodel.BorderStyle.THIN);
+		this.existingCellStyle.setBottomBorderColor(blackColor);
 		this.existingCellStyle.setBorderTop(org.apache.poi.ss.usermodel.BorderStyle.THIN);
+		this.existingCellStyle.setTopBorderColor(blackColor);
 		this.existingCellStyle.setBorderLeft(org.apache.poi.ss.usermodel.BorderStyle.THIN);
+		this.existingCellStyle.setLeftBorderColor(blackColor);
 		this.existingCellStyle.setBorderRight(org.apache.poi.ss.usermodel.BorderStyle.THIN);
+		this.existingCellStyle.setRightBorderColor(blackColor);
 		
 		this.newCellStyle = this.orgWb.createCellStyle();
 		
@@ -118,13 +130,17 @@ public class CheckUtilityAppDataModel {
 		greenRgb[0] = (byte) 0; // red
 		greenRgb[1] = (byte) 255; // green
 		greenRgb[2] = (byte) 0; // blue
-		org.apache.poi.xssf.usermodel.XSSFColor greenForeGroundcolor = new org.apache.poi.xssf.usermodel.XSSFColor(greenRgb, new org.apache.poi.xssf.usermodel.DefaultIndexedColorMap()); // #00FF00
-		this.newCellStyle.setFillForegroundColor(greenForeGroundcolor);
+		org.apache.poi.xssf.usermodel.XSSFColor greenColor = new org.apache.poi.xssf.usermodel.XSSFColor(greenRgb, new org.apache.poi.xssf.usermodel.DefaultIndexedColorMap()); // #00FF00
+		this.newCellStyle.setFillForegroundColor(greenColor);
 		this.newCellStyle.setFillPattern(org.apache.poi.ss.usermodel.FillPatternType.SOLID_FOREGROUND);
 		this.newCellStyle.setBorderBottom(org.apache.poi.ss.usermodel.BorderStyle.THIN);
+		this.newCellStyle.setBottomBorderColor(blackColor);
 		this.newCellStyle.setBorderTop(org.apache.poi.ss.usermodel.BorderStyle.THIN);
+		this.newCellStyle.setTopBorderColor(blackColor);
 		this.newCellStyle.setBorderLeft(org.apache.poi.ss.usermodel.BorderStyle.THIN);
+		this.newCellStyle.setLeftBorderColor(blackColor);
 		this.newCellStyle.setBorderRight(org.apache.poi.ss.usermodel.BorderStyle.THIN);
+		this.newCellStyle.setRightBorderColor(blackColor);
 		
 		this.errorCellStyle = this.orgWb.createCellStyle();
 		
@@ -132,41 +148,61 @@ public class CheckUtilityAppDataModel {
 		redRgb[0] = (byte) 255; // red
 		redRgb[1] = (byte) 0; // green
 		redRgb[2] = (byte) 0; // blue
-		org.apache.poi.xssf.usermodel.XSSFColor redForeGroundcolor = new org.apache.poi.xssf.usermodel.XSSFColor(redRgb, new org.apache.poi.xssf.usermodel.DefaultIndexedColorMap()); // #FF0000
-		this.errorCellStyle.setFillForegroundColor(redForeGroundcolor);
-		this.errorCellStyle.setFillPattern(org.apache.poi.ss.usermodel.FillPatternType.SOLID_FOREGROUND);
+		org.apache.poi.xssf.usermodel.XSSFColor redColor = new org.apache.poi.xssf.usermodel.XSSFColor(redRgb, new org.apache.poi.xssf.usermodel.DefaultIndexedColorMap()); // #FF0000
+		/*this.errorCellStyle.setFillForegroundColor(redForeGroundcolor);
+		this.errorCellStyle.setFillPattern(org.apache.poi.ss.usermodel.FillPatternType.SOLID_FOREGROUND);*/
 		this.errorCellStyle.setBorderBottom(org.apache.poi.ss.usermodel.BorderStyle.THIN);
+		this.errorCellStyle.setBottomBorderColor(blackColor);
 		this.errorCellStyle.setBorderTop(org.apache.poi.ss.usermodel.BorderStyle.THIN);
+		this.errorCellStyle.setTopBorderColor(blackColor);
 		this.errorCellStyle.setBorderLeft(org.apache.poi.ss.usermodel.BorderStyle.THIN);
+		this.errorCellStyle.setLeftBorderColor(blackColor);
 		this.errorCellStyle.setBorderRight(org.apache.poi.ss.usermodel.BorderStyle.THIN);
+		this.errorCellStyle.setRightBorderColor(blackColor);
 		org.apache.poi.xssf.usermodel.XSSFFont boldFont= this.orgWb.createFont();
 		boldFont.setBold(true);
+		boldFont.setColor(redColor);
 		this.errorCellStyle.setFont(boldFont);
 		
 		this.objTranslationSheet = this.orgWb.getSheet("Object translation");
-		this.objTranslationSheetLastRow = (objTranslationSheet == null ? -1 : objTranslationSheet.getLastRowNum());
+		this.objTranslationSheetLastRow = (this.objTranslationSheet == null ? -1 : this.objTranslationSheet.getLastRowNum());
+		
+		this.nameFieldSheet = this.orgWb.getSheet("Fields");
+		this.nameFieldSheetLastRow = (this.nameFieldSheet == null ? -1 : this.nameFieldSheet.getLastRowNum());
+		
 		this.fieldSheet = this.orgWb.getSheet("Fields");
 		this.fieldSheetLastRow = (this.fieldSheet == null ? -1 : this.fieldSheet.getLastRowNum());
+		
 		this.fieldTranslationSheet = this.orgWb.getSheet("Fields translation");
 		this.fieldTranslationSheetLastRow = (this.fieldTranslationSheet == null ? -1 : this.fieldTranslationSheet.getLastRowNum());
+		
 		this.fieldValueSetsSheet = this.orgWb.getSheet("Fields valueSets");
 		this.fieldValueSetsSheetLastRow = (this.fieldValueSetsSheet == null ? -1 : this.fieldValueSetsSheet.getLastRowNum());
+		
 		this.fieldValueSetTranslationSheet = this.orgWb.getSheet("Fields valueSets translations");
 		this.fieldValueSetTranslationSheetLastRow = (this.fieldValueSetTranslationSheet == null ? -1 : this.fieldValueSetTranslationSheet.getLastRowNum());
+		
 		this.globalValueSetSheet = this.orgWb.getSheet("Global valueSets");
 		this.globalValueSetSheetLastRow = (this.globalValueSetSheet == null ? -1 : this.globalValueSetSheet.getLastRowNum());
+		
 		this.globalValueSetTranslationSheet = this.orgWb.getSheet("Global valueSets translation");
 		this.globalValueSetTranslationSheetLastRow = (this.globalValueSetTranslationSheet == null ? -1 : this.globalValueSetTranslationSheet.getLastRowNum());
+		
 		this.standardValueSetSheet = this.orgWb.getSheet("Standard valueSets");
 		this.standardValueSetSheetLastRow = (this.standardValueSetSheet == null ? -1 : this.standardValueSetSheet.getLastRowNum());
+		
 		this.standardValueSetTranslationSheet = this.orgWb.getSheet("Standard valueSets translation");
 		this.standardValueSetTranslationSheetLastRow = (this.standardValueSetTranslationSheet == null ? -1 : this.standardValueSetTranslationSheet.getLastRowNum());
+		
 		this.labelSheet = this.orgWb.getSheet("Labels");
 		this.labelSheetLastRow = (this.labelSheet == null ? -1 : this.labelSheet.getLastRowNum());
+		
 		this.labelSheetTranslation = this.orgWb.getSheet("Label translation");
 		this.labelSheetTranslationLastRow = (this.labelSheetTranslation == null ? -1 : this.labelSheetTranslation.getLastRowNum());
+		
 		this.recordTypeSheet = this.orgWb.getSheet("RecordTypes");
 		this.recordTypeSheetLastRow = (this.recordTypeSheet == null ? -1 : this.recordTypeSheet.getLastRowNum());
+		
 		this.recordTypeTranslationSheet = this.orgWb.getSheet("RecordTypes translation");
 		this.recordTypeTranslationSheetLastRow = (this.recordTypeTranslationSheet == null ? -1 : this.recordTypeTranslationSheet.getLastRowNum());
 		
