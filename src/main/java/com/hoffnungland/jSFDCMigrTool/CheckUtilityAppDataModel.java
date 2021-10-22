@@ -568,7 +568,7 @@ public class CheckUtilityAppDataModel {
 				boolean insertStandardValueSetTranslation = this.checkMultipleEntry(this.standardValueSetTranslationSheet, listMatchEntryStandardVsTranslation, listCheckEntryStandardVsTranslation, fieldStatus);
 				
 				if(insertStandardValueSetTranslation) {
-					this.insertStandardValueSetTranslation(fieldName, fieldLabel, italianFieldTranslation, fieldStatus, sourceValue);
+					this.insertStandardValueSetTranslation(fieldName + "-it", fieldLabel, italianFieldTranslation, fieldStatus, sourceValue);
 				}
 				
 			} else {
