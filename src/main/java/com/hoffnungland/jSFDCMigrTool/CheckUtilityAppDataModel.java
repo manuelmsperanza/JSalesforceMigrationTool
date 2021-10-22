@@ -178,7 +178,7 @@ public class CheckUtilityAppDataModel {
 		this.objTranslationSheet = this.orgWb.getSheet("Object translation");
 		this.objTranslationSheetLastRow = (this.objTranslationSheet == null ? -1 : this.objTranslationSheet.getLastRowNum());
 		
-		this.nameFieldSheet = this.orgWb.getSheet("Fields");
+		this.nameFieldSheet = this.orgWb.getSheet("Name Fields");
 		this.nameFieldSheetLastRow = (this.nameFieldSheet == null ? -1 : this.nameFieldSheet.getLastRowNum());
 		
 		this.fieldSheet = this.orgWb.getSheet("Fields");
