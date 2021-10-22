@@ -797,9 +797,7 @@ public class CheckUtilityAppDataModel {
 			logger.error(entityName + ": source is empty for row " + dmRow.getRowNum());
 			return;
 		}
-		if(!listSources.contains(sourceValue)) {
-			return;
-		}
+		
 		boolean rowHasError = false;
 		String fieldName = getCellValue(dmRow, namePos);
 		logger.debug("fieldName: " + fieldName);
@@ -815,6 +813,9 @@ public class CheckUtilityAppDataModel {
 			rowHasError = true;
 		}
 		
+		String fieldItalianTranslation = getCellValue(dmRow, italianPos);
+		logger.debug("fieldItalianTranslation: " + fieldItalianTranslation);
+		
 		if("name".equalsIgnoreCase(fieldName)) {
 			
 			if(rowHasError) {
@@ -822,12 +823,17 @@ public class CheckUtilityAppDataModel {
 				return;
 			}
 			
-			boolean insertNameField = this.checkSingleEntry(this.nameFieldSheet,entityName, 0, fieldLabel, 2, "object name label");
+			boolean insertNameField = this.checkSingleEntry(this.nameFieldSheet, entityName, 0, fieldLabel, 2, "object name label");
 			if(insertNameField) {
 				this.insertNameField(entityName, fieldLabel);
 			}
 			
 		} else {
+			
+			if(!listSources.contains(sourceValue)) {
+				return;
+			}
+			
 			String fieldType = getCellValue(dmRow, labelPos);
 			logger.debug("fieldType: " + fieldType);
 			if(StringUtils.isBlank(fieldType)) {
@@ -847,8 +853,7 @@ public class CheckUtilityAppDataModel {
 				return;
 			}
 		
-			String fieldItalianTranslation = getCellValue(dmRow, italianPos);
-			logger.debug("fieldItalianTranslation: " + fieldItalianTranslation);
+			
 			String fieldValueSetName = getCellValue(dmRow, valueSetNamePos);
 			logger.debug("fieldValueSetName: " + fieldValueSetName);
 			
@@ -971,10 +976,10 @@ public class CheckUtilityAppDataModel {
 		
 	}
 	
-	private boolean checkSingleEntry(org.apache.poi.xssf.usermodel.XSSFSheet checkSheet, String matchValue, int matchPosition, String checkValue, int checkPosition, String objectDescription) {
+	private boolean checkSingleEntry(org.apache.poi.xssf.usermodel.XSSFSheet checkSheet, String matchValue, int matchPosition, String sourceCheckValue, int checkPosition, String objectDescription) {
 		logger.traceEntry();
 		
-		boolean insertNewRecord = !StringUtils.isBlank(checkValue);
+		boolean insertNewRecord = !StringUtils.isBlank(sourceCheckValue);
 				
 		if(checkSheet == null) {
 			return logger.traceExit(insertNewRecord);
@@ -990,16 +995,16 @@ public class CheckUtilityAppDataModel {
 				if((matchValue).equals(matchCell.getStringCellValue())) {
 					
 					org.apache.poi.xssf.usermodel.XSSFCell checkValueCell = entryRow.getCell(checkPosition);
-					String checkString = (checkValueCell == null ? null : checkValueCell.getStringCellValue());
-					logger.debug("checkString: " + checkString);
+					String targetCheckString = (checkValueCell == null ? null : checkValueCell.getStringCellValue());
+					logger.debug("checkString: " + targetCheckString);
 					if(StringUtils.isBlank(matchValue)) {
-						if(!StringUtils.isBlank(checkString)) {
-							logger.error("Missing " + objectDescription + " in data model design for " + matchValue + ": " + checkString);
+						if(!StringUtils.isBlank(targetCheckString)) {
+							logger.error("Missing " + objectDescription + " in data model design for " + matchValue + ": " + targetCheckString);
 							checkValueCell.setCellStyle(this.errorCellStyle);
 						}
 					} else {
 						
-						if(matchValue.equals(checkString)) {
+						if(sourceCheckValue.equals(targetCheckString)) {
 							insertNewRecord = false;
 							checkValueCell.setCellStyle(this.existingCellStyle);
 						} else {
@@ -1007,7 +1012,7 @@ public class CheckUtilityAppDataModel {
 								checkValueCell = entryRow.createCell(checkPosition);
 							}
 							checkValueCell.setCellStyle(this.errorCellStyle);
-							logger.error("Mismatch in " + objectDescription + ". Data Model: " + matchValue + " Org: " + checkString);
+							logger.error("Mismatch in " + objectDescription + ". Data Model: " + sourceCheckValue + " Org: " + targetCheckString);
 						}
 					}
 					return logger.traceExit(insertNewRecord);
