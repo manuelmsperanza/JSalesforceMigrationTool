@@ -865,7 +865,7 @@ public class CheckUtilityAppDataModel {
 				return;
 			}
 			
-			String fieldType = this.getCellValue(dmRow, labelPos);
+			String fieldType = this.getCellValue(dmRow, typePos);
 			logger.debug("fieldType: " + fieldType);
 			if(StringUtils.isBlank(fieldType)) {
 				logger.error(entityName + ": type is empty for row " + dmRow.getRowNum());
@@ -902,7 +902,7 @@ public class CheckUtilityAppDataModel {
 			boolean insertField = this.checkMultipleEntry(this.fieldSheet, listMatchEntryField, listCheckEntryField, fieldStatus);
 			
 			if(insertField) {
-				this.insertField(entityName, fieldName, fieldType,fieldValueSetName, fieldStatus, sourceValue);
+				this.insertField(entityName, fieldName, fieldLabel, fieldType,fieldValueSetName, fieldStatus, sourceValue);
 			}
 			
 			//boolean insertFieldTranslation = this.checkFieldTranslation(entityName, fieldName, italianFieldTranslation);
@@ -977,6 +977,18 @@ public class CheckUtilityAppDataModel {
 		return logger.traceExit(insertNewRecord);
 	}
 	
+	private boolean needsInsert(CheckUtilityAppDataModel.CheckEntry checkEntries[]) {
+		logger.traceEntry();
+		
+		for(CheckUtilityAppDataModel.CheckEntry curCheckEntry : checkEntries) {
+			if(!StringUtils.isBlank(curCheckEntry.sourceCheckValue)) {
+				return logger.traceExit(true);
+			}
+		}
+		
+		return logger.traceExit(false);
+	}
+	
 	private boolean isRecordMatching(org.apache.poi.xssf.usermodel.XSSFRow entryRow, CheckUtilityAppDataModel.MatchEntry matchEntries[]) {
 		logger.traceEntry();
 				
@@ -1023,10 +1035,10 @@ public class CheckUtilityAppDataModel {
 	private boolean checkMultipleEntry(org.apache.poi.xssf.usermodel.XSSFSheet checkSheet, CheckUtilityAppDataModel.MatchEntry matchEntries[], CheckUtilityAppDataModel.CheckEntry checkEntries[], String fieldStatus) {
 		logger.traceEntry();
 		
-		boolean insertNewRecord = true;
+		boolean insertNewRecord = this.needsInsert(checkEntries);
 				
 		if(checkSheet == null) {
-			return logger.traceExit(true);
+			return logger.traceExit(insertNewRecord);
 		}
 		
 		Iterator<org.apache.poi.ss.usermodel.Row> rowIter = checkSheet.rowIterator();
@@ -1272,7 +1284,7 @@ public class CheckUtilityAppDataModel {
 		return logger.traceExit(insertField);
 	}
 	
-	private void insertField(String entityName, String fieldName, String fieldType, String fieldValueSetName, String fieldStatus, String sourceValue) {
+	private void insertField(String entityName, String fieldName, String fieldLabel, String fieldType, String fieldValueSetName, String fieldStatus, String sourceValue) {
 		logger.traceEntry();
 		
 		if(this.fieldSheet == null) {
@@ -1292,7 +1304,7 @@ public class CheckUtilityAppDataModel {
 		logger.error(entityName + "." + fieldName + ": field missing. Status: " + fieldStatus + " Source: " + sourceValue);
 		org.apache.poi.xssf.usermodel.XSSFRow newFieldRow = this.fieldSheet.createRow(++this.fieldSheetLastRow);
 		
-		String cellValues[] = {entityName, fieldName, fieldType, null, null,
+		String cellValues[] = {entityName, fieldName, fieldLabel, fieldType, null,
 				null, null, null, null, null,
 				null, null, null, null, null,
 				null, null, null, null, null,
