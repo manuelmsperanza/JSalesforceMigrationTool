@@ -2,28 +2,30 @@ package com.hoffnungland.jSFDCMigrTool;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.usermodel.XSSFColor;
-import org.apache.poi.xssf.usermodel.XSSFFont;
 
 public class CheckUtilityAppDataModel {
 	
 	private static final Logger logger = LogManager.getLogger(CheckUtilityAppDataModel.class);
 	
-	private org.apache.poi.xssf.usermodel.XSSFWorkbook dmWb;
 	private File orgExcel;
 	private FileInputStream orgExcelFis = null;
 	private FileOutputStream orgExcelFos = null;
+	private org.apache.poi.xssf.usermodel.XSSFWorkbook dmWb;
 	private org.apache.poi.xssf.usermodel.XSSFWorkbook orgWb;
 	
 	private org.apache.poi.xssf.usermodel.XSSFCellStyle metadataHeaderCellStyle;
@@ -63,6 +65,10 @@ public class CheckUtilityAppDataModel {
 
 	private int orgObjTranslationRow;
 	private int dmObjTranslationRow;
+	
+	private Properties fieldStandardValueSet;
+
+	private Set<String> setStandardValueSet;
 	
 	private class MatchEntry {
 		
@@ -138,7 +144,7 @@ public class CheckUtilityAppDataModel {
 		rgb[0] = (byte) 255; // red
 		rgb[1] = (byte) 204; // green
 		rgb[2] = (byte) 153; // blue
-		XSSFColor foreGroundcolor = new XSSFColor(rgb, new org.apache.poi.xssf.usermodel.DefaultIndexedColorMap()); // #f2dcdb
+		org.apache.poi.xssf.usermodel.XSSFColor foreGroundcolor = new org.apache.poi.xssf.usermodel.XSSFColor(rgb, new org.apache.poi.xssf.usermodel.DefaultIndexedColorMap()); // #f2dcdb
 		this.headerCellStyle.setFillForegroundColor(foreGroundcolor );
 		this.headerCellStyle.setFillPattern(org.apache.poi.ss.usermodel.FillPatternType.SOLID_FOREGROUND);
 		this.headerCellStyle.setBorderBottom(org.apache.poi.ss.usermodel.BorderStyle.THIN);
@@ -154,7 +160,7 @@ public class CheckUtilityAppDataModel {
 		this.metadataHeaderCellStyle.setBorderLeft(org.apache.poi.ss.usermodel.BorderStyle.THIN);
 		this.metadataHeaderCellStyle.setBorderRight(org.apache.poi.ss.usermodel.BorderStyle.THIN);
 		this.metadataHeaderCellStyle.setAlignment(HorizontalAlignment.CENTER);
-		XSSFFont defaultFont= this.orgWb.createFont();
+		org.apache.poi.xssf.usermodel.XSSFFont defaultFont= this.orgWb.createFont();
 		defaultFont.setBold(true);
 		this.metadataHeaderCellStyle.setFont(defaultFont);
 		
@@ -325,7 +331,22 @@ public class CheckUtilityAppDataModel {
 		return logger.traceExit(workingCellStringValue);
 	}
 	
-	public void scanDataModel(List<String> listSources) {
+	private void createStringCell(org.apache.poi.xssf.usermodel.XSSFRow row, String cellValues[], org.apache.poi.xssf.usermodel.XSSFCellStyle cellStyle) {
+		logger.traceEntry();
+		
+		for(int columnIndex = 0; columnIndex < cellValues.length; columnIndex++) {
+			org.apache.poi.xssf.usermodel.XSSFCell workingCell = row.createCell(columnIndex);
+			String fieldValue = cellValues[columnIndex];
+			if(fieldValue != null) {
+				workingCell.setCellValue(fieldValue);
+			}
+			workingCell.setCellStyle(cellStyle);
+		}
+		
+		logger.traceExit();
+	}
+	
+	public void scanDataModel(List<String> listSources) throws FileNotFoundException, IOException {
 		logger.traceEntry();
 		
 		Iterator<org.apache.poi.ss.usermodel.Sheet> wsIter = this.dmWb.sheetIterator();
@@ -347,14 +368,13 @@ public class CheckUtilityAppDataModel {
 				this.checkEntity(dmSheet, listSources);
 			}
 			
-			
 		}
 		
 		logger.traceExit();
 		
 	}
-
-	private void checkLov(org.apache.poi.xssf.usermodel.XSSFSheet dmSheet, List<String> listSources) {
+	
+	private void checkLov(org.apache.poi.xssf.usermodel.XSSFSheet dmSheet, List<String> listSources) throws FileNotFoundException, IOException {
 		
 		logger.traceEntry();
 		
@@ -450,238 +470,338 @@ public class CheckUtilityAppDataModel {
 			return;
 		}
 		
+		this.fieldStandardValueSet = new Properties();
+		File fieldStandardValueSetFile = new File("./etc/fieldStandardValueSet.properties");
+		if(fieldStandardValueSetFile.exists()) {
+			try (FileInputStream configFile = new FileInputStream(fieldStandardValueSetFile)) {
+				this.fieldStandardValueSet.load(configFile);
+			}
+		}
+		this.setStandardValueSet = new HashSet<String>();
+		for(Object curValue : this.fieldStandardValueSet.values()) {
+			this.setStandardValueSet.add((String) curValue);
+		}
+		
 		while(dmRowIter.hasNext()) {
-			org.apache.poi.xssf.usermodel.XSSFRow dmRow = (org.apache.poi.xssf.usermodel.XSSFRow) dmRowIter.next();
-			org.apache.poi.xssf.usermodel.XSSFCell sourceCell = dmRow.getCell(sourcePos);
-			String sourceValue = (sourceCell == null) ? null : sourceCell.getStringCellValue();
-			if(StringUtils.isBlank(sourceValue)) {
-				logger.error("LOV: Source is empty for row #" + dmRow.getRowNum());
-				continue;
-			}
-			if(listSources.contains(sourceValue)) {
-				boolean rowHasError = false;
-				
-				String entityName = this.getCellValue(dmRow, objectPos);
-				if(StringUtils.isBlank(entityName)) {
-					logger.error("LOV: Object is empty for row " + dmRow.getRowNum());
-					rowHasError = true;
-				}
-				
-				String fieldName = this.getCellValue(dmRow, fieldPos);
-				if(StringUtils.isBlank(fieldName)) {
-					logger.error("LOV: Name is empty for row " + dmRow.getRowNum());
-					rowHasError = true;
-				}
-				String fieldValue = this.getCellValue(dmRow, valuePos);
-				if(StringUtils.isBlank(fieldValue)) {
-					logger.error("LOV: Value is empty for row " + dmRow.getRowNum());
-					rowHasError = true;
-				}
-				String fieldStatus = this.getCellValue(dmRow, statusPos);
-				if(StringUtils.isBlank(fieldStatus)) {
-					logger.error("LOV: Status is empty for row " + dmRow.getRowNum());
-					rowHasError = true;
-				}
-				
-				String fieldLabel = this.getCellValue(dmRow, labelPos);
-				if(StringUtils.isBlank(fieldLabel)) {
-					logger.error("LOV: English is empty for row " + dmRow.getRowNum());
-					rowHasError = true;
-				}
-				
-				if(rowHasError) {
-					logger.error("LOV: missing useful value(s). Skip row #" + dmRow.getRowNum());
-				} else {
-					
-					String italianFieldTranslation = this.getCellValue(dmRow, italianPos);
-					
-					if("*".equals(entityName)) {
-						boolean insertGlobalValueSet = true;
-						
-						Iterator<org.apache.poi.ss.usermodel.Row> orgGlobalValueSetsIter = this.globalValueSetSheet.rowIterator();
-						while(orgGlobalValueSetsIter.hasNext()) {
-							org.apache.poi.xssf.usermodel.XSSFRow orgGlobalValueSetRow = (org.apache.poi.xssf.usermodel.XSSFRow) orgGlobalValueSetsIter.next();
-							String orgGlobalVsName = this.getCellValue(orgGlobalValueSetRow, 0);
-							if(fieldName.equals(orgGlobalVsName)) {
-								String orgGlobalVsValue = this.getCellValue(orgGlobalValueSetRow, 1);
-								if(fieldValue.equals(orgGlobalVsValue)) {
-									org.apache.poi.xssf.usermodel.XSSFCell orgGlobalVsLabelCell = null;
-									String orgGlobalVsLabel = (orgGlobalVsLabelCell = orgGlobalValueSetRow.getCell(3)) == null ? null : orgGlobalVsLabelCell.getStringCellValue();
-									
-									if(fieldLabel.equals(orgGlobalVsLabel)) {
-										orgGlobalVsLabelCell.setCellStyle(this.existingCellStyle);
-										insertGlobalValueSet = false;
-										if(!"active".equalsIgnoreCase(fieldStatus)) {
-											logger.error("Global Value Set " + fieldName + "." + fieldValue + ": Status is not Active");
-										}
-									} else {
-										orgGlobalVsLabelCell.setCellStyle(errorCellStyle);
-										logger.error("Global Value Set " + fieldName + "." + fieldValue + ": Label mismatch. Data Model: " + fieldLabel + " Org: " + orgGlobalVsLabel);
-									}
-								}
-							}
-						}
-						
-						if(insertGlobalValueSet) {
-							logger.error("Global Value Set " + fieldName + "." + fieldValue + ": value missing. Status: " + fieldStatus + " Source: " + sourceValue);
-							org.apache.poi.xssf.usermodel.XSSFRow newGlobalValueSet = this.globalValueSetSheet.createRow(++this.globalValueSetSheetLastRow);
-							String cellValues[] = {fieldName, fieldValue, null, fieldLabel, fieldStatus, sourceValue};
-							this.createStringCell(newGlobalValueSet, cellValues, this.newCellStyle);
-						}
-						
-						boolean insertGlobalValueSetTranslation = !StringUtils.isBlank(italianFieldTranslation);
-						Iterator<org.apache.poi.ss.usermodel.Row> orgGlobalValueSetTranslationIter = this.globalValueSetTranslationSheet.rowIterator();
-						while(orgGlobalValueSetTranslationIter.hasNext()) {
-							org.apache.poi.xssf.usermodel.XSSFRow orgGlobalValueSetTranslationRow = (org.apache.poi.xssf.usermodel.XSSFRow) orgGlobalValueSetTranslationIter.next();
-							String orgGlobalVsName = this.getCellValue(orgGlobalValueSetTranslationRow, 0);
-							if((fieldName + "-it").equals(orgGlobalVsName)) {
-								String orgGlobalVsValue = this.getCellValue(orgGlobalValueSetTranslationRow, 1);
-								if(fieldLabel.equals(orgGlobalVsValue)) {
-									org.apache.poi.xssf.usermodel.XSSFCell orgGlobalVsLabelCell = null;
-									String orgGlobalVsLabel = (orgGlobalVsLabelCell = orgGlobalValueSetTranslationRow.getCell(2)) == null ? null : orgGlobalVsLabelCell.getStringCellValue();
-									
-									if(StringUtils.isBlank(italianFieldTranslation)) {
-										if(!StringUtils.isBlank(orgGlobalVsLabel)) {
-											insertGlobalValueSetTranslation = true;
-											orgGlobalVsLabelCell.setCellStyle(this.errorCellStyle);
-											logger.error("Missing Global Value Set italian Translation in data model design for " + fieldName + "." + fieldLabel + ": " + orgGlobalVsLabel);
-											
-										}
-									} else {
-									
-										if(italianFieldTranslation.equals(orgGlobalVsLabel)) {
-											orgGlobalVsLabelCell.setCellStyle(this.existingCellStyle);
-											insertGlobalValueSetTranslation = false;
-											if(!"active".equalsIgnoreCase(fieldStatus)) {
-												logger.error("Global Value Set italian Translation " + fieldName + "." + fieldLabel + ": Status is not Active");
-											}
-										} else {
-											insertGlobalValueSetTranslation = true;
-											orgGlobalVsLabelCell.setCellStyle(this.errorCellStyle);
-											logger.error("Global Value Set " + fieldName + "." + fieldLabel + ": italian Label Translation mismatch. Data Model: " + italianFieldTranslation + " Org: " + orgGlobalVsLabel);
-										}
-									}
-								}
-							}
-						}
-						
-						if(insertGlobalValueSetTranslation) {
-							logger.error("Global Value Set " + fieldName + "." + fieldValue + ": value italian translation missing. Status: " + fieldStatus + " Source: " + sourceValue);
-							org.apache.poi.xssf.usermodel.XSSFRow newGlobalValueSetTranslation = this.globalValueSetTranslationSheet.createRow(++this.globalValueSetTranslationSheetLastRow);							
-							String cellValues[] = {fieldName + "-it", fieldLabel, italianFieldTranslation, fieldStatus, fieldStatus, sourceValue};
-							this.createStringCell(newGlobalValueSetTranslation, cellValues, this.newCellStyle);
-						}
-						
-					} else {
-						boolean insertFieldValueSet = true;
-						Iterator<org.apache.poi.ss.usermodel.Row> orgFieldValueSetsIter = this.fieldValueSetsSheet.rowIterator();
-						while(orgFieldValueSetsIter.hasNext()) {
-							
-							org.apache.poi.xssf.usermodel.XSSFRow orgFieldValueSetRow = (org.apache.poi.xssf.usermodel.XSSFRow) orgFieldValueSetsIter.next();
-							
-							String orgFieldFilename = this.getCellValue(orgFieldValueSetRow, 0);
-							
-							if(entityName.equals(orgFieldFilename)) {
-								String orgFieldName = this.getCellValue(orgFieldValueSetRow, 1);
-								if(fieldName.equals(orgFieldName)) {
-									String orgFieldValue = this.getCellValue(orgFieldValueSetRow, 3);
-									if(fieldValue.equals(orgFieldValue)) {
-										org.apache.poi.xssf.usermodel.XSSFCell orgFieldLabelCell = null;
-										String orgFieldLabel = (orgFieldLabelCell = orgFieldValueSetRow.getCell(5)) == null ? null : orgFieldLabelCell.getStringCellValue();
-										
-										if(fieldLabel.equals(orgFieldLabel)) {
-											orgFieldLabelCell.setCellStyle(this.existingCellStyle);
-											insertFieldValueSet = false;
-											if(!"active".equalsIgnoreCase(fieldStatus)) {
-												logger.error("Value Set " + entityName + "." + fieldName + "." + fieldValue + ": Status is not Active");
-											}
-										} else {
-											orgFieldLabelCell.setCellStyle(this.errorCellStyle);
-											logger.error("Value Set " + entityName + "." + fieldName + "." + fieldValue + ": Label mismatch. Data Model: " + fieldLabel + " Org: " + orgFieldLabel);
-										}
-										
-									}
-								}
-							}
-						}
-						
-						if(insertFieldValueSet) {
-							logger.error("Value Set " + entityName + "." + fieldName + "." + fieldValue + ": value missing. Status: " + fieldStatus + " Source: " + sourceValue);
-							org.apache.poi.xssf.usermodel.XSSFRow newFieldValueSet = this.fieldValueSetsSheet.createRow(++this.fieldValueSetsSheetLastRow);
-							
-							String cellValues[] = {entityName, fieldName, fieldValue, fieldLabel, fieldStatus, sourceValue};
-							this.createStringCell(newFieldValueSet, cellValues, this.newCellStyle);
-						}
-						
-						boolean insertValueSetTranslation = !StringUtils.isBlank(italianFieldTranslation);
-						Iterator<org.apache.poi.ss.usermodel.Row> orgValueSetTranslationIter = this.fieldValueSetTranslationSheet.rowIterator();
-						while(orgValueSetTranslationIter.hasNext()) {
-							org.apache.poi.xssf.usermodel.XSSFRow orgValueSetTranslationRow = (org.apache.poi.xssf.usermodel.XSSFRow) orgValueSetTranslationIter.next();
-							String orgEntityName = this.getCellValue(orgValueSetTranslationRow, 0);
-							if((entityName + "-it").equals(orgEntityName)) {
-								String orgFieldName = this.getCellValue(orgValueSetTranslationRow, 2);
-								if(fieldName.equals(orgFieldName)) {
-									String orgFieldValue = this.getCellValue(orgValueSetTranslationRow, 3);
-									if(fieldLabel.equals(orgFieldValue)) {
-										org.apache.poi.xssf.usermodel.XSSFCell orgValueTranslationCell = null;
-										String orgValueTranslation = (orgValueTranslationCell = orgValueSetTranslationRow.getCell(4)) == null ? null : orgValueTranslationCell.getStringCellValue();
-										
-										if(StringUtils.isBlank(italianFieldTranslation)) {
-											if(!StringUtils.isBlank(orgValueTranslation)) {
-												insertValueSetTranslation = true;
-												orgValueTranslationCell.setCellStyle(this.errorCellStyle);
-												logger.error("Missing Value Set Translation in data model design for " + entityName + "." + fieldName + "." + fieldLabel + ": " + orgValueTranslation);
-											}
-										} else {
-											
-											if(italianFieldTranslation.equals(orgValueTranslation)) {
-												orgValueTranslationCell.setCellStyle(this.existingCellStyle);
-												insertValueSetTranslation = false;
-												if(!"active".equalsIgnoreCase(fieldStatus)) {
-													logger.error("Value Set " + entityName + "." + fieldName + "." + fieldLabel + ": Status is not Active");
-												}
-											} else {
-												insertValueSetTranslation = true;
-												orgValueTranslationCell.setCellStyle(this.errorCellStyle);
-												logger.error("Value Set " + entityName + "." + fieldName + "." + fieldLabel + ": Label Translation mismatch. Data Model: " + italianFieldTranslation + " Org: " + orgValueTranslation);
-											}
-										}
-									}
-								}
-							}
-						}
-						
-						if(insertValueSetTranslation) {
-							logger.error("Value Set " + entityName + "." + fieldName + "." + fieldValue + ": value italian translation missing. Status: " + fieldStatus + " Source: " + sourceValue);
-							org.apache.poi.xssf.usermodel.XSSFRow newFieldValueSetTranslation = this.fieldValueSetTranslationSheet.createRow(++this.fieldValueSetTranslationSheetLastRow);
-							
-							String cellValues[] = {entityName + "-it", null, fieldName, fieldLabel, italianFieldTranslation, fieldStatus, sourceValue};
-							this.createStringCell(newFieldValueSetTranslation, cellValues, this.newCellStyle);
-							
-						}
-					}
-				}
-			}
+			
+			this.checkLovRow((org.apache.poi.xssf.usermodel.XSSFRow) dmRowIter.next(), listSources, objectPos, fieldPos, valuePos, labelPos, italianPos, statusPos, sourcePos);
 		}
 		
 		logger.traceExit();
 	}
 	
-	private void createStringCell(org.apache.poi.xssf.usermodel.XSSFRow row, String cellValues[], org.apache.poi.xssf.usermodel.XSSFCellStyle cellStyle) {
+	private void checkLovRow(org.apache.poi.xssf.usermodel.XSSFRow dmRow, List<String> listSources, int objectPos, int fieldPos, int valuePos,	int labelPos, int italianPos, int statusPos, int sourcePos) {
 		logger.traceEntry();
 		
-		for(int columnIndex = 0; columnIndex < cellValues.length; columnIndex++) {
-			org.apache.poi.xssf.usermodel.XSSFCell workingCell = row.createCell(columnIndex);
-			String fieldValue = cellValues[columnIndex];
-			if(fieldValue != null) {
-				workingCell.setCellValue(fieldValue);
+		org.apache.poi.xssf.usermodel.XSSFCell sourceCell = dmRow.getCell(sourcePos);
+		String sourceValue = (sourceCell == null) ? null : sourceCell.getStringCellValue();
+		if(StringUtils.isBlank(sourceValue)) {
+			logger.error("LOV: Source is empty for row #" + dmRow.getRowNum());
+			logger.traceExit();
+			return;
+		}
+		
+		boolean rowHasError = false;
+			
+		String entityName = this.getCellValue(dmRow, objectPos);
+		if(StringUtils.isBlank(entityName)) {
+			logger.error("LOV: Object is empty for row " + dmRow.getRowNum());
+			rowHasError = true;
+		}
+			
+		String fieldName = this.getCellValue(dmRow, fieldPos);
+		if(StringUtils.isBlank(fieldName)) {
+			logger.error("LOV: Name is empty for row " + dmRow.getRowNum());
+			rowHasError = true;
+		}
+		String fieldValue = this.getCellValue(dmRow, valuePos);
+		if(StringUtils.isBlank(fieldValue)) {
+			logger.error("LOV: Value is empty for row " + dmRow.getRowNum());
+			rowHasError = true;
+		}
+		String fieldStatus = this.getCellValue(dmRow, statusPos);
+		if(StringUtils.isBlank(fieldStatus)) {
+			logger.error("LOV: Status is empty for row " + dmRow.getRowNum());
+			rowHasError = true;
+		}
+		
+		String fieldLabel = this.getCellValue(dmRow, labelPos);
+		if(StringUtils.isBlank(fieldLabel)) {
+			logger.error("LOV: English is empty for row " + dmRow.getRowNum());
+			rowHasError = true;
+		}
+		
+		if(rowHasError) {
+			logger.error("LOV: missing useful value(s). Skip row #" + dmRow.getRowNum());
+			logger.traceExit();
+			return;
+		}
+				
+		String italianFieldTranslation = this.getCellValue(dmRow, italianPos);
+		
+		if("*".equals(entityName)) {
+			
+			if(this.setStandardValueSet.contains(fieldName)) {
+				
+				CheckUtilityAppDataModel.MatchEntry listMatchEntryStandardVs[] = {
+						new CheckUtilityAppDataModel.MatchEntry(fieldName, 0),
+						new CheckUtilityAppDataModel.MatchEntry(fieldValue, 1)
+				};
+				CheckUtilityAppDataModel.CheckEntry listCheckEntryStandardVs[] = {
+						new CheckUtilityAppDataModel.CheckEntry(fieldLabel, 3, "standard valueset entry"),
+				};
+				
+				boolean insertStandardValueSet = this.checkMultipleEntry(this.standardValueSetSheet, listMatchEntryStandardVs, listCheckEntryStandardVs, fieldStatus);
+				
+				if(insertStandardValueSet) {
+					this.insertStandardValueSet(fieldName, fieldValue, fieldLabel, fieldStatus, sourceValue);
+				}
+				
+				CheckUtilityAppDataModel.MatchEntry listMatchEntryStandardVsTranslation[] = {
+						new CheckUtilityAppDataModel.MatchEntry(fieldName+"-it", 0),
+						new CheckUtilityAppDataModel.MatchEntry(fieldLabel, 1)
+				};
+				CheckUtilityAppDataModel.CheckEntry listCheckEntryStandardVsTranslation[] = {
+						new CheckUtilityAppDataModel.CheckEntry(italianFieldTranslation, 2, "italian standard valueset translation"),
+				};
+				
+				boolean insertStandardValueSetTranslation = this.checkMultipleEntry(this.standardValueSetTranslationSheet, listMatchEntryStandardVsTranslation, listCheckEntryStandardVsTranslation, fieldStatus);
+				
+				if(insertStandardValueSetTranslation) {
+					this.insertStandardValueSetTranslation(fieldName, fieldLabel, italianFieldTranslation, fieldStatus, sourceValue);
+				}
+				
+			} else {
+				
+				if(!listSources.contains(sourceValue)) {
+					logger.traceExit();
+					return;
+				}
+				
+				/*boolean insertGlobalValueSet = true;
+				
+				Iterator<org.apache.poi.ss.usermodel.Row> orgGlobalValueSetsIter = this.globalValueSetSheet.rowIterator();
+				while(orgGlobalValueSetsIter.hasNext()) {
+					org.apache.poi.xssf.usermodel.XSSFRow orgGlobalValueSetRow = (org.apache.poi.xssf.usermodel.XSSFRow) orgGlobalValueSetsIter.next();
+					String orgGlobalVsName = this.getCellValue(orgGlobalValueSetRow, 0);
+					if(fieldName.equals(orgGlobalVsName)) {
+						String orgGlobalVsValue = this.getCellValue(orgGlobalValueSetRow, 1);
+						if(fieldValue.equals(orgGlobalVsValue)) {
+							org.apache.poi.xssf.usermodel.XSSFCell orgGlobalVsLabelCell = null;
+							String orgGlobalVsLabel = (orgGlobalVsLabelCell = orgGlobalValueSetRow.getCell(3)) == null ? null : orgGlobalVsLabelCell.getStringCellValue();
+							
+							if(fieldLabel.equals(orgGlobalVsLabel)) {
+								orgGlobalVsLabelCell.setCellStyle(this.existingCellStyle);
+								insertGlobalValueSet = false;
+								if(!"active".equalsIgnoreCase(fieldStatus)) {
+									logger.error("Global Value Set " + fieldName + "." + fieldValue + ": Status is not Active");
+								}
+							} else {
+								orgGlobalVsLabelCell.setCellStyle(errorCellStyle);
+								logger.error("Global Value Set " + fieldName + "." + fieldValue + ": Label mismatch. Data Model: " + fieldLabel + " Org: " + orgGlobalVsLabel);
+							}
+						}
+					}
+				}*/
+				CheckUtilityAppDataModel.MatchEntry listMatchEntryStandardVs[] = {
+						new CheckUtilityAppDataModel.MatchEntry(fieldName, 0),
+						new CheckUtilityAppDataModel.MatchEntry(fieldValue, 1)
+				};
+				CheckUtilityAppDataModel.CheckEntry listCheckEntryStandardVs[] = {
+						new CheckUtilityAppDataModel.CheckEntry(fieldLabel, 3, "global valueset entry"),
+				};
+				
+				boolean insertGlobalValueSet = this.checkMultipleEntry(this.globalValueSetSheet, listMatchEntryStandardVs, listCheckEntryStandardVs, fieldStatus);
+				
+				if(insertGlobalValueSet) {
+					this.insertGlobalValueSet(fieldName, fieldValue, fieldLabel, fieldStatus, sourceValue);
+					/*logger.error("Global Value Set " + fieldName + "." + fieldValue + ": value missing. Status: " + fieldStatus + " Source: " + sourceValue);
+					org.apache.poi.xssf.usermodel.XSSFRow newGlobalValueSet = this.globalValueSetSheet.createRow(++this.globalValueSetSheetLastRow);
+					String cellValues[] = {fieldName, fieldValue, null, fieldLabel, fieldStatus, sourceValue};
+					this.createStringCell(newGlobalValueSet, cellValues, this.newCellStyle);*/
+				}
+				
+				/*boolean insertGlobalValueSetTranslation = !StringUtils.isBlank(italianFieldTranslation);
+				Iterator<org.apache.poi.ss.usermodel.Row> orgGlobalValueSetTranslationIter = this.globalValueSetTranslationSheet.rowIterator();
+				while(orgGlobalValueSetTranslationIter.hasNext()) {
+					org.apache.poi.xssf.usermodel.XSSFRow orgGlobalValueSetTranslationRow = (org.apache.poi.xssf.usermodel.XSSFRow) orgGlobalValueSetTranslationIter.next();
+					String orgGlobalVsName = this.getCellValue(orgGlobalValueSetTranslationRow, 0);
+					if((fieldName + "-it").equals(orgGlobalVsName)) {
+						String orgGlobalVsValue = this.getCellValue(orgGlobalValueSetTranslationRow, 1);
+						if(fieldLabel.equals(orgGlobalVsValue)) {
+							org.apache.poi.xssf.usermodel.XSSFCell orgGlobalVsLabelCell = null;
+							String orgGlobalVsLabel = (orgGlobalVsLabelCell = orgGlobalValueSetTranslationRow.getCell(2)) == null ? null : orgGlobalVsLabelCell.getStringCellValue();
+							
+							if(StringUtils.isBlank(italianFieldTranslation)) {
+								if(!StringUtils.isBlank(orgGlobalVsLabel)) {
+									insertGlobalValueSetTranslation = true;
+									orgGlobalVsLabelCell.setCellStyle(this.errorCellStyle);
+									logger.error("Missing Global Value Set italian Translation in data model design for " + fieldName + "." + fieldLabel + ": " + orgGlobalVsLabel);
+									
+								}
+							} else {
+							
+								if(italianFieldTranslation.equals(orgGlobalVsLabel)) {
+									orgGlobalVsLabelCell.setCellStyle(this.existingCellStyle);
+									insertGlobalValueSetTranslation = false;
+									if(!"active".equalsIgnoreCase(fieldStatus)) {
+										logger.error("Global Value Set italian Translation " + fieldName + "." + fieldLabel + ": Status is not Active");
+									}
+								} else {
+									insertGlobalValueSetTranslation = true;
+									orgGlobalVsLabelCell.setCellStyle(this.errorCellStyle);
+									logger.error("Global Value Set " + fieldName + "." + fieldLabel + ": italian Label Translation mismatch. Data Model: " + italianFieldTranslation + " Org: " + orgGlobalVsLabel);
+								}
+							}
+						}
+					}
+				}*/
+				
+				CheckUtilityAppDataModel.MatchEntry listMatchEntryStandardVsTranslation[] = {
+						new CheckUtilityAppDataModel.MatchEntry(fieldName+"-it", 0),
+						new CheckUtilityAppDataModel.MatchEntry(fieldLabel, 1)
+				};
+				CheckUtilityAppDataModel.CheckEntry listCheckEntryStandardVsTranslation[] = {
+						new CheckUtilityAppDataModel.CheckEntry(italianFieldTranslation, 2, "italian global valueset translation"),
+				};
+				
+				boolean insertGlobalValueSetTranslation = this.checkMultipleEntry(this.globalValueSetTranslationSheet, listMatchEntryStandardVsTranslation, listCheckEntryStandardVsTranslation, fieldStatus);
+				
+				if(insertGlobalValueSetTranslation) {
+					this.insertGlobalValueSetTranslation(fieldName + "-it", fieldLabel, italianFieldTranslation, fieldStatus, sourceValue);
+					/*logger.error("Global Value Set " + fieldName + "." + fieldValue + ": value italian translation missing. Status: " + fieldStatus + " Source: " + sourceValue);
+					org.apache.poi.xssf.usermodel.XSSFRow newGlobalValueSetTranslation = this.globalValueSetTranslationSheet.createRow(++this.globalValueSetTranslationSheetLastRow);							
+					String cellValues[] = {fieldName + "-it", fieldLabel, italianFieldTranslation, fieldStatus, sourceValue};
+					this.createStringCell(newGlobalValueSetTranslation, cellValues, this.newCellStyle);*/
+				}
+				
 			}
-			workingCell.setCellStyle(cellStyle);
+			
+			
+			
+		} else {
+			
+			if(!listSources.contains(sourceValue)) {
+				logger.traceExit();
+				return;
+			}
+			
+			/*boolean insertFieldValueSet = true;
+			Iterator<org.apache.poi.ss.usermodel.Row> orgFieldValueSetsIter = this.fieldValueSetsSheet.rowIterator();
+			while(orgFieldValueSetsIter.hasNext()) {
+				
+				org.apache.poi.xssf.usermodel.XSSFRow orgFieldValueSetRow = (org.apache.poi.xssf.usermodel.XSSFRow) orgFieldValueSetsIter.next();
+				
+				String orgFieldFilename = this.getCellValue(orgFieldValueSetRow, 0);
+				
+				if(entityName.equals(orgFieldFilename)) {
+					String orgFieldName = this.getCellValue(orgFieldValueSetRow, 1);
+					if(fieldName.equals(orgFieldName)) {
+						String orgFieldValue = this.getCellValue(orgFieldValueSetRow, 3);
+						if(fieldValue.equals(orgFieldValue)) {
+							org.apache.poi.xssf.usermodel.XSSFCell orgFieldLabelCell = null;
+							String orgFieldLabel = (orgFieldLabelCell = orgFieldValueSetRow.getCell(5)) == null ? null : orgFieldLabelCell.getStringCellValue();
+							
+							if(fieldLabel.equals(orgFieldLabel)) {
+								orgFieldLabelCell.setCellStyle(this.existingCellStyle);
+								insertFieldValueSet = false;
+								if(!"active".equalsIgnoreCase(fieldStatus)) {
+									logger.error("Value Set " + entityName + "." + fieldName + "." + fieldValue + ": Status is not Active");
+								}
+							} else {
+								orgFieldLabelCell.setCellStyle(this.errorCellStyle);
+								logger.error("Value Set " + entityName + "." + fieldName + "." + fieldValue + ": Label mismatch. Data Model: " + fieldLabel + " Org: " + orgFieldLabel);
+							}
+							
+						}
+					}
+				}
+			}*/
+			
+			CheckUtilityAppDataModel.MatchEntry listMatchEntryStandardVs[] = {
+					new CheckUtilityAppDataModel.MatchEntry(entityName, 0),
+					new CheckUtilityAppDataModel.MatchEntry(fieldName, 1),
+					new CheckUtilityAppDataModel.MatchEntry(fieldValue, 3)
+			};
+			CheckUtilityAppDataModel.CheckEntry listCheckEntryStandardVs[] = {
+					new CheckUtilityAppDataModel.CheckEntry(fieldLabel, 5, "field valueset entry"),
+			};
+			
+			boolean insertFieldValueSet = this.checkMultipleEntry(this.fieldValueSetsSheet, listMatchEntryStandardVs, listCheckEntryStandardVs, fieldStatus);
+			
+			if(insertFieldValueSet) {
+				this.insertFieldValueSet(entityName, fieldName, fieldValue, fieldLabel, fieldStatus, sourceValue);
+				/*logger.error("Value Set " + entityName + "." + fieldName + "." + fieldValue + ": value missing. Status: " + fieldStatus + " Source: " + sourceValue);
+				org.apache.poi.xssf.usermodel.XSSFRow newFieldValueSet = this.fieldValueSetsSheet.createRow(++this.fieldValueSetsSheetLastRow);
+				
+				String cellValues[] = {entityName, fieldName, null, fieldValue, null, fieldLabel, fieldStatus, sourceValue};
+				this.createStringCell(newFieldValueSet, cellValues, this.newCellStyle);*/
+			}
+			
+			/*boolean insertFieldValueSetTranslation = !StringUtils.isBlank(italianFieldTranslation);
+			Iterator<org.apache.poi.ss.usermodel.Row> orgValueSetTranslationIter = this.fieldValueSetTranslationSheet.rowIterator();
+			while(orgValueSetTranslationIter.hasNext()) {
+				org.apache.poi.xssf.usermodel.XSSFRow orgValueSetTranslationRow = (org.apache.poi.xssf.usermodel.XSSFRow) orgValueSetTranslationIter.next();
+				String orgEntityName = this.getCellValue(orgValueSetTranslationRow, 0);
+				if((entityName + "-it").equals(orgEntityName)) {
+					String orgFieldName = this.getCellValue(orgValueSetTranslationRow, 2);
+					if(fieldName.equals(orgFieldName)) {
+						String orgFieldValue = this.getCellValue(orgValueSetTranslationRow, 3);
+						if(fieldLabel.equals(orgFieldValue)) {
+							org.apache.poi.xssf.usermodel.XSSFCell orgValueTranslationCell = null;
+							String orgValueTranslation = (orgValueTranslationCell = orgValueSetTranslationRow.getCell(4)) == null ? null : orgValueTranslationCell.getStringCellValue();
+							
+							if(StringUtils.isBlank(italianFieldTranslation)) {
+								if(!StringUtils.isBlank(orgValueTranslation)) {
+									insertFieldValueSetTranslation = true;
+									orgValueTranslationCell.setCellStyle(this.errorCellStyle);
+									logger.error("Missing Value Set Translation in data model design for " + entityName + "." + fieldName + "." + fieldLabel + ": " + orgValueTranslation);
+								}
+							} else {
+								
+								if(italianFieldTranslation.equals(orgValueTranslation)) {
+									orgValueTranslationCell.setCellStyle(this.existingCellStyle);
+									insertFieldValueSetTranslation = false;
+									if(!"active".equalsIgnoreCase(fieldStatus)) {
+										logger.error("Value Set " + entityName + "." + fieldName + "." + fieldLabel + ": Status is not Active");
+									}
+								} else {
+									insertFieldValueSetTranslation = true;
+									orgValueTranslationCell.setCellStyle(this.errorCellStyle);
+									logger.error("Value Set " + entityName + "." + fieldName + "." + fieldLabel + ": Label Translation mismatch. Data Model: " + italianFieldTranslation + " Org: " + orgValueTranslation);
+								}
+							}
+						}
+					}
+				}
+			}*/
+			
+			CheckUtilityAppDataModel.MatchEntry listMatchEntryStandardVsTranslation[] = {
+					new CheckUtilityAppDataModel.MatchEntry(entityName+"-it", 0),
+					new CheckUtilityAppDataModel.MatchEntry(fieldName, 2),
+					new CheckUtilityAppDataModel.MatchEntry(fieldLabel, 3)
+			};
+			CheckUtilityAppDataModel.CheckEntry listCheckEntryStandardVsTranslation[] = {
+					new CheckUtilityAppDataModel.CheckEntry(italianFieldTranslation, 4, "italian field valueset translation"),
+			};
+			
+			boolean insertFieldValueSetTranslation = this.checkMultipleEntry(this.fieldValueSetTranslationSheet, listMatchEntryStandardVsTranslation, listCheckEntryStandardVsTranslation, fieldStatus);
+			
+			if(insertFieldValueSetTranslation) {
+				this.insertFieldValueSetTranslation(entityName + "-it", fieldName, fieldLabel, italianFieldTranslation, fieldStatus, sourceValue);
+				/*logger.error("Value Set " + entityName + "." + fieldName + "." + fieldValue + ": value italian translation missing. Status: " + fieldStatus + " Source: " + sourceValue);
+				org.apache.poi.xssf.usermodel.XSSFRow newFieldValueSetTranslation = this.fieldValueSetTranslationSheet.createRow(++this.fieldValueSetTranslationSheetLastRow);
+				
+				String cellValues[] = {entityName + "-it", null, fieldName, fieldLabel, italianFieldTranslation, fieldStatus, sourceValue};
+				this.createStringCell(newFieldValueSetTranslation, cellValues, this.newCellStyle);*/
+				
+			}
 		}
 		
 		logger.traceExit();
+		
 	}
-
+	
 	private void checkEntity(org.apache.poi.xssf.usermodel.XSSFSheet dmSheet, List<String> listSources) {
 		
 		logger.traceEntry();
@@ -912,7 +1032,7 @@ public class CheckUtilityAppDataModel {
 					new CheckUtilityAppDataModel.MatchEntry(fieldName, 1)
 			};
 			CheckUtilityAppDataModel.CheckEntry listCheckEntryFieldTranslation[] = {
-					new CheckUtilityAppDataModel.CheckEntry(italianFieldTranslation, 2, " italian field translation"),
+					new CheckUtilityAppDataModel.CheckEntry(italianFieldTranslation, 2, "italian field translation"),
 			};
 			
 			boolean insertFieldTranslation = this.checkMultipleEntry(this.fieldTranslationSheet, listMatchEntryFieldTranslation, listCheckEntryFieldTranslation, fieldStatus);
@@ -1383,6 +1503,146 @@ public class CheckUtilityAppDataModel {
 		
 		String cellValues[] = {entityName + "-it", fieldName, italianFieldTranslation, null, null, null, null, null, fieldStatus, sourceValue};
 		this.createStringCell(newFieldTranslationRow, cellValues, this.newCellStyle);
+		
+		logger.traceExit();	
+	}
+	
+	private void insertStandardValueSet(String fieldName, String fieldValue, String fieldLabel, String fieldStatus, String sourceValue) {
+		
+		logger.traceEntry();
+		
+		if(this.standardValueSetSheet == null) {
+			String sheetName = "Standard valueSets";
+			String[] columnsList = {"filename", "fullName", "default", "label", "groupingStringEnum", "groupingString", "cssExposed", "closed",
+					"converted", "forecastCategory", "probability", "won", "reviewed", "highPriority"};
+
+			this.standardValueSetSheet = this.orgWb.createSheet(sheetName);
+			this.createMetadataHeader(this.standardValueSetSheet, "Metadata " + sheetName, columnsList.length, 0, 0);
+			this.createSheetHeader(this.standardValueSetSheet, columnsList, 1, 0);
+			this.standardValueSetSheetLastRow = 1;
+		}
+		
+		logger.error(fieldName + "." + fieldValue + ": standard valueset missing. Label: " + fieldLabel + " Status: " + fieldStatus + " Source: " + sourceValue);
+		org.apache.poi.xssf.usermodel.XSSFRow newStandardValueSetRow = this.standardValueSetSheet.createRow(++this.standardValueSetSheetLastRow);
+		
+		String cellValues[] = {fieldName, fieldValue, null, fieldLabel, null, null, null, null,
+				null, null, null, null, null, null, fieldStatus, sourceValue};
+		this.createStringCell(newStandardValueSetRow, cellValues, this.newCellStyle);
+		
+		logger.traceExit();	
+	}
+	
+	private void insertStandardValueSetTranslation(String fieldName, String fieldLabel, String italianFieldTranslation, String fieldStatus, String sourceValue) {
+		
+		logger.traceEntry();
+		
+		if(this.standardValueSetTranslationSheet == null) {
+			String sheetName = "Standard valueSets translation";
+			String[] columnsList = {"filename", "masterLabel", "translation"};
+
+			this.standardValueSetTranslationSheet = this.orgWb.createSheet(sheetName);
+			this.createMetadataHeader(this.standardValueSetTranslationSheet, "Metadata " + sheetName, columnsList.length, 0, 0);
+			this.createSheetHeader(this.standardValueSetTranslationSheet, columnsList, 1, 0);
+			this.standardValueSetTranslationSheetLastRow = 1;
+		}
+		
+		logger.error(fieldName + "." + fieldLabel + ": italian standard valueset missing. Value: " + italianFieldTranslation + " Status: " + fieldStatus + " Source: " + sourceValue);
+		org.apache.poi.xssf.usermodel.XSSFRow newStandardValueSetTranslationRow = this.standardValueSetTranslationSheet.createRow(++this.standardValueSetTranslationSheetLastRow);
+		
+		String cellValues[] = {fieldName, fieldLabel, italianFieldTranslation, fieldStatus, sourceValue};
+		this.createStringCell(newStandardValueSetTranslationRow, cellValues, this.newCellStyle);
+		
+		logger.traceExit();	
+	}
+	
+	private void insertGlobalValueSet(String fieldName, String fieldValue, String fieldLabel, String fieldStatus, String sourceValue) {
+		
+		logger.traceEntry();
+		
+		if(this.globalValueSetSheet == null) {
+			String sheetName = "Global valueSets";
+			String[] columnsList = {"filename", "fullName", "default", "label"};
+
+			this.globalValueSetSheet = this.orgWb.createSheet(sheetName);
+			this.createMetadataHeader(this.globalValueSetSheet, "Metadata " + sheetName, columnsList.length, 0, 0);
+			this.createSheetHeader(this.globalValueSetSheet, columnsList, 1, 0);
+			this.globalValueSetSheetLastRow = 1;
+		}
+		
+		logger.error(fieldName + "." + fieldValue + ": global valueset missing. Label: " + fieldLabel + " Status: " + fieldStatus + " Source: " + sourceValue);
+		org.apache.poi.xssf.usermodel.XSSFRow newGlobalValueSetRow = this.globalValueSetSheet.createRow(++this.globalValueSetSheetLastRow);
+		
+		String cellValues[] = {fieldName, fieldValue, null, fieldLabel, fieldStatus, sourceValue};
+		this.createStringCell(newGlobalValueSetRow, cellValues, this.newCellStyle);
+		
+		logger.traceExit();	
+	}
+	
+	private void insertGlobalValueSetTranslation(String fieldName, String fieldLabel, String italianFieldTranslation, String fieldStatus, String sourceValue) {
+		
+		logger.traceEntry();
+		
+		if(this.globalValueSetTranslationSheet == null) {
+			String sheetName = "Global valueSets translation";
+			String[] columnsList = {"filename", "masterLabel", "translation"};
+
+			this.globalValueSetTranslationSheet = this.orgWb.createSheet(sheetName);
+			this.createMetadataHeader(this.globalValueSetTranslationSheet, "Metadata " + sheetName, columnsList.length, 0, 0);
+			this.createSheetHeader(this.globalValueSetTranslationSheet, columnsList, 1, 0);
+			this.globalValueSetTranslationSheetLastRow = 1;
+		}
+		
+		logger.error(fieldName + "." + fieldLabel + ": italian standard valueset missing. Value: " + italianFieldTranslation + " Status: " + fieldStatus + " Source: " + sourceValue);
+		org.apache.poi.xssf.usermodel.XSSFRow newGlobalValueSetTranslationRow = this.globalValueSetTranslationSheet.createRow(++this.globalValueSetTranslationSheetLastRow);
+		
+		String cellValues[] = {fieldName, fieldLabel, italianFieldTranslation, fieldStatus, sourceValue};
+		this.createStringCell(newGlobalValueSetTranslationRow, cellValues, this.newCellStyle);
+		
+		logger.traceExit();	
+	}
+	
+	private void insertFieldValueSet(String entityName, String fieldName, String fieldValue, String fieldLabel, String fieldStatus, String sourceValue) {
+		
+		logger.traceEntry();
+		
+		if(this.fieldValueSetsSheet == null) {
+			String sheetName = "Fields valueSets";
+			String[] columnsList = {"filename", "fullName", "value.position", "value.fullName", "value.default", "value.label"};
+
+			this.fieldValueSetsSheet = this.orgWb.createSheet(sheetName);
+			this.createMetadataHeader(this.fieldValueSetsSheet, "Metadata " + sheetName, columnsList.length, 0, 0);
+			this.createSheetHeader(this.fieldValueSetsSheet, columnsList, 1, 0);
+			this.fieldValueSetsSheetLastRow = 1;
+		}
+		
+		logger.error(entityName + "." + fieldName + "." + fieldValue + ": valueset missing. Label: " + fieldLabel + " Status: " + fieldStatus + " Source: " + sourceValue);
+		org.apache.poi.xssf.usermodel.XSSFRow newFieldValueSetRow = this.fieldValueSetsSheet.createRow(++this.fieldValueSetsSheetLastRow);
+		
+		String cellValues[] = {entityName, fieldName, null, fieldValue, null, fieldLabel, fieldStatus, sourceValue};
+		this.createStringCell(newFieldValueSetRow, cellValues, this.newCellStyle);
+		
+		logger.traceExit();	
+	}
+	
+	private void insertFieldValueSetTranslation(String entityName, String fieldName, String fieldLabel, String italianFieldTranslation, String fieldStatus, String sourceValue) {
+		
+		logger.traceEntry();
+		
+		if(this.fieldValueSetTranslationSheet == null) {
+			String sheetName = "Fields valueSets translations";
+			String[] columnsList = {"filename", "label", "name", "masterLabel", "translation"};
+
+			this.fieldValueSetTranslationSheet = this.orgWb.createSheet(sheetName);
+			this.createMetadataHeader(this.fieldValueSetTranslationSheet, "Metadata " + sheetName, columnsList.length, 0, 0);
+			this.createSheetHeader(this.fieldValueSetTranslationSheet, columnsList, 1, 0);
+			this.fieldValueSetTranslationSheetLastRow = 1;
+		}
+		
+		logger.error(fieldName + "." + fieldLabel + ": italian standard valueset missing. Value: " + italianFieldTranslation + " Status: " + fieldStatus + " Source: " + sourceValue);
+		org.apache.poi.xssf.usermodel.XSSFRow newFieldValueSetTranslationRow = this.fieldValueSetTranslationSheet.createRow(++this.fieldValueSetTranslationSheetLastRow);
+		
+		String cellValues[] = {entityName, null, fieldName, fieldLabel, italianFieldTranslation, fieldStatus, sourceValue};
+		this.createStringCell(newFieldValueSetTranslationRow, cellValues, this.newCellStyle);
 		
 		logger.traceExit();	
 	}
