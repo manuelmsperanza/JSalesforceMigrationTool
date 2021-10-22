@@ -467,7 +467,7 @@ public class CheckUtilityAppDataModel {
 					logger.error("LOV: missing useful value(s). Skip row #" + dmRow.getRowNum());
 				} else {
 					
-					String fieldItalianTranslation = getCellValue(dmRow, italianPos);
+					String italianFieldTranslation = getCellValue(dmRow, italianPos);
 					
 					if("*".equals(entityName)) {
 						boolean insertGlobalValueSet = true;
@@ -503,7 +503,7 @@ public class CheckUtilityAppDataModel {
 							this.createStringCell(newGlobalValueSet, cellValues, this.newCellStyle);
 						}
 						
-						boolean insertGlobalValueSetTranslation = !StringUtils.isBlank(fieldItalianTranslation);
+						boolean insertGlobalValueSetTranslation = !StringUtils.isBlank(italianFieldTranslation);
 						Iterator<org.apache.poi.ss.usermodel.Row> orgGlobalValueSetTranslationIter = this.globalValueSetTranslationSheet.rowIterator();
 						while(orgGlobalValueSetTranslationIter.hasNext()) {
 							org.apache.poi.xssf.usermodel.XSSFRow orgGlobalValueSetTranslationRow = (org.apache.poi.xssf.usermodel.XSSFRow) orgGlobalValueSetTranslationIter.next();
@@ -514,7 +514,7 @@ public class CheckUtilityAppDataModel {
 									org.apache.poi.xssf.usermodel.XSSFCell orgGlobalVsLabelCell = null;
 									String orgGlobalVsLabel = (orgGlobalVsLabelCell = orgGlobalValueSetTranslationRow.getCell(2)) == null ? null : orgGlobalVsLabelCell.getStringCellValue();
 									
-									if(StringUtils.isBlank(fieldItalianTranslation)) {
+									if(StringUtils.isBlank(italianFieldTranslation)) {
 										if(!StringUtils.isBlank(orgGlobalVsLabel)) {
 											insertGlobalValueSetTranslation = true;
 											orgGlobalVsLabelCell.setCellStyle(this.errorCellStyle);
@@ -523,7 +523,7 @@ public class CheckUtilityAppDataModel {
 										}
 									} else {
 									
-										if(fieldItalianTranslation.equals(orgGlobalVsLabel)) {
+										if(italianFieldTranslation.equals(orgGlobalVsLabel)) {
 											orgGlobalVsLabelCell.setCellStyle(this.existingCellStyle);
 											insertGlobalValueSetTranslation = false;
 											if(!"active".equalsIgnoreCase(fieldStatus)) {
@@ -532,7 +532,7 @@ public class CheckUtilityAppDataModel {
 										} else {
 											insertGlobalValueSetTranslation = true;
 											orgGlobalVsLabelCell.setCellStyle(this.errorCellStyle);
-											logger.error("Global Value Set " + fieldName + "." + fieldLabel + ": italian Label Translation mismatch. Data Model: " + fieldItalianTranslation + " Org: " + orgGlobalVsLabel);
+											logger.error("Global Value Set " + fieldName + "." + fieldLabel + ": italian Label Translation mismatch. Data Model: " + italianFieldTranslation + " Org: " + orgGlobalVsLabel);
 										}
 									}
 								}
@@ -542,7 +542,7 @@ public class CheckUtilityAppDataModel {
 						if(insertGlobalValueSetTranslation) {
 							logger.error("Global Value Set " + fieldName + "." + fieldValue + ": value italian translation missing. Status: " + fieldStatus + " Source: " + sourceValue);
 							org.apache.poi.xssf.usermodel.XSSFRow newGlobalValueSetTranslation = this.globalValueSetTranslationSheet.createRow(++this.globalValueSetTranslationSheetLastRow);							
-							String cellValues[] = {fieldName + "-it", fieldLabel, fieldItalianTranslation, fieldStatus, fieldStatus, sourceValue};
+							String cellValues[] = {fieldName + "-it", fieldLabel, italianFieldTranslation, fieldStatus, fieldStatus, sourceValue};
 							this.createStringCell(newGlobalValueSetTranslation, cellValues, this.newCellStyle);
 						}
 						
@@ -587,7 +587,7 @@ public class CheckUtilityAppDataModel {
 							this.createStringCell(newFieldValueSet, cellValues, this.newCellStyle);
 						}
 						
-						boolean insertValueSetTranslation = !StringUtils.isBlank(fieldItalianTranslation);
+						boolean insertValueSetTranslation = !StringUtils.isBlank(italianFieldTranslation);
 						Iterator<org.apache.poi.ss.usermodel.Row> orgValueSetTranslationIter = this.fieldValueSetTranslationSheet.rowIterator();
 						while(orgValueSetTranslationIter.hasNext()) {
 							org.apache.poi.xssf.usermodel.XSSFRow orgValueSetTranslationRow = (org.apache.poi.xssf.usermodel.XSSFRow) orgValueSetTranslationIter.next();
@@ -600,7 +600,7 @@ public class CheckUtilityAppDataModel {
 										org.apache.poi.xssf.usermodel.XSSFCell orgValueTranslationCell = null;
 										String orgValueTranslation = (orgValueTranslationCell = orgValueSetTranslationRow.getCell(4)) == null ? null : orgValueTranslationCell.getStringCellValue();
 										
-										if(StringUtils.isBlank(fieldItalianTranslation)) {
+										if(StringUtils.isBlank(italianFieldTranslation)) {
 											if(!StringUtils.isBlank(orgValueTranslation)) {
 												insertValueSetTranslation = true;
 												orgValueTranslationCell.setCellStyle(this.errorCellStyle);
@@ -608,7 +608,7 @@ public class CheckUtilityAppDataModel {
 											}
 										} else {
 											
-											if(fieldItalianTranslation.equals(orgValueTranslation)) {
+											if(italianFieldTranslation.equals(orgValueTranslation)) {
 												orgValueTranslationCell.setCellStyle(this.existingCellStyle);
 												insertValueSetTranslation = false;
 												if(!"active".equalsIgnoreCase(fieldStatus)) {
@@ -617,7 +617,7 @@ public class CheckUtilityAppDataModel {
 											} else {
 												insertValueSetTranslation = true;
 												orgValueTranslationCell.setCellStyle(this.errorCellStyle);
-												logger.error("Value Set " + entityName + "." + fieldName + "." + fieldLabel + ": Label Translation mismatch. Data Model: " + fieldItalianTranslation + " Org: " + orgValueTranslation);
+												logger.error("Value Set " + entityName + "." + fieldName + "." + fieldLabel + ": Label Translation mismatch. Data Model: " + italianFieldTranslation + " Org: " + orgValueTranslation);
 											}
 										}
 									}
@@ -629,7 +629,7 @@ public class CheckUtilityAppDataModel {
 							logger.error("Value Set " + entityName + "." + fieldName + "." + fieldValue + ": value italian translation missing. Status: " + fieldStatus + " Source: " + sourceValue);
 							org.apache.poi.xssf.usermodel.XSSFRow newFieldValueSetTranslation = this.fieldValueSetTranslationSheet.createRow(++this.fieldValueSetTranslationSheetLastRow);
 							
-							String cellValues[] = {entityName + "-it", null, fieldName, fieldLabel, fieldItalianTranslation, fieldStatus, sourceValue};
+							String cellValues[] = {entityName + "-it", null, fieldName, fieldLabel, italianFieldTranslation, fieldStatus, sourceValue};
 							this.createStringCell(newFieldValueSetTranslation, cellValues, this.newCellStyle);
 							
 						}
@@ -773,22 +773,22 @@ public class CheckUtilityAppDataModel {
 			return;
 		}
 		
-		org.apache.poi.xssf.usermodel.XSSFCell entityNameItalianCell = dmHeadRow.getCell(italianPos);
-		String entityNameItalian = (entityNameCell == null ? null : entityNameItalianCell.getStringCellValue());
-		logger.debug("entityNameItalian: " + entityNameItalian);
+		org.apache.poi.xssf.usermodel.XSSFCell italianEntityNameCell = dmHeadRow.getCell(italianPos);
+		String italianEntityName = (entityNameCell == null ? null : italianEntityNameCell.getStringCellValue());
+		logger.debug("italianEntityName: " + italianEntityName);
 		
-		boolean insertTranslation = this.checkObjectTranslation(entityName, entityNameItalian);
+		boolean insertTranslation = this.checkObjectTranslation(entityName, italianEntityName);
 		if(insertTranslation) {
-			this.insertObjectTranslation(entityName, entityNameItalian, null);
+			this.insertObjectTranslation(entityName, italianEntityName, null);
 		}
 		
 		while(dmRowIter.hasNext()) {
-			this.checkEntityRow((org.apache.poi.xssf.usermodel.XSSFRow) dmRowIter.next(), entityName, listSources, namePos, labelPos, typePos, italianPos, valueSetNamePos, statusPos, sourcePos);
+			this.checkEntityRow((org.apache.poi.xssf.usermodel.XSSFRow) dmRowIter.next(), entityName, italianEntityName, listSources, namePos, labelPos, typePos, italianPos, valueSetNamePos, statusPos, sourcePos);
 		}
 		logger.traceExit();
 	}
 
-	private void checkEntityRow(org.apache.poi.xssf.usermodel.XSSFRow dmRow, String entityName, List<String> listSources, int namePos, int labelPos, int typePos, int italianPos, int valueSetNamePos, int statusPos, int sourcePos) {
+	private void checkEntityRow(org.apache.poi.xssf.usermodel.XSSFRow dmRow, String entityName, String italianEntityName, List<String> listSources, int namePos, int labelPos, int typePos, int italianPos, int valueSetNamePos, int statusPos, int sourcePos) {
 		logger.traceEntry();
 		
 		org.apache.poi.xssf.usermodel.XSSFCell sourceCell = dmRow.getCell(sourcePos);
@@ -813,8 +813,8 @@ public class CheckUtilityAppDataModel {
 			rowHasError = true;
 		}
 		
-		String fieldItalianTranslation = getCellValue(dmRow, italianPos);
-		logger.debug("fieldItalianTranslation: " + fieldItalianTranslation);
+		String italianFieldTranslation = getCellValue(dmRow, italianPos);
+		logger.debug("italianFieldTranslation: " + italianFieldTranslation);
 		
 		if("name".equalsIgnoreCase(fieldName)) {
 			
@@ -828,9 +828,9 @@ public class CheckUtilityAppDataModel {
 				this.insertNameField(entityName, fieldLabel);
 			}
 			
-			boolean insertNameTranslation = this.checkNameTranslation(entityName, fieldItalianTranslation);
+			boolean insertNameTranslation = this.checkNameTranslation(entityName, italianFieldTranslation);
 			if(insertNameTranslation) {
-				this.insertObjectTranslation(entityName, null, fieldItalianTranslation);
+				this.insertObjectTranslation(entityName, italianEntityName, italianFieldTranslation);
 			}
 			
 		} else {
@@ -928,7 +928,7 @@ public class CheckUtilityAppDataModel {
 				this.createStringCell(newFieldRow, cellValues, this.newCellStyle);
 			}
 			
-			boolean insertFieldTranslation = !StringUtils.isBlank(fieldItalianTranslation);
+			boolean insertFieldTranslation = !StringUtils.isBlank(italianFieldTranslation);
 			Iterator<org.apache.poi.ss.usermodel.Row> orgFieldsTranslationIter = this.fieldTranslationSheet.rowIterator();
 			while(orgFieldsTranslationIter.hasNext()) {
 				org.apache.poi.xssf.usermodel.XSSFRow orgFieldTranslationRow = (org.apache.poi.xssf.usermodel.XSSFRow) orgFieldsTranslationIter.next();
@@ -942,7 +942,7 @@ public class CheckUtilityAppDataModel {
 						org.apache.poi.xssf.usermodel.XSSFCell orgFieldLabelTranslationCell = null;
 						String orgFieldLabelTranslation = (orgFieldLabelTranslationCell = orgFieldTranslationRow.getCell(2)) == null ? null : orgFieldLabelTranslationCell.getStringCellValue();
 						logger.debug("orgFieldLabelTranslation: " + orgFieldLabelTranslation);
-						if(StringUtils.isBlank(fieldItalianTranslation)) {
+						if(StringUtils.isBlank(italianFieldTranslation)) {
 							if(!StringUtils.isBlank(orgFieldLabelTranslation)) {
 								insertFieldTranslation = true;
 								if(orgFieldLabelTranslationCell == null) {
@@ -952,12 +952,12 @@ public class CheckUtilityAppDataModel {
 								logger.error("Missing italian Label Translation in data model design for " + entityName  + "." + fieldName + ": " + orgFieldLabelTranslation);
 							}
 						} else {
-							if(fieldItalianTranslation.equals(orgFieldLabelTranslation)) {
+							if(italianFieldTranslation.equals(orgFieldLabelTranslation)) {
 								orgFieldLabelTranslationCell.setCellStyle(existingCellStyle);
 								
 							} else {
 								insertFieldTranslation = true;
-								logger.error(entityName + "." + fieldName + ": Label italian Translation mismatch. Data Model: " + fieldItalianTranslation + " Org: " + orgFieldLabelTranslation);
+								logger.error(entityName + "." + fieldName + ": Label italian Translation mismatch. Data Model: " + italianFieldTranslation + " Org: " + orgFieldLabelTranslation);
 								orgFieldLabelTranslationCell.setCellStyle(errorCellStyle);
 							}
 						}
@@ -967,10 +967,10 @@ public class CheckUtilityAppDataModel {
 			}
 			
 			if(insertFieldTranslation) {
-				logger.error(entityName + "." + fieldName + ": italian field translation missing. Translation: " + fieldItalianTranslation + " Status: " + fieldStatus + " Source: " + sourceValue);
+				logger.error(entityName + "." + fieldName + ": italian field translation missing. Translation: " + italianFieldTranslation + " Status: " + fieldStatus + " Source: " + sourceValue);
 				org.apache.poi.xssf.usermodel.XSSFRow newFieldTranslationRow = this.fieldTranslationSheet.createRow(++this.fieldTranslationSheetLastRow);
 				
-				String cellValues[] = {entityName + "-it", fieldName, fieldItalianTranslation, null, null,
+				String cellValues[] = {entityName + "-it", fieldName, italianFieldTranslation, null, null,
 						null, null, null, fieldStatus, sourceValue};
 				this.createStringCell(newFieldTranslationRow, cellValues, this.newCellStyle);
 				
@@ -1029,10 +1029,10 @@ public class CheckUtilityAppDataModel {
 		return logger.traceExit(insertNewRecord);
 	}
 
-	private boolean checkObjectTranslation(String entityName, String entityNameItalian) {
+	private boolean checkObjectTranslation(String entityName, String italianEntityName) {
 		logger.traceEntry();
 		
-		boolean insertTranslation = !StringUtils.isBlank(entityNameItalian);
+		boolean insertTranslation = !StringUtils.isBlank(italianEntityName);
 		
 		this.orgObjTranslationRow = -1;
 		this.dmObjTranslationRow = -1;
@@ -1053,14 +1053,14 @@ public class CheckUtilityAppDataModel {
 					org.apache.poi.xssf.usermodel.XSSFCell valueCell = objTranslationRow.getCell(2);
 					String orgObjectTranslation = (valueCell == null ? null : valueCell.getStringCellValue());
 					logger.debug("orgObjectTranslation: " + orgObjectTranslation);
-					if(StringUtils.isBlank(entityNameItalian)) {
+					if(StringUtils.isBlank(italianEntityName)) {
 						if(!StringUtils.isBlank(orgObjectTranslation)) {
 							logger.error("Missing object translation in data model design for " + entityName + ": " + orgObjectTranslation);
 							valueCell.setCellStyle(this.errorCellStyle);
 						}
 					} else {
 						
-						if(entityNameItalian.equals(orgObjectTranslation)) {
+						if(italianEntityName.equals(orgObjectTranslation)) {
 							insertTranslation = false;
 							valueCell.setCellStyle(this.existingCellStyle);
 						} else {
@@ -1068,7 +1068,7 @@ public class CheckUtilityAppDataModel {
 								valueCell = objTranslationRow.createCell(2);
 							}
 							valueCell.setCellStyle(this.errorCellStyle);
-							logger.error("Mismatch in object translation. Data Model: " + entityNameItalian + " Org: " + orgObjectTranslation);
+							logger.error("Mismatch in object translation. Data Model: " + italianEntityName + " Org: " + orgObjectTranslation);
 						}
 					}
 					return logger.traceExit(insertTranslation);
@@ -1080,7 +1080,7 @@ public class CheckUtilityAppDataModel {
 		return logger.traceExit(insertTranslation);
 	}
 	
-	private void insertObjectTranslation(String entityName, String entityNameItalian, String nameFieldLabel) {
+	private void insertObjectTranslation(String entityName, String italianEntityName, String nameFieldLabel) {
 		logger.traceEntry();
 		if(this.objTranslationSheet == null) {
 			String sheetName = "Object translation";
@@ -1095,7 +1095,7 @@ public class CheckUtilityAppDataModel {
 		org.apache.poi.xssf.usermodel.XSSFRow newObjTranslationRow = this.objTranslationSheet.createRow(++this.objTranslationSheetLastRow);
 		this.dmObjTranslationRow = this.objTranslationSheetLastRow;
 		
-		String cellValues[] = {entityName + "-it", null, entityNameItalian, null, null, nameFieldLabel};
+		String cellValues[] = {entityName + "-it", null, italianEntityName, null, null, nameFieldLabel};
 		this.createStringCell(newObjTranslationRow, cellValues, this.newCellStyle);
 		
 		logger.traceExit();
@@ -1123,19 +1123,19 @@ public class CheckUtilityAppDataModel {
 		
 	}
 	
-	private boolean checkNameTranslation(String entityName, String fieldItalianTranslation) {
+	private boolean checkNameTranslation(String entityName, String italianFieldTranslation) {
 		logger.traceEntry();
 		
-		boolean insertNameTranslation = !StringUtils.isBlank(fieldItalianTranslation);
+		boolean insertNameTranslation = !StringUtils.isBlank(italianFieldTranslation);
 		if(this.dmObjTranslationRow != -1) {
 			insertNameTranslation = false;
 			org.apache.poi.xssf.usermodel.XSSFRow dmObjTranslationRow = this.objTranslationSheet.getRow(this.dmObjTranslationRow);
-			org.apache.poi.xssf.usermodel.XSSFCell dmFieldItalianTranslation = dmObjTranslationRow.getCell(5);
-			if(dmFieldItalianTranslation == null) {
-				dmFieldItalianTranslation = dmObjTranslationRow.createCell(5);
-				dmFieldItalianTranslation.setCellStyle(this.newCellStyle);
+			org.apache.poi.xssf.usermodel.XSSFCell dmitalianFieldTranslation = dmObjTranslationRow.getCell(5);
+			if(dmitalianFieldTranslation == null) {
+				dmitalianFieldTranslation = dmObjTranslationRow.createCell(5);
+				dmitalianFieldTranslation.setCellStyle(this.newCellStyle);
 			}
-			dmFieldItalianTranslation.setCellValue(fieldItalianTranslation);
+			dmitalianFieldTranslation.setCellValue(italianFieldTranslation);
 		}
 		
 		if(this.objTranslationSheet == null || this.orgObjTranslationRow == -1) {
@@ -1143,25 +1143,25 @@ public class CheckUtilityAppDataModel {
 		}
 		
 		org.apache.poi.xssf.usermodel.XSSFRow orgObjTranslationRow = this.objTranslationSheet.getRow(this.orgObjTranslationRow);
-		org.apache.poi.xssf.usermodel.XSSFCell orgFieldItalianTranslationCell = orgObjTranslationRow.getCell(5);
-		String orgNameTranslation = (orgFieldItalianTranslationCell == null ? null : orgFieldItalianTranslationCell.getStringCellValue());
+		org.apache.poi.xssf.usermodel.XSSFCell orgItalianFieldTranslationCell = orgObjTranslationRow.getCell(5);
+		String orgNameTranslation = (orgItalianFieldTranslationCell == null ? null : orgItalianFieldTranslationCell.getStringCellValue());
 		
-		if(StringUtils.isBlank(fieldItalianTranslation)) {
+		if(StringUtils.isBlank(italianFieldTranslation)) {
 			if(!StringUtils.isBlank(orgNameTranslation)) {
 				logger.error("Missing object name translation in data model design for " + entityName + ": " + orgNameTranslation);
-				orgFieldItalianTranslationCell.setCellStyle(this.errorCellStyle);
+				orgItalianFieldTranslationCell.setCellStyle(this.errorCellStyle);
 			}
 		} else {
 			
-			if(fieldItalianTranslation.equals(orgNameTranslation)) {
+			if(italianFieldTranslation.equals(orgNameTranslation)) {
 				insertNameTranslation = false;
-				orgFieldItalianTranslationCell.setCellStyle(this.existingCellStyle);
+				orgItalianFieldTranslationCell.setCellStyle(this.existingCellStyle);
 			} else {
-				if(orgFieldItalianTranslationCell == null) {
-					orgFieldItalianTranslationCell = orgObjTranslationRow.createCell(5);
+				if(orgItalianFieldTranslationCell == null) {
+					orgItalianFieldTranslationCell = orgObjTranslationRow.createCell(5);
 				}
-				orgFieldItalianTranslationCell.setCellStyle(this.errorCellStyle);
-				logger.error("Mismatch in object name translation. Data Model: " + fieldItalianTranslation + " Org: " + orgNameTranslation);
+				orgItalianFieldTranslationCell.setCellStyle(this.errorCellStyle);
+				logger.error("Mismatch in object name translation. Data Model: " + italianFieldTranslation + " Org: " + orgNameTranslation);
 			}
 		}
 		
