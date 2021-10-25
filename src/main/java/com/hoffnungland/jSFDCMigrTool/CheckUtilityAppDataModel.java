@@ -938,7 +938,7 @@ public class CheckUtilityAppDataModel {
 		
 		String italianFieldTranslation = this.getCellValue(dmRow, italianPos);
 		
-		boolean insertLabelTranslation = this.checkSingleEntry(this.labelSheet, fullName, 1, italianFieldTranslation, 2, "italian custom label translation", fieldStatus);
+		boolean insertLabelTranslation = this.checkSingleEntry(this.labelSheetTranslation, fullName, 1, italianFieldTranslation, 2, "italian custom label translation", fieldStatus);
 		if(insertLabelTranslation) {
 			this.insertLabelTranslation(fullName, italianFieldTranslation, fieldStatus, sourceValue);
 		}
@@ -1810,7 +1810,7 @@ public class CheckUtilityAppDataModel {
 		logger.error(fieldLabel + ": label missing. value: " + fieldValue + " Status: " + fieldStatus + " Source: " + sourceValue);
 		org.apache.poi.xssf.usermodel.XSSFRow newLabelRow = this.labelSheet.createRow(++this.labelSheetLastRow);
 		
-		String cellValues[] = {fieldLabel, null, null, null, null, null, fieldValue, fieldStatus, sourceValue};
+		String cellValues[] = {"CustomLabels", fieldLabel, null, null, null, null, fieldValue, fieldStatus, sourceValue};
 		this.createStringCell(newLabelRow, cellValues, this.newCellStyle);
 		
 		logger.traceExit();	
