@@ -1752,7 +1752,7 @@ public class CheckUtilityAppDataModel {
 		
 		if(this.fieldValueSetsSheet == null) {
 			String sheetName = "Fields valueSets";
-			String[] columnsList = {"filename", "fullName", "value.position", "value.fullName", "value.default", "value.label"};
+			String[] columnsList = {"filename", "fullName", "value.position", "value.fullName", "value.default", "value.label", "value.isActive"};
 
 			this.fieldValueSetsSheet = this.orgWb.createSheet(sheetName);
 			this.createMetadataHeader(this.fieldValueSetsSheet, "Metadata " + sheetName, columnsList.length, 0, 0);
@@ -1763,7 +1763,7 @@ public class CheckUtilityAppDataModel {
 		logger.error(entityName + "." + fieldName + "." + fieldValue + ": valueset missing. Label: " + fieldLabel + " Status: " + fieldStatus + " Source: " + sourceValue);
 		org.apache.poi.xssf.usermodel.XSSFRow newFieldValueSetRow = this.fieldValueSetsSheet.createRow(++this.fieldValueSetsSheetLastRow);
 		
-		String cellValues[] = {entityName, fieldName, null, fieldValue, null, fieldLabel, fieldStatus, sourceValue};
+		String cellValues[] = {entityName, fieldName, null, fieldValue, null, fieldLabel, null, fieldStatus, sourceValue};
 		this.createStringCell(newFieldValueSetRow, cellValues, this.newCellStyle);
 		
 		logger.traceExit();	
