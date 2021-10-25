@@ -110,6 +110,7 @@ public class CheckUtilityAppDataModel {
 		//Read Excel
 		String dmExcelPath = "C:\\Users\\msperanza\\OneDrive - Engineering Ingegneria Informatica S.p.A\\Documenti condivisi\\General\\Analisi\\UAPP Data Model v01.xlsx";
 		String orgExcelPath = "wrtsuapp.xlsx";
+		//String orgExcelPath = "manuel.speranza - eap2.xlsx";
 		//String orgExcelPath = "eng.msperanza - teaspa.it.release1.xlsx";
 		//String orgExcelPath = "eng.msperanza - teaspa.it.dev.xlsx";
 		
@@ -363,6 +364,7 @@ public class CheckUtilityAppDataModel {
 			case "recordtype":
 				break;
 			case "labels":
+				this.checkLabels(dmSheet, listSources);
 				break;
 			default:
 				this.checkEntity(dmSheet, listSources);
@@ -490,7 +492,7 @@ public class CheckUtilityAppDataModel {
 		logger.traceExit();
 	}
 	
-	private void checkLovRow(org.apache.poi.xssf.usermodel.XSSFRow dmRow, List<String> listSources, int objectPos, int fieldPos, int valuePos,	int labelPos, int italianPos, int statusPos, int sourcePos) {
+	private void checkLovRow(org.apache.poi.xssf.usermodel.XSSFRow dmRow, List<String> listSources, int objectPos, int fieldPos, int valuePos, int labelPos, int italianPos, int statusPos, int sourcePos) {
 		logger.traceEntry();
 		
 		org.apache.poi.xssf.usermodel.XSSFCell sourceCell = dmRow.getCell(sourcePos);
@@ -796,6 +798,149 @@ public class CheckUtilityAppDataModel {
 				this.createStringCell(newFieldValueSetTranslation, cellValues, this.newCellStyle);*/
 				
 			}
+		}
+		
+		logger.traceExit();
+		
+	}
+	
+	private void checkLabels(org.apache.poi.xssf.usermodel.XSSFSheet dmSheet, List<String> listSources) {
+		
+		logger.traceEntry();
+		
+		Iterator<org.apache.poi.ss.usermodel.Row> dmRowIter = dmSheet.rowIterator();
+		org.apache.poi.xssf.usermodel.XSSFRow dmColsRow = null;
+		
+		if(dmRowIter.hasNext()) {
+			dmColsRow = (org.apache.poi.xssf.usermodel.XSSFRow) dmRowIter.next();	
+		}
+			
+		if(dmColsRow == null) {
+			logger.warn("Missing colums. Skip " + dmSheet.getSheetName() + " sheet.");
+			logger.traceExit();
+			return;
+		} 
+		int fullNamePos = -1;
+		int valuePos = -1;
+		int statusPos = -1;
+		int sourcePos = -1;
+		int italianPos = -1;
+		
+		Iterator<org.apache.poi.ss.usermodel.Cell> dmColsCellIter = dmColsRow.cellIterator();
+		while(dmColsCellIter.hasNext()) {
+			org.apache.poi.xssf.usermodel.XSSFCell collCell = (org.apache.poi.xssf.usermodel.XSSFCell) dmColsCellIter.next();
+			if(collCell != null) {
+				switch(collCell.getStringCellValue().toLowerCase()) {
+				case "fullname":
+					fullNamePos = collCell.getColumnIndex();
+					break;
+				case "value":
+					valuePos = collCell.getColumnIndex();
+					break;
+				case "status":
+					statusPos = collCell.getColumnIndex();
+					break;
+				case "source":
+					sourcePos = collCell.getColumnIndex();
+					break;
+				case "italian":
+					italianPos = collCell.getColumnIndex();
+					break;
+				}
+			}
+		}
+		boolean colsError = false;
+		if(fullNamePos == -1) {
+			logger.error(dmSheet.getSheetName() + ": missing fullName column");
+			colsError = true;
+		}
+				
+		if(valuePos == -1) {
+			logger.error(dmSheet.getSheetName() + ": missing value column");
+			colsError = true;
+		}
+		
+		if(statusPos == -1) {
+			logger.error(dmSheet.getSheetName() + ": missing Status column");
+			colsError = true;
+		}
+		
+		if(sourcePos == -1) {
+			logger.error(dmSheet.getSheetName() + ": missing Source column");
+			colsError = true;
+		}
+				
+		if(italianPos == -1) {
+			logger.error(dmSheet.getSheetName() + ": missing Italian column");
+			colsError = true;
+		}
+		
+		if(colsError) {
+			logger.error("Missing useful colum(s). Skip " + dmSheet.getSheetName() + " sheet.");
+			logger.traceExit();
+			return;
+		}
+				
+		while(dmRowIter.hasNext()) {
+			
+			this.checkLabelRow((org.apache.poi.xssf.usermodel.XSSFRow) dmRowIter.next(), listSources, fullNamePos, valuePos, italianPos, statusPos, sourcePos);
+		}
+		
+		logger.traceExit();
+	}
+	
+	private void checkLabelRow(org.apache.poi.xssf.usermodel.XSSFRow dmRow, List<String> listSources, int fullNamePos, int valuePos, int italianPos, int statusPos, int sourcePos) {
+		logger.traceEntry();
+		
+		org.apache.poi.xssf.usermodel.XSSFCell sourceCell = dmRow.getCell(sourcePos);
+		String sourceValue = (sourceCell == null) ? null : sourceCell.getStringCellValue();
+		if(StringUtils.isBlank(sourceValue)) {
+			logger.error("Labels: Source is empty for row #" + dmRow.getRowNum());
+			logger.traceExit();
+			return;
+		}
+		
+		if(!listSources.contains(sourceValue)) {
+			logger.traceExit();
+			return;
+		}
+		
+		boolean rowHasError = false;
+			
+		String fullName = this.getCellValue(dmRow, fullNamePos);
+		if(StringUtils.isBlank(fullName)) {
+			logger.error("Labels: fullName is empty for row " + dmRow.getRowNum());
+			rowHasError = true;
+		}
+			
+		String value = this.getCellValue(dmRow, valuePos);
+		if(StringUtils.isBlank(value)) {
+			logger.error("Labels: value is empty for row " + dmRow.getRowNum());
+			rowHasError = true;
+		}
+		
+		String fieldStatus = this.getCellValue(dmRow, statusPos);
+		if(StringUtils.isBlank(fieldStatus)) {
+			logger.error("Labels: Status is empty for row " + dmRow.getRowNum());
+			rowHasError = true;
+		}
+		
+		if(rowHasError) {
+			logger.error("Labels: missing useful value(s). Skip row #" + dmRow.getRowNum());
+			logger.traceExit();
+			return;
+		}
+		
+		boolean insertLabels = this.checkSingleEntry(this.labelSheet, fullName, 1, value, 5, "custom label", fieldStatus);
+		if(insertLabels) {
+			this.insertLabels(fullName, value, fieldStatus, sourceValue);
+		}
+		
+		String italianFieldTranslation = this.getCellValue(dmRow, italianPos);
+		
+		boolean insertLabelTranslation = this.checkSingleEntry(this.labelSheet, fullName, 1, italianFieldTranslation, 2, "italian custom label translation", fieldStatus);
+		if(insertLabelTranslation) {
+			this.insertLabelTranslation(fullName, italianFieldTranslation, fieldStatus, sourceValue);
 		}
 		
 		logger.traceExit();
@@ -1643,6 +1788,53 @@ public class CheckUtilityAppDataModel {
 		
 		String cellValues[] = {entityName, null, fieldName, fieldLabel, italianFieldTranslation, fieldStatus, sourceValue};
 		this.createStringCell(newFieldValueSetTranslationRow, cellValues, this.newCellStyle);
+		
+		logger.traceExit();	
+	}
+	
+
+	private void insertLabels(String fieldLabel, String fieldValue, String fieldStatus, String sourceValue) {
+		
+		logger.traceEntry();
+		
+		if(this.labelSheet == null) {
+			String sheetName = "Labels";
+			String[] columnsList = {"filename", "fullName", "categories", "language", "protected", "shortDescription", "value"};
+
+			this.labelSheet = this.orgWb.createSheet(sheetName);
+			this.createMetadataHeader(this.labelSheet, "Metadata " + sheetName, columnsList.length, 0, 0);
+			this.createSheetHeader(this.labelSheet, columnsList, 1, 0);
+			this.labelSheetLastRow = 1;
+		}
+		
+		logger.error(fieldLabel + ": label missing. value: " + fieldValue + " Status: " + fieldStatus + " Source: " + sourceValue);
+		org.apache.poi.xssf.usermodel.XSSFRow newLabelRow = this.labelSheet.createRow(++this.labelSheetLastRow);
+		
+		String cellValues[] = {fieldLabel, null, null, null, null, null, fieldValue, fieldStatus, sourceValue};
+		this.createStringCell(newLabelRow, cellValues, this.newCellStyle);
+		
+		logger.traceExit();	
+	}
+	
+	private void insertLabelTranslation(String fieldLabel, String fieldValue, String fieldStatus, String sourceValue) {
+		
+		logger.traceEntry();
+		
+		if(this.labelSheetTranslation == null) {
+			String sheetName = "Label translation";
+			String[] columnsList = {"filename", "name", "label"};
+
+			this.labelSheetTranslation = this.orgWb.createSheet(sheetName);
+			this.createMetadataHeader(this.labelSheetTranslation, "Metadata " + sheetName, columnsList.length, 0, 0);
+			this.createSheetHeader(this.labelSheetTranslation, columnsList, 1, 0);
+			this.labelSheetTranslationLastRow = 1;
+		}
+		
+		logger.error(fieldLabel + ": label missing. value: " + fieldValue + " Status: " + fieldStatus + " Source: " + sourceValue);
+		org.apache.poi.xssf.usermodel.XSSFRow newLabelTranslationRow = this.labelSheetTranslation.createRow(++this.labelSheetTranslationLastRow);
+		
+		String cellValues[] = {"it", fieldLabel, fieldValue, fieldValue, fieldStatus, sourceValue};
+		this.createStringCell(newLabelTranslationRow, cellValues, this.newCellStyle);
 		
 		logger.traceExit();	
 	}
