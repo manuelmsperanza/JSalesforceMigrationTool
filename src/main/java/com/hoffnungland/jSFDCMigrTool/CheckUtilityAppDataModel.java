@@ -931,7 +931,7 @@ public class CheckUtilityAppDataModel {
 			return;
 		}
 		
-		boolean insertLabels = this.checkSingleEntry(this.labelSheet, fullName, 1, value, 5, "custom label", fieldStatus);
+		boolean insertLabels = this.checkSingleEntry(this.labelSheet, fullName, 1, value, 6, "custom label", fieldStatus);
 		if(insertLabels) {
 			this.insertLabels(fullName, value, fieldStatus, sourceValue);
 		}
@@ -1833,7 +1833,7 @@ public class CheckUtilityAppDataModel {
 		logger.error(fieldLabel + ": label missing. value: " + fieldValue + " Status: " + fieldStatus + " Source: " + sourceValue);
 		org.apache.poi.xssf.usermodel.XSSFRow newLabelTranslationRow = this.labelSheetTranslation.createRow(++this.labelSheetTranslationLastRow);
 		
-		String cellValues[] = {"it", fieldLabel, fieldValue, fieldValue, fieldStatus, sourceValue};
+		String cellValues[] = {"it", fieldLabel, fieldValue, fieldStatus, sourceValue};
 		this.createStringCell(newLabelTranslationRow, cellValues, this.newCellStyle);
 		
 		logger.traceExit();	
