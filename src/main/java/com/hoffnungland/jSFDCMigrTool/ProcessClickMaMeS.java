@@ -254,27 +254,49 @@ public class ProcessClickMaMeS {
 										logger.info("update wrts_prcgvr__ServiceLink__c.wrts_prcgvr__Category__c");
 										NodeList valueSetChildren = valueSetNode.getChildNodes();
 										
-										
-										
 										for(int valueSetChildrenIdx = 0; valueSetChildrenIdx < valueSetChildren.getLength(); valueSetChildrenIdx++ ) {
 											Node valueSetChild = valueSetChildren.item(valueSetChildrenIdx);
-											String valueFullName = lightningAction;
 											
-											Element valueEl = doc.createElementNS(root.getNamespaceURI(), "value");
-											
-											Element fullNameEl = doc.createElementNS(root.getNamespaceURI(), "fullName");
-											fullNameEl.setTextContent(valueFullName);
-											valueEl.appendChild(fullNameEl);
-											
-											Element defaultEl = doc.createElementNS(root.getNamespaceURI(), "default");
-											defaultEl.setTextContent("false");
-											valueEl.appendChild(defaultEl);
-											
-											Element labelEl = doc.createElementNS(root.getNamespaceURI(), "label");
-											labelEl.setTextContent(valueFullName);
-											valueEl.appendChild(labelEl);
-											
-											valueSetChild.appendChild(valueEl);
+											if(valueSetChild.getNodeName().equals("valueSetDefinition")) {
+												
+												
+												NodeList valueSetDefinitionChildren = valueSetChild.getChildNodes();
+												boolean insertValue = true;
+												for(int valueSetDefinitionChildrenIdx = 0; valueSetDefinitionChildrenIdx < valueSetDefinitionChildren.getLength(); valueSetDefinitionChildrenIdx++ ) {
+													Node valueSetDefinitionChild = valueSetDefinitionChildren.item(valueSetDefinitionChildrenIdx);
+													if(valueSetDefinitionChild.getNodeName().equals("value")) {
+														NodeList valueChildren = valueSetDefinitionChild.getChildNodes();
+														for(int valueChildrenIdx = 0; valueChildrenIdx < valueChildren.getLength(); valueChildrenIdx++) {
+															Node valueChild = valueChildren.item(valueChildrenIdx);
+															if(valueChild.getNodeName().equals("fullName") && lightningAction.equals(valueChild.getTextContent())) {
+																
+																insertValue = false;
+															}
+														}
+													}
+													
+												}
+												if(insertValue) {
+												
+													String valueFullName = lightningAction;
+													
+													Element valueEl = doc.createElementNS(root.getNamespaceURI(), "value");
+													
+													Element fullNameEl = doc.createElementNS(root.getNamespaceURI(), "fullName");
+													fullNameEl.setTextContent(valueFullName);
+													valueEl.appendChild(fullNameEl);
+													
+													Element defaultEl = doc.createElementNS(root.getNamespaceURI(), "default");
+													defaultEl.setTextContent("false");
+													valueEl.appendChild(defaultEl);
+													
+													Element labelEl = doc.createElementNS(root.getNamespaceURI(), "label");
+													labelEl.setTextContent(valueFullName);
+													valueEl.appendChild(labelEl);
+													
+													valueSetChild.appendChild(valueEl);
+												}
+											}
 										}
 									}
 								}
