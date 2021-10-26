@@ -128,97 +128,166 @@ public class ProcessClickMaMeS {
 			} else if(curDir.isDirectory() && curDir.getName().equals("objects")) {
 
 				for(File curObjectFile : curDir.listFiles()) {
-					if(curObjectFile.isFile() && curObjectFile.getName().equals("wrts_prcgvr__ServiceLink__c.object")){
-
-						Document doc = builder.parse(curObjectFile);
-						Element root = doc.getDocumentElement();
-						String[] categoryLov = {"Acquisition", "Disconnection", "Technical", "Commercial"};
-						int categoryLovIdx = 0;
-						NodeList fieldsNodes = root.getElementsByTagNameNS(root.getNamespaceURI(), "fields");
-						for(int fieldsNodeIdx = 0; fieldsNodeIdx < fieldsNodes.getLength(); fieldsNodeIdx++) {
-							Node fieldNode = fieldsNodes.item(fieldsNodeIdx);
-
-							Node fullNameNode = null;
-							Node valueSetNode = null;
-							NodeList fieldChildren = fieldNode.getChildNodes();
-
-							for(int fieldChildrenIdx = 0; fieldChildrenIdx < fieldChildren.getLength(); fieldChildrenIdx++ ) {
-								Node fieldChild = fieldChildren.item(fieldChildrenIdx);
-								if(fieldChild.getNodeName().equals("fullName")) {
-									fullNameNode = fieldChild;
-								} else if(fieldChild.getNodeName().equals("valueSet")) {
-									valueSetNode = fieldChild;
+					if(curObjectFile.isFile()) {
+						
+						if(curObjectFile.getName().equals("wrts_prcgvr__ServiceLink__c.object")){
+							
+							Document doc = builder.parse(curObjectFile);
+							Element root = doc.getDocumentElement();
+							String[] categoryLov = {"Acquisition", "Disconnection", "Technical", "Commercial"};
+							int categoryLovIdx = 0;
+							NodeList fieldsNodes = root.getElementsByTagNameNS(root.getNamespaceURI(), "fields");
+							for(int fieldsNodeIdx = 0; fieldsNodeIdx < fieldsNodes.getLength(); fieldsNodeIdx++) {
+								Node fieldNode = fieldsNodes.item(fieldsNodeIdx);
+								
+								Node fullNameNode = null;
+								Node valueSetNode = null;
+								NodeList fieldChildren = fieldNode.getChildNodes();
+								
+								for(int fieldChildrenIdx = 0; fieldChildrenIdx < fieldChildren.getLength(); fieldChildrenIdx++ ) {
+									Node fieldChild = fieldChildren.item(fieldChildrenIdx);
+									if(fieldChild.getNodeName().equals("fullName")) {
+										fullNameNode = fieldChild;
+									} else if(fieldChild.getNodeName().equals("valueSet")) {
+										valueSetNode = fieldChild;
+									}
 								}
-							}
-
-							if("wrts_prcgvr__Category__c".equals(fullNameNode.getTextContent())) {
-								if(valueSetNode == null) {
-									logger.warn("valueSet is null");
-								} else {
-									logger.info("update wrts_prcgvr__ServiceLink__c.wrts_prcgvr__Category__c");
-									NodeList valueSetChildren = valueSetNode.getChildNodes();
-
-									for(int valueSetChildrenIdx = 0; valueSetChildrenIdx < valueSetChildren.getLength(); valueSetChildrenIdx++ ) {
-										Node valueSetChild = valueSetChildren.item(valueSetChildrenIdx);
-										if(valueSetChild.getNodeName().equals("valueSetDefinition")) {
-
-											NodeList valueSetDefinitionChildren = valueSetChild.getChildNodes();
-
-											for(int valueSetDefinitionChildrenIdx = 0; valueSetDefinitionChildrenIdx < valueSetDefinitionChildren.getLength(); valueSetDefinitionChildrenIdx++ ) {
-												Node valueSetDefinitionChild = valueSetDefinitionChildren.item(valueSetDefinitionChildrenIdx);
-												if(valueSetDefinitionChild.getNodeName().equals("value")) {
-													if(categoryLovIdx < categoryLov.length) {
-
-														String valueFullName = categoryLov[categoryLovIdx++];
-
-														NodeList valueChildren = valueSetDefinitionChild.getChildNodes();
-														for(int valueChildrenIdx = 0; valueChildrenIdx < valueChildren.getLength(); valueChildrenIdx++) {
-															Node valueChild = valueChildren.item(valueChildrenIdx);
-															if(valueChild.getNodeName().equals("fullName") || valueChild.getNodeName().equals("label")) {
-																valueChild.setTextContent(valueFullName);
-															} else if(valueChild.getNodeName().equals("default")) {
-																valueChild.setTextContent("false");
+								
+								if("wrts_prcgvr__Category__c".equals(fullNameNode.getTextContent())) {
+									if(valueSetNode == null) {
+										logger.warn("valueSet is null");
+									} else {
+										logger.info("update wrts_prcgvr__ServiceLink__c.wrts_prcgvr__Category__c");
+										NodeList valueSetChildren = valueSetNode.getChildNodes();
+										
+										for(int valueSetChildrenIdx = 0; valueSetChildrenIdx < valueSetChildren.getLength(); valueSetChildrenIdx++ ) {
+											Node valueSetChild = valueSetChildren.item(valueSetChildrenIdx);
+											if(valueSetChild.getNodeName().equals("valueSetDefinition")) {
+												
+												NodeList valueSetDefinitionChildren = valueSetChild.getChildNodes();
+												
+												for(int valueSetDefinitionChildrenIdx = 0; valueSetDefinitionChildrenIdx < valueSetDefinitionChildren.getLength(); valueSetDefinitionChildrenIdx++ ) {
+													Node valueSetDefinitionChild = valueSetDefinitionChildren.item(valueSetDefinitionChildrenIdx);
+													if(valueSetDefinitionChild.getNodeName().equals("value")) {
+														if(categoryLovIdx < categoryLov.length) {
+															
+															String valueFullName = categoryLov[categoryLovIdx++];
+															
+															NodeList valueChildren = valueSetDefinitionChild.getChildNodes();
+															for(int valueChildrenIdx = 0; valueChildrenIdx < valueChildren.getLength(); valueChildrenIdx++) {
+																Node valueChild = valueChildren.item(valueChildrenIdx);
+																if(valueChild.getNodeName().equals("fullName") || valueChild.getNodeName().equals("label")) {
+																	valueChild.setTextContent(valueFullName);
+																} else if(valueChild.getNodeName().equals("default")) {
+																	valueChild.setTextContent("false");
+																}
 															}
+															
+														} else {
+															valueSetChild.removeChild(valueSetDefinitionChild);
 														}
-
-													} else {
-														valueSetChild.removeChild(valueSetDefinitionChild);
 													}
 												}
-											}
-
-											for(;categoryLovIdx < categoryLov.length; categoryLovIdx++) {
-												String valueFullName = categoryLov[categoryLovIdx];
-
-												Element valueEl = doc.createElementNS(root.getNamespaceURI(), "value");
-
-												Element fullNameEl = doc.createElementNS(root.getNamespaceURI(), "fullName");
-												fullNameEl.setTextContent(valueFullName);
-												valueEl.appendChild(fullNameEl);
-
-												Element defaultEl = doc.createElementNS(root.getNamespaceURI(), "default");
-												defaultEl.setTextContent("false");
-												valueEl.appendChild(defaultEl);
-
-												Element labelEl = doc.createElementNS(root.getNamespaceURI(), "label");
-												labelEl.setTextContent(valueFullName);
-												valueEl.appendChild(labelEl);
-
-												valueSetChild.appendChild(valueEl);
+												
+												for(;categoryLovIdx < categoryLov.length; categoryLovIdx++) {
+													String valueFullName = categoryLov[categoryLovIdx];
+													
+													Element valueEl = doc.createElementNS(root.getNamespaceURI(), "value");
+													
+													Element fullNameEl = doc.createElementNS(root.getNamespaceURI(), "fullName");
+													fullNameEl.setTextContent(valueFullName);
+													valueEl.appendChild(fullNameEl);
+													
+													Element defaultEl = doc.createElementNS(root.getNamespaceURI(), "default");
+													defaultEl.setTextContent("false");
+													valueEl.appendChild(defaultEl);
+													
+													Element labelEl = doc.createElementNS(root.getNamespaceURI(), "label");
+													labelEl.setTextContent(valueFullName);
+													valueEl.appendChild(labelEl);
+													
+													valueSetChild.appendChild(valueEl);
+												}
 											}
 										}
 									}
 								}
+								
 							}
-
-						}
-
-						DOMSource source = new DOMSource(doc);
-
-						try(FileWriter writer = new FileWriter(curObjectFile)){
-
-							StreamResult result = new StreamResult(writer);
-							transformer.transform(source, result);
+							
+							DOMSource source = new DOMSource(doc);
+							
+							try(FileWriter writer = new FileWriter(curObjectFile)){
+								
+								StreamResult result = new StreamResult(writer);
+								transformer.transform(source, result);
+							}
+						} else if(curObjectFile.getName().equals("wrts_prcgvr__ServiceLinkItem__c.object")){
+							
+							Document doc = builder.parse(curObjectFile);
+							Element root = doc.getDocumentElement();
+							
+							String lightningAction = "comm__namedPage";
+							
+							int categoryLovIdx = 0;
+							NodeList fieldsNodes = root.getElementsByTagNameNS(root.getNamespaceURI(), "fields");
+							for(int fieldsNodeIdx = 0; fieldsNodeIdx < fieldsNodes.getLength(); fieldsNodeIdx++) {
+								Node fieldNode = fieldsNodes.item(fieldsNodeIdx);
+								
+								Node fullNameNode = null;
+								Node valueSetNode = null;
+								NodeList fieldChildren = fieldNode.getChildNodes();
+								
+								for(int fieldChildrenIdx = 0; fieldChildrenIdx < fieldChildren.getLength(); fieldChildrenIdx++ ) {
+									Node fieldChild = fieldChildren.item(fieldChildrenIdx);
+									if(fieldChild.getNodeName().equals("fullName")) {
+										fullNameNode = fieldChild;
+									} else if(fieldChild.getNodeName().equals("valueSet")) {
+										valueSetNode = fieldChild;
+									}
+								}
+								
+								if("wrts_prcgvr__LightningAction__c".equals(fullNameNode.getTextContent())) {
+									if(valueSetNode == null) {
+										logger.warn("valueSet is null");
+									} else {
+										logger.info("update wrts_prcgvr__ServiceLink__c.wrts_prcgvr__Category__c");
+										NodeList valueSetChildren = valueSetNode.getChildNodes();
+										
+										
+										
+										for(int valueSetChildrenIdx = 0; valueSetChildrenIdx < valueSetChildren.getLength(); valueSetChildrenIdx++ ) {
+											Node valueSetChild = valueSetChildren.item(valueSetChildrenIdx);
+											String valueFullName = lightningAction;
+											
+											Element valueEl = doc.createElementNS(root.getNamespaceURI(), "value");
+											
+											Element fullNameEl = doc.createElementNS(root.getNamespaceURI(), "fullName");
+											fullNameEl.setTextContent(valueFullName);
+											valueEl.appendChild(fullNameEl);
+											
+											Element defaultEl = doc.createElementNS(root.getNamespaceURI(), "default");
+											defaultEl.setTextContent("false");
+											valueEl.appendChild(defaultEl);
+											
+											Element labelEl = doc.createElementNS(root.getNamespaceURI(), "label");
+											labelEl.setTextContent(valueFullName);
+											valueEl.appendChild(labelEl);
+											
+											valueSetChild.appendChild(valueEl);
+										}
+									}
+								}
+								
+							}
+							
+							DOMSource source = new DOMSource(doc);
+							
+							try(FileWriter writer = new FileWriter(curObjectFile)){
+								
+								StreamResult result = new StreamResult(writer);
+								transformer.transform(source, result);
+							}
 						}
 					}
 				}
