@@ -1,8 +1,8 @@
 /target/
 /logs/
-/retrieveUnpackaged/
+/retrieveUnpackaged*/
 /*.txt
+/*.xlsx
 /package.xml
 /scratchOrg/
 /ea2/
-/OrgMetadata.xlsx
