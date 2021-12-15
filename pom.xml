@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.hoffnungland</groupId>
 	<artifactId>jsalesforcemigrationtool</artifactId>
-	<version>0.0.4-SNAPSHOT</version>
+	<version>0.0.5-SNAPSHOT</version>
 
 	<name>JSalesforceMigrationTool</name>
 	<url>http://hoffnungland.com</url>
+	<prerequisites>
+		<maven>3.1.0</maven>
+	</prerequisites>
 	<distributionManagement>
 		<repository>
 			<id>manuelmsperanza.github</id>
@@ -30,9 +31,9 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.source.version>1.8</java.source.version>
 		<java.target.version>1.8</java.target.version>
-		<salesforce.ant.zip>salesforce_ant_52.0.zip</salesforce.ant.zip>
-		<salesforce.ant.jar>ant-salesforce-52.0.jar</salesforce.ant.jar>
-		<salesforce.ant.pom>ant-salesforce-52.0.pom</salesforce.ant.pom>
+		<salesforce.ant.zip>salesforce_ant_53.0.zip</salesforce.ant.zip>
+		<salesforce.ant.jar>ant-salesforce-53.0.jar</salesforce.ant.jar>
+		<salesforce.ant.pom>ant-salesforce-53.0.pom</salesforce.ant.pom>
 	</properties>
 	<build>
 		<pluginManagement><!-- lock down plugins versions to avoid using Maven 
@@ -154,7 +155,7 @@
 						<configuration>
 							<rules>
 								<requireMavenVersion>
-									<version>3.0.5</version>
+									<version>3.1.0</version>
 								</requireMavenVersion>
 								<requireJavaVersion>
 									<version>1.8.0</version>
@@ -233,17 +234,13 @@
 								<echo>target 1</echo>
 							</target>
 							<target>
-								<get skipexisting="true"
-									src="https://gs0.salesforce.com/dwnld/SfdcAnt/${salesforce.ant.zip}"
-									dest="./salesforce" />
-								<unzip src="./salesforce/${salesforce.ant.zip}"
-									dest="./salesforce/">
+								<get skipexisting="true" src="https://gs0.salesforce.com/dwnld/SfdcAnt/${salesforce.ant.zip}" dest="./salesforce" />
+								<unzip src="./salesforce/${salesforce.ant.zip}" dest="./salesforce/">
 									<patternset>
 										<include name="ant-salesforce.jar" />
 									</patternset>
 								</unzip>
-								<move file="./salesforce/ant-salesforce.jar"
-									tofile="./salesforce/${salesforce.ant.jar}" />
+								<move file="./salesforce/ant-salesforce.jar" tofile="./salesforce/${salesforce.ant.jar}" />
 							</target>
 						</configuration>
 					</execution>
@@ -340,7 +337,7 @@
 		<dependency>
 			<groupId>org.apache.xmlbeans</groupId>
 			<artifactId>xmlbeans</artifactId>
-			<version>5.0.1</version>
+			<version>5.0.2</version>
 		</dependency>
 		<dependency>
 			<groupId>salesforce</groupId>
@@ -350,17 +347,17 @@
 		<dependency>
 			<groupId>com.hoffnungland</groupId>
 			<artifactId>log4j</artifactId>
-			<version>1.0.9</version>
+			<version>1.0.10</version>
 		</dependency>
 		<dependency>
 			<groupId>com.hoffnungland</groupId>
 			<artifactId>orcxlsreport</artifactId>
-			<version>0.0.33</version>
+			<version>0.0.36</version>
 		</dependency>
 		<dependency>
 			<groupId>com.hoffnungland</groupId>
 			<artifactId>jappkeystoremanager</artifactId>
-			<version>1.0.1</version>
+			<version>1.0.2</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
 		<dependency>
@@ -378,25 +375,25 @@
 		<dependency>
 			<groupId>com.hoffnungland</groupId>
 			<artifactId>saxonxpathutils</artifactId>
-			<version>1.0.23</version>
+			<version>1.0.24</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.ant/ant -->
 		<dependency>
 			<groupId>org.apache.ant</groupId>
 			<artifactId>ant</artifactId>
-			<version>1.10.11</version>
+			<version>1.10.12</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.force.api/force-wsc -->
 		<dependency>
 			<groupId>com.force.api</groupId>
 			<artifactId>force-wsc</artifactId>
-			<version>52.2.0</version>
+			<version>53.1.0</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-java</artifactId>
-			<version>3.141.59</version>
+			<version>4.1.0</version>
 		</dependency>
 	</dependencies>
 </project>
