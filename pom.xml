@@ -333,21 +333,15 @@
 			<version>4.13.2</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.apache.xmlbeans/xmlbeans -->
-		<dependency>
-			<groupId>org.apache.xmlbeans</groupId>
-			<artifactId>xmlbeans</artifactId>
-			<version>5.0.2</version>
-		</dependency>
-		<dependency>
-			<groupId>salesforce</groupId>
-			<artifactId>ant-salesforce</artifactId>
-			<version>52.0</version>
-		</dependency>
 		<dependency>
 			<groupId>com.hoffnungland</groupId>
 			<artifactId>log4j</artifactId>
 			<version>1.0.10</version>
+		</dependency>
+		<dependency>
+			<groupId>salesforce</groupId>
+			<artifactId>ant-salesforce</artifactId>
+			<version>53.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.hoffnungland</groupId>
@@ -395,5 +389,12 @@
 			<artifactId>selenium-java</artifactId>
 			<version>4.1.0</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.xmlbeans/xmlbeans -->
+		<!-- 
+		<dependency>
+			<groupId>org.apache.xmlbeans</groupId>
+			<artifactId>xmlbeans</artifactId>
+			<version>5.0.2</version>
+		</dependency>-->
 	</dependencies>
 </project>
