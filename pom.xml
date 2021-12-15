@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.hoffnungland</groupId>
 	<artifactId>jsalesforcemigrationtool</artifactId>
-	<version>0.0.4-SNAPSHOT</version>
+	<version>0.0.4</version>
 
 	<name>JSalesforceMigrationTool</name>
 	<url>http://hoffnungland.com</url>
@@ -23,7 +21,7 @@
 	<scm>
 		<connection>scm:git:https://github.com/manuelmsperanza/JSalesforceMigrationTool.git</connection>
 		<developerConnection>scm:git:git@github.com:manuelmsperanza/JSalesforceMigrationTool.git</developerConnection>
-		<tag>HEAD</tag>
+		<tag>jsalesforcemigrationtool-0.0.4</tag>
 	</scm>
 	<issueManagement>
 		<system>GitHub</system>
@@ -236,17 +234,13 @@
 								<echo>target 1</echo>
 							</target>
 							<target>
-								<get skipexisting="true"
-									src="https://gs0.salesforce.com/dwnld/SfdcAnt/${salesforce.ant.zip}"
-									dest="./salesforce" />
-								<unzip src="./salesforce/${salesforce.ant.zip}"
-									dest="./salesforce/">
+								<get skipexisting="true" src="https://gs0.salesforce.com/dwnld/SfdcAnt/${salesforce.ant.zip}" dest="./salesforce" />
+								<unzip src="./salesforce/${salesforce.ant.zip}" dest="./salesforce/">
 									<patternset>
 										<include name="ant-salesforce.jar" />
 									</patternset>
 								</unzip>
-								<move file="./salesforce/ant-salesforce.jar"
-									tofile="./salesforce/${salesforce.ant.jar}" />
+								<move file="./salesforce/ant-salesforce.jar" tofile="./salesforce/${salesforce.ant.jar}" />
 							</target>
 						</configuration>
 					</execution>
