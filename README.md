@@ -86,7 +86,7 @@ _Different store and key passwords not supported for PKCS12 KeyStores_
 ## Build settings
 ### Add prerequisites
 	<prerequisites>
-		<maven>3.0.5</maven>
+		<maven>3.1.0</maven>
 	</prerequisites>
 
 Update to java 1.8<br>
