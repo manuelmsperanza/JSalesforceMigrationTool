@@ -336,7 +336,7 @@
 		<dependency>
 			<groupId>com.hoffnungland</groupId>
 			<artifactId>log4j</artifactId>
-			<version>1.0.11</version>
+			<version>1.0.12</version>
 		</dependency>
 		<dependency>
 			<groupId>salesforce</groupId>
@@ -346,12 +346,12 @@
 		<dependency>
 			<groupId>com.hoffnungland</groupId>
 			<artifactId>orcxlsreport</artifactId>
-			<version>0.0.37</version>
+			<version>0.0.38</version>
 		</dependency>
 		<dependency>
 			<groupId>com.hoffnungland</groupId>
 			<artifactId>jappkeystoremanager</artifactId>
-			<version>1.0.3</version>
+			<version>1.0.4</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
 		<dependency>
@@ -369,7 +369,7 @@
 		<dependency>
 			<groupId>com.hoffnungland</groupId>
 			<artifactId>saxonxpathutils</artifactId>
-			<version>1.0.25</version>
+			<version>1.0.26</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.ant/ant -->
 		<dependency>
