@@ -31,9 +31,9 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.source.version>1.8</java.source.version>
 		<java.target.version>1.8</java.target.version>
-		<salesforce.ant.zip>salesforce_ant_53.0.zip</salesforce.ant.zip>
-		<salesforce.ant.jar>ant-salesforce-53.0.jar</salesforce.ant.jar>
-		<salesforce.ant.pom>ant-salesforce-53.0.pom</salesforce.ant.pom>
+		<salesforce.ant.zip>salesforce_ant_54.0.zip</salesforce.ant.zip>
+		<salesforce.ant.jar>ant-salesforce-54.0.jar</salesforce.ant.jar>
+		<salesforce.ant.pom>ant-salesforce-54.0.pom</salesforce.ant.pom>
 	</properties>
 	<build>
 		<pluginManagement><!-- lock down plugins versions to avoid using Maven 

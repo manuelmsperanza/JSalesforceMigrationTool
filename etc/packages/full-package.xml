@@ -347,5 +347,5 @@
 	<types><members>*</members><name>CallCoachingMediaProvider</name></types>
 	<types><members>*</members><name>PlatformEventSubscriberConfig</name></types>
 	<types><members>*</members><name>Settings</name></types>
-    <version>51.0</version>
+    <version>53.0</version>
 </Package>
