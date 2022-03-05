@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 
-import com.hoffnungland.poi.corner.orcxlsreport.ExcelManager;
+import com.hoffnungland.poi.corner.dbxlsreport.ExcelManager;
 
 public class OrgXlsMgr extends ExcelManager {
 	
