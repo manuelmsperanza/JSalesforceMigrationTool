@@ -345,8 +345,8 @@
 		</dependency>
 		<dependency>
 			<groupId>com.hoffnungland</groupId>
-			<artifactId>dbxlsreport</artifactId>
-			<version>0.0.1</version>
+			<artifactId>xlsreport</artifactId>
+			<version>1.0.2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.hoffnungland</groupId>
