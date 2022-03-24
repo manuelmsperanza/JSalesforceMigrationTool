@@ -108,7 +108,7 @@ public class CheckUtilityAppDataModel {
 		//listSources.add("TEA");
 		
 		//Read Excel
-		String dmExcelPath = "C:\\Users\\msperanza\\OneDrive - Engineering Ingegneria Informatica S.p.A\\Documenti condivisi\\General\\Analisi\\UAPP Data Model v01.xlsx";
+		String dmExcelPath = "C:\\Users\\msperanza\\OneDrive - Engineering Ingegneria Informatica S.p.A\\Documenti condivisi\\General\\Analisi\\UAPP Data Model v02.xlsm";
 		String orgExcelPath = "wrtsuapp.xlsx";
 		//String orgExcelPath = "manuel.speranza - eap2.xlsx";
 		//String orgExcelPath = "eng.msperanza - teaspa.it.release1.xlsx";
@@ -357,11 +357,11 @@ public class CheckUtilityAppDataModel {
 			
 			switch(dmSheet.getSheetName().toLowerCase()) {
 			case "cover":
+			case "recordtype":
+			case "objects":
 				break;
 			case "lov":
 				this.checkLov(dmSheet, listSources);
-				break;
-			case "recordtype":
 				break;
 			case "labels":
 				this.checkLabels(dmSheet, listSources);
