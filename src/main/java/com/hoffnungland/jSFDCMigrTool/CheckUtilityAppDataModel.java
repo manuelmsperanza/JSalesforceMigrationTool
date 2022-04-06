@@ -21,6 +21,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 public class CheckUtilityAppDataModel {
 	
 	private static final Logger logger = LogManager.getLogger(CheckUtilityAppDataModel.class);
+	private static String fileSeparator = System.getProperty("file.separator");
 	
 	private File orgExcel;
 	private FileInputStream orgExcelFis = null;
@@ -102,20 +103,27 @@ public class CheckUtilityAppDataModel {
 	public static void main(String[] args) {
 		logger.traceEntry();
 		
-		List<String> listSources = new ArrayList<String>();
-		listSources.add("EAP2");
-		listSources.add("UAPP");
-		//listSources.add("TEA");
-		
-		//Read Excel
-		String dmExcelPath = "C:\\Users\\msperanza\\OneDrive - Engineering Ingegneria Informatica S.p.A\\Documenti condivisi\\General\\Analisi\\UAPP Data Model v02.xlsm";
-		String orgExcelPath = "wrtsuapp.xlsx";
-		//String orgExcelPath = "manuel.speranza - eap2.xlsx";
-		//String orgExcelPath = "eng.msperanza - teaspa.it.release1.xlsx";
-		//String orgExcelPath = "eng.msperanza - teaspa.it.dev.xlsx";
 		
 		CheckUtilityAppDataModel checkUAppDm = new CheckUtilityAppDataModel();
 		try {
+			Properties checkUtilityAppDataModelProperties = new Properties();
+			File checkUtilityAppDataModelPropFile = new File("." + fileSeparator + "etc" + fileSeparator + "checkUtilityAppDataModel.properties");
+			if(checkUtilityAppDataModelPropFile.exists()) {
+				try (FileInputStream configFile = new FileInputStream(checkUtilityAppDataModelPropFile)) {
+					checkUtilityAppDataModelProperties.load(configFile);
+				}
+			}
+			
+			String[] listSourcesProp = checkUtilityAppDataModelProperties.getProperty("listSources").split(",");
+			List<String> listSources = new ArrayList<String>();
+			for(String curSourceProp : listSourcesProp) {
+				listSources.add(curSourceProp);
+			}
+			
+			//Read Excel
+			String dmExcelPath = checkUtilityAppDataModelProperties.getProperty("dmExcelPath");
+			String orgExcelPath = checkUtilityAppDataModelProperties.getProperty("orgExcelPath");
+			
 			checkUAppDm.init(orgExcelPath, dmExcelPath);
 			checkUAppDm.scanDataModel(listSources);
 			checkUAppDm.write();
