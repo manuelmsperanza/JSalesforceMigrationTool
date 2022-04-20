@@ -428,7 +428,7 @@ public class CheckUtilityAppDataModel {
 				case "source":
 					sourcePos = collCell.getColumnIndex();
 					break;
-				case "english":
+				case "english label":
 					labelPos = collCell.getColumnIndex();
 					break;
 				case "italian":
