@@ -126,3 +126,16 @@ Update to java 1.8<br>
 ## Execute the maven assembly single
 
 	mvn install assembly:single
+	
+# add .gitignore to mandatory empty directory
+
+	# Ignore everything in this directory
+	*
+	# Except this file
+	!.gitignore
+
+# Configure the Package Clean UP Automation with GitHub Action
+
+The Action run during the release phase of package (or you can run it manually).
+Leave only the latest package version into the repository.
+Create the .github/workflows/cleanupPackages.yml file.
