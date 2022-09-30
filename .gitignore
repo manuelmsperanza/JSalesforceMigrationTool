@@ -5,11 +5,11 @@
 .classpath
 .factorypath
 .project
-**/.settings/*
-**/.vscode/*
-**/bin/*
-**/logs/*
-**/target/*
+.settings/*
+.vscode/*
+bin/*
+logs/*
+target/*
 /retrieveUnpackaged*/
 /*.txt
 /*.xlsx
