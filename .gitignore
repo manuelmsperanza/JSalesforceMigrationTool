@@ -10,11 +10,13 @@
 bin
 logs
 target
+.apt_generated
+.apt_generated_tests
+
+# JSalesforceMigrationTool ignore below
 retrieveUnpackaged*
 /*.txt
 /*.xlsx
 /package.xml
 /scratchOrg/
 /ea2/
-/.apt_generated/
-/.apt_generated_tests/
