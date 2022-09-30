@@ -7,8 +7,9 @@
 .classpath
 .factorypath
 .project
-/target/
+/bin/
 /logs/
+/target/
 /retrieveUnpackaged*/
 /*.txt
 /*.xlsx
