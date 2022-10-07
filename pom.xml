@@ -4,7 +4,7 @@
 
 	<groupId>com.hoffnungland</groupId>
 	<artifactId>jsalesforcemigrationtool</artifactId>
-	<version>56.0.18-SNAPSHOT</version>
+	<version>56.0.20-SNAPSHOT</version>
 
 	<name>JSalesforceMigrationTool</name>
 	<url>http://hoffnungland.com</url>
@@ -342,7 +342,7 @@
 			<groupId>salesforce</groupId>
 			<artifactId>ant-salesforce</artifactId>
 			<version>56.0</version>
-		</dependency>
+		</dependency>		
 		<dependency>
 			<groupId>com.hoffnungland</groupId>
 			<artifactId>xlsreport</artifactId>
@@ -369,7 +369,7 @@
 		<dependency>
 			<groupId>com.hoffnungland</groupId>
 			<artifactId>saxonxpathutils</artifactId>
-			<version>1.0.29</version>
+			<version>1.0.30</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.ant/ant -->
 		<dependency>
