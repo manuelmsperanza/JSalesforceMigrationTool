@@ -321,6 +321,18 @@ public class App implements ActionListener {
 			springLayout.putConstraint(SpringLayout.WEST, btnProcessClickMaMeSButton, 10, SpringLayout.EAST, btnUtilityAppMaMeS);
 			btnProcessClickMaMeSButton.addActionListener(this);
 			frame.getContentPane().add(btnProcessClickMaMeSButton);
+			
+			JButton btnBlockAutomation = new JButton("Block Automations");
+			springLayout.putConstraint(SpringLayout.NORTH, btnBlockAutomation, 10, SpringLayout.SOUTH, btnUtilityAppMaMeS);
+			springLayout.putConstraint(SpringLayout.WEST, btnBlockAutomation, 0, SpringLayout.WEST, progressLabel);
+			btnBlockAutomation.addActionListener(this);
+			frame.getContentPane().add(btnBlockAutomation);
+			
+			JButton btnUnblockAutomation = new JButton("Unblock Automations");
+			springLayout.putConstraint(SpringLayout.WEST, btnUnblockAutomation, 10, SpringLayout.EAST, btnBlockAutomation);
+			springLayout.putConstraint(SpringLayout.SOUTH, btnUnblockAutomation, 0, SpringLayout.SOUTH, btnBlockAutomation);
+			btnUnblockAutomation.addActionListener(this);
+			frame.getContentPane().add(btnUnblockAutomation);
 
 			
 
@@ -477,6 +489,12 @@ public class App implements ActionListener {
 			case "Clear Metadata":
 				this.postActionClearMetadataDir("Clear Metadata Directory");
 				break;
+			case "Block Automations":
+				this.startAutomationManager(false);
+				break;
+			case "Unblock Automations":
+				this.startAutomationManager(true);
+				break;
 			}
 
 		} catch (IOException | NoSuchAlgorithmException | UnrecoverableEntryException | KeyStoreException | InvalidKeySpecException | IndexOutOfBoundsException | SaxonApiUncheckedException | SaxonApiException | SAXException | ParserConfigurationException | TransformerException e) {
@@ -490,6 +508,59 @@ public class App implements ActionListener {
 		}
 		logger.traceExit();
 	}
+
+	private void startAutomationManager(boolean enable) throws FileNotFoundException, IOException, NoSuchAlgorithmException, UnrecoverableEntryException, KeyStoreException, InvalidKeySpecException, IndexOutOfBoundsException, SaxonApiUncheckedException, SaxonApiException, SAXException, ParserConfigurationException, TransformerException {
+		
+		logger.traceEntry();
+		this.progressLabel.setVisible(true);
+		this.progressLabel.setText("Retrieve metadata in progress");
+		String selectedSourceOrg = this.jSalesforceMigrationToolProperties.getProperty("selectedSourceOrg");
+		Properties sourceOrgProperties = new Properties();
+		File sourceOrgPropertiesFile = new File("." + fileSeparator + "etc" + fileSeparator + "orgs" + fileSeparator + selectedSourceOrg + ".properties");
+		try (FileInputStream configFile = new FileInputStream(sourceOrgPropertiesFile)) {
+			sourceOrgProperties.load(configFile);
+		}
+
+		String passwordType = sourceOrgProperties.getProperty("passwordType");
+		String passwd = null;
+		switch(passwordType) {
+		case "encrypted":
+			String encriptedPassword = sourceOrgProperties.getProperty("sf.password");
+			passwd = this.appKsManager.readPasswordFromKeyStore(selectedSourceOrg + ".password", encriptedPassword);
+			break;
+		case "oneTimePassword":
+			PasswordPanel passwordPanel = new PasswordPanel();
+			int option = JOptionPane.showOptionDialog(this.frame, passwordPanel, selectedSourceOrg, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+			if(option == JOptionPane.OK_OPTION) { // pressing OK button
+				char[] passwdChr = passwordPanel.getPasswordField().getPassword();
+				passwd = new String(passwdChr);
+			} else {
+				logger.traceExit();
+				return;
+			}
+			break;
+		}
+
+		
+		
+		String username = sourceOrgProperties.getProperty("sf.username");
+		String sourcePackageName = this.jSalesforceMigrationToolProperties.getProperty("selectedSourcePackage");
+		
+		AutomationManager automationManager = new AutomationManager(
+				username,
+				passwd,
+				sourceOrgProperties.getProperty("sf.serverurl"),
+				"." + fileSeparator,
+				"." + fileSeparator + "etc" + fileSeparator + "packages"  + fileSeparator + sourcePackageName);
+		
+		automationManager.retrieveAutomationConfiguration();
+		automationManager.changeAutomations(enable);
+		automationManager.deployAutomationConfiguration();
+		
+		JOptionPane.showMessageDialog(this.frame, "Automation " + (enable ? "unblock" : "block") + " is completed", "Automantion switch completed", JOptionPane.INFORMATION_MESSAGE);
+		
+	}
+
 
 	private void showErrorList(String message) {
 		JScrollPane scrollpane = new JScrollPane(); 
