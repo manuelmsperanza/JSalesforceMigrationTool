@@ -25,6 +25,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.tools.ant.Project;
@@ -38,6 +39,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonWriter;
 import com.hoffnungland.jSFDCMigrTool.entity.Automations;
+import com.hoffnungland.jSFDCMigrTool.entity.ValidationRules;
 import com.hoffnungland.jSFDCMigrTool.entity.Workflows;
 import com.hoffnungland.xpath.XmlExtractor;
 import com.salesforce.ant.DeployTask;
@@ -55,16 +57,18 @@ public class AutomationManager {
 	private String passwd;
 	private String serverUrl;
 	private String baseDir = ".";
-	private String automationPackagePath;
+	private String automationPackagePathRetrieve;
+	private String automationPackagePathDeploy;
 	
 	public AutomationManager(String username, String passwd, String serverUrl, String baseDir,
-			String automationPackagePath) {
+			String automationPackagePathRetrieve, String automationPackagePathDeploy) {
 		super();
 		this.username = username;
 		this.passwd = passwd;
 		this.serverUrl = serverUrl;
 		this.baseDir = baseDir;
-		this.automationPackagePath = automationPackagePath;
+		this.automationPackagePathRetrieve = automationPackagePathRetrieve;
+		this.automationPackagePathDeploy = automationPackagePathDeploy;
 	}
 	
 	public void retrieveAutomationConfiguration() throws IOException {
@@ -89,7 +93,7 @@ public class AutomationManager {
 		}
 
 		retrieveTask.setRetrieveTarget(targetDir);
-		retrieveTask.setUnpackaged(this.automationPackagePath);
+		retrieveTask.setUnpackaged(this.automationPackagePathRetrieve);
 		retrieveTask.setTrace(logger.isTraceEnabled());
 		logger.info("Run retrieve task");
 		retrieveTask.execute();
@@ -115,7 +119,7 @@ public class AutomationManager {
 		String targetDir = "retrieveUnpackaged";
 		deployTask.setDeployRoot(targetDir);
 
-		Files.copy(Paths.get(this.automationPackagePath), Paths.get(this.baseDir + fileSeparator + "retrieveUnpackaged" + fileSeparator + "package.xml"), StandardCopyOption.REPLACE_EXISTING);
+		Files.copy(Paths.get(this.automationPackagePathDeploy), Paths.get(this.baseDir + fileSeparator + "retrieveUnpackaged" + fileSeparator + "package.xml"), StandardCopyOption.REPLACE_EXISTING);
 
 		deployTask.setTrace(logger.isTraceEnabled());
 		logger.info("Run deploy task");
@@ -227,6 +231,68 @@ public class AutomationManager {
 		logger.traceExit();
 	}
 	
+	
+	private void manageValidationRulesChange(XmlExtractor xmlExtractor, DocumentBuilder builder, Transformer transformer, File metadataDir, String metadataPrefix, Automations automationMap, boolean enable) throws SaxonApiException, SAXException, IOException, TransformerException {
+		
+		logger.traceEntry();
+		for(File curObjectile : metadataDir.listFiles()) {
+			if(curObjectile.isFile() && curObjectile.getName().endsWith(metadataPrefix)){
+				
+				String objectName = curObjectile.getName().substring(0, curObjectile.getName().length() - metadataPrefix.length());
+				logger.debug("objectName: {}", objectName);
+				ValidationRules vrMap = automationMap.validationRules.get(objectName);
+				if(vrMap == null) {
+					vrMap = new ValidationRules();
+					automationMap.validationRules.put(objectName, vrMap);
+				}
+				Document doc = builder.parse(curObjectile);
+				Element root = doc.getDocumentElement();
+				NodeList validationRulesNodes = root.getElementsByTagNameNS(root.getNamespaceURI(), "validationRules");
+				if(validationRulesNodes.getLength() == 0) {
+					logger.debug("object without validationRules {}", objectName);
+					FileUtils.delete(curObjectile);
+					automationMap.validationRules.remove(objectName);
+				} else {
+					for(int curValidationRulesNodeIdx = 0; curValidationRulesNodeIdx < validationRulesNodes.getLength(); curValidationRulesNodeIdx++) {
+						Node validationRulesNode = validationRulesNodes.item(curValidationRulesNodeIdx);
+						String ruleName = null;
+						Node statusNode = null;
+						String currentStatus = null;
+						NodeList wfRulesChildren = validationRulesNode.getChildNodes();
+						for(int wfRuleChildIdx = 0; wfRuleChildIdx < wfRulesChildren.getLength(); wfRuleChildIdx++) {
+							Node wfRuleChildNode = wfRulesChildren.item(wfRuleChildIdx);
+							switch(wfRuleChildNode.getNodeName()) {
+								case "fullName":
+									ruleName = wfRuleChildNode.getTextContent();
+									break;
+								case "active":
+									statusNode = wfRuleChildNode;
+									currentStatus = statusNode.getTextContent();
+									logger.debug("currentStatus: {}", currentStatus);
+									break;
+							}
+						}
+						
+						String newStatus = enable ? vrMap.rules.get(ruleName) : "false";
+						logger.debug("newStatus: {}", newStatus);
+						if(!enable) {
+							vrMap.rules.put(ruleName, currentStatus);
+						}
+						if(!newStatus.equals(currentStatus)) {
+							statusNode.setTextContent(newStatus);
+						}
+					}
+					DOMSource source = new DOMSource(doc);
+					try(FileWriter writer = new FileWriter(curObjectile)){
+						StreamResult result = new StreamResult(writer);
+						transformer.transform(source, result);
+					}
+				}
+			}
+		}
+		logger.traceExit();
+	}
+	
 	public void changeAutomations(boolean enable) throws SaxonApiException, IndexOutOfBoundsException, SaxonApiUncheckedException, SAXException, IOException, ParserConfigurationException, TransformerException {
 		
 		logger.traceEntry();
@@ -274,6 +340,9 @@ public class AutomationManager {
 						break;
 					case "workflows":
 						this.manageWorkflowChange(xmlExtractor, builder, transformer, curDir, ".workflow", automations, enable);
+						break;
+					case "objects":
+						this.manageValidationRulesChange(xmlExtractor, builder, transformer, curDir, ".object", automations, enable);
 						break;
 				}	
 			}				

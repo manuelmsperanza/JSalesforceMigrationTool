@@ -545,13 +545,15 @@ public class App implements ActionListener {
 		
 		String username = sourceOrgProperties.getProperty("sf.username");
 		String sourcePackageName = this.jSalesforceMigrationToolProperties.getProperty("selectedSourcePackage");
+		String targetPackageName = this.jSalesforceMigrationToolProperties.getProperty("selectedTargetPackage");
 		
 		AutomationManager automationManager = new AutomationManager(
 				username,
 				passwd,
 				sourceOrgProperties.getProperty("sf.serverurl"),
 				"." + fileSeparator,
-				"." + fileSeparator + "etc" + fileSeparator + "packages"  + fileSeparator + sourcePackageName);
+				"." + fileSeparator + "etc" + fileSeparator + "packages"  + fileSeparator + sourcePackageName,
+				"." + fileSeparator + "etc" + fileSeparator + "packages"  + fileSeparator + targetPackageName);
 		
 		automationManager.retrieveAutomationConfiguration();
 		automationManager.changeAutomations(enable);
