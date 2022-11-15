@@ -555,9 +555,11 @@ public class App implements ActionListener {
 				"." + fileSeparator + "etc" + fileSeparator + "packages"  + fileSeparator + sourcePackageName,
 				"." + fileSeparator + "etc" + fileSeparator + "packages"  + fileSeparator + targetPackageName);
 		
-		automationManager.retrieveAutomationConfiguration();
-		automationManager.changeAutomations(enable);
-		automationManager.deployAutomationConfiguration();
+		if(automationManager.checkEnablement(enable)) {			
+			automationManager.retrieveAutomationConfiguration();
+			automationManager.changeAutomations(enable);
+			automationManager.deployAutomationConfiguration();
+		}
 		
 		JOptionPane.showMessageDialog(this.frame, "Automation " + (enable ? "unblock" : "block") + " is completed", "Automantion switch completed", JOptionPane.INFORMATION_MESSAGE);
 		

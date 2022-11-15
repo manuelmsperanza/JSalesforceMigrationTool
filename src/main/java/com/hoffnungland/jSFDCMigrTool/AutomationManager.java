@@ -2,6 +2,7 @@ package com.hoffnungland.jSFDCMigrTool;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -175,7 +176,6 @@ public class AutomationManager {
 		logger.traceExit();
 	}
 	
-	
 	private void manageWorkflowChange(XmlExtractor xmlExtractor, DocumentBuilder builder, Transformer transformer, File metadataDir, String metadataPrefix, Automations automationMap, boolean enable) throws SaxonApiException, SAXException, IOException, TransformerException {
 		
 		logger.traceEntry();
@@ -230,7 +230,6 @@ public class AutomationManager {
 		}
 		logger.traceExit();
 	}
-	
 	
 	private void manageValidationRulesChange(XmlExtractor xmlExtractor, DocumentBuilder builder, Transformer transformer, File metadataDir, String metadataPrefix, Automations automationMap, boolean enable) throws SaxonApiException, SAXException, IOException, TransformerException {
 		
@@ -293,6 +292,31 @@ public class AutomationManager {
 		logger.traceExit();
 	}
 	
+	public boolean checkEnablement(boolean enable) throws FileNotFoundException, IOException {
+		logger.traceEntry();
+		
+		Gson jsonb = new GsonBuilder().create();
+		Automations automations = null;
+		
+		String outFile = "automations.json";
+		String outZipFilePath = this.baseDir + "automations.zip";
+		File outZipFile = new File(outZipFilePath);
+		if(outZipFile.exists()) {
+			try(ZipInputStream inZip = new ZipInputStream(new FileInputStream(outZipFile));){				
+				ZipEntry inZipEntry = inZip.getNextEntry();
+				if(outFile.equals(inZipEntry.getName())) {
+					automations = jsonb.fromJson(new InputStreamReader(inZip, "UTF-8"), Automations.class);
+				}
+			}
+		}
+		if(automations != null && !automations.enabled && !enable) {
+			logger.warn("Autmations aleady disabled");
+			return logger.traceExit(false);
+		}
+		
+		return logger.traceExit(true);
+	}
+	
 	public void changeAutomations(boolean enable) throws SaxonApiException, IndexOutOfBoundsException, SaxonApiUncheckedException, SAXException, IOException, ParserConfigurationException, TransformerException {
 		
 		logger.traceEntry();
@@ -300,18 +324,26 @@ public class AutomationManager {
 		Gson jsonb = new GsonBuilder().create();
 		Automations automations = null;
 		
-		if(enable) {
-			String outFile = "automations.json";
-			String outZipFilePath = this.baseDir + "automations.zip";
-			try(ZipInputStream inZip = new ZipInputStream(new FileInputStream(outZipFilePath));){				
+		String outFile = "automations.json";
+		String outZipFilePath = this.baseDir + "automations.zip";
+		File outZipFile = new File(outZipFilePath);
+		if(outZipFile.exists()) {
+			try(ZipInputStream inZip = new ZipInputStream(new FileInputStream(outZipFile));){				
 				ZipEntry inZipEntry = inZip.getNextEntry();
 				if(outFile.equals(inZipEntry.getName())) {
 					automations = jsonb.fromJson(new InputStreamReader(inZip, "UTF-8"), Automations.class);
 				}
 			}
-		} else {
+		}
+		if(automations != null && !automations.enabled && !enable) {
+			logger.warn("Autmations aleady disabled");
+			logger.traceExit();
+			return;
+		}
+		if(!enable){
 			automations = new Automations();
 		}
+		automations.enabled = enable;
 		
 		XmlExtractor xmlExtractor = new XmlExtractor();
 		
@@ -348,15 +380,12 @@ public class AutomationManager {
 			}				
 			logger.debug("automations: {}", automations);
 		}
-		if(!enable) {
-		// start part of your Java code
-			try(ZipOutputStream outZip = new ZipOutputStream(new FileOutputStream(this.baseDir + "automations.zip"))){
-				outZip.putNextEntry(new ZipEntry("automations.json"));
-				
-				JsonWriter writerAutomationsMap = new JsonWriter(new OutputStreamWriter(outZip, "UTF-8"));
-				writerAutomationsMap.jsonValue(jsonb.toJson(automations));
-				writerAutomationsMap.close();
-			}
+		
+		try(ZipOutputStream outZip = new ZipOutputStream(new FileOutputStream(outZipFilePath))){
+			outZip.putNextEntry(new ZipEntry(outFile));
+			JsonWriter writerAutomationsMap = new JsonWriter(new OutputStreamWriter(outZip, "UTF-8"));
+			writerAutomationsMap.jsonValue(jsonb.toJson(automations));
+			writerAutomationsMap.close();
 		}
 		
 		logger.traceExit();

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Automations {
+	public boolean enabled;
 	public Map<String, String> flows = new HashMap<String, String>();
 	public Map<String, String> flowDefinitions = new HashMap<String, String>();
 	public Map<String, String> triggers = new HashMap<String, String>();
