@@ -310,7 +310,7 @@ public class AutomationManager {
 			}
 		}
 		if(automations != null && !automations.enabled && !enable) {
-			logger.warn("Autmations aleady disabled");
+			logger.warn("Automations aleady disabled");
 			return logger.traceExit(false);
 		}
 		
