@@ -378,7 +378,6 @@ public class AutomationManager {
 						break;
 				}	
 			}				
-			logger.debug("automations: {}", automations);
 		}
 		
 		try(ZipOutputStream outZip = new ZipOutputStream(new FileOutputStream(outZipFilePath))){

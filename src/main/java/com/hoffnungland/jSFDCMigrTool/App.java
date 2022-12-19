@@ -561,7 +561,7 @@ public class App implements ActionListener {
 			automationManager.deployAutomationConfiguration();
 		}
 		
-		JOptionPane.showMessageDialog(this.frame, "Automation " + (enable ? "unblock" : "block") + " is completed", "Automantion switch completed", JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(this.frame, "Automation " + (enable ? "unblock" : "block") + " is completed", "Automation switch completed", JOptionPane.INFORMATION_MESSAGE);
 		
 	}
 
