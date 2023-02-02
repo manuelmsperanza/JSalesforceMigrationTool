@@ -165,7 +165,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!--plugin>
+			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
 				<executions>
@@ -218,7 +218,7 @@
 						</configuration>
 					</execution>
 				</executions>
-			</plugin-->
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
@@ -369,7 +369,7 @@
 		<dependency>
 			<groupId>com.hoffnungland</groupId>
 			<artifactId>saxonxpathutils</artifactId>
-			<version>1.0.30</version>
+			<version>1.0.31</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.ant/ant -->
 		<dependency>
@@ -378,11 +378,11 @@
 			<version>1.10.12</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.force.api/force-wsc -->
-		<!--dependencyncy>
+		<dependency>
 			<groupId>com.force.api</groupId>
 			<artifactId>force-wsc</artifactId>
-			<version>56.0.0</version>
-		</dependency-->
+			<version>57.0.0</version>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
