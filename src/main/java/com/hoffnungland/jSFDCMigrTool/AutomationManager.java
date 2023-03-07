@@ -53,19 +53,23 @@ public class AutomationManager {
 	
 	private static final Logger logger = LogManager.getLogger(AutomationManager.class);
 	private static String fileSeparator = System.getProperty("file.separator");
-
+	
+	private String passwordType;
 	private String username;
 	private String passwd;
+	private String sessionId;
 	private String serverUrl;
 	private String baseDir = ".";
 	private String automationPackagePathRetrieve;
 	private String automationPackagePathDeploy;
 	
-	public AutomationManager(String username, String passwd, String serverUrl, String baseDir,
+	public AutomationManager(String passwordType, String username, String passwd, String sessionId, String serverUrl, String baseDir,
 			String automationPackagePathRetrieve, String automationPackagePathDeploy) {
 		super();
+		this.passwordType = passwordType;
 		this.username = username;
 		this.passwd = passwd;
+		this.sessionId = sessionId;
 		this.serverUrl = serverUrl;
 		this.baseDir = baseDir;
 		this.automationPackagePathRetrieve = automationPackagePathRetrieve;
@@ -79,8 +83,13 @@ public class AutomationManager {
 		retrieveTaskProject.setBasedir(this.baseDir);
 		retrieveTask.setProject(retrieveTaskProject);
 		
+		
 		retrieveTask.setUsername(this.username);
-		retrieveTask.setPassword(this.passwd);
+		if("sessionId".equals(this.passwordType)) {
+			retrieveTask.setSessionId(this.sessionId);
+		} else {
+			retrieveTask.setPassword(this.passwd);
+		}
 		if(this.serverUrl != null && this.serverUrl.length() > 0) {
 			retrieveTask.setServerURL(this.serverUrl);
 		}
@@ -111,7 +120,13 @@ public class AutomationManager {
 		deployTaskProject.setBasedir(this.baseDir);
 		deployTask.setProject(deployTaskProject);
 		deployTask.setUsername(this.username);
-		deployTask.setPassword(this.passwd);
+		
+		if("sessionId".equals(this.passwordType)) {
+			deployTask.setSessionId(this.sessionId);
+		} else {
+			deployTask.setPassword(this.passwd);
+		}
+		
 		if(this.serverUrl != null && this.serverUrl.length() > 0) {
 			deployTask.setServerURL(this.serverUrl);
 		}

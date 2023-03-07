@@ -372,14 +372,23 @@ public class App implements ActionListener {
 					orgProperties.load(configFile);
 				}
 
-				String passwordType = orgProperties.getProperty("passwordType");
+				String encryptionStatus = orgProperties.getProperty("encryptionStatus");
 
-				if(StringUtils.isBlank(passwordType) || "encrypt".equals(passwordType)) {
-
-					String password = this.appKsManager.writePasswordToKeyStore(orgName + ".password", orgProperties.getProperty("sf.password"));
-
-					orgProperties.setProperty("passwordType", "encrypted");
-					orgProperties.setProperty("sf.password", password);
+				if(StringUtils.isBlank(encryptionStatus) || "encrypt".equals(encryptionStatus)) {
+					
+					String password = orgProperties.getProperty("sf.password");
+					if(password != null && !"".equals(password)) {						
+						String encriptedPassword = this.appKsManager.writePasswordToKeyStore(orgName + ".password", password);
+						orgProperties.setProperty("sf.password", encriptedPassword);
+					}
+					
+					String sessionId = orgProperties.getProperty("sf.sessionId");
+					if(sessionId != null && !"".equals(sessionId)) {						
+						String encryptedSessionId = this.appKsManager.writePasswordToKeyStore(orgName + ".sessionId", sessionId);
+						orgProperties.setProperty("sf.sessionId", encryptedSessionId);
+					}
+					
+					orgProperties.setProperty("encryptionStatus", "encrypted");
 
 					try(FileOutputStream out = new FileOutputStream(curPropFile)) {			
 						orgProperties.store(out, null);
@@ -389,8 +398,6 @@ public class App implements ActionListener {
 
 				this.sourceOrgComboBox.addItem(orgName);
 				this.targetOrgComboBox.addItem(orgName);
-
-
 			}
 		}
 
@@ -523,8 +530,13 @@ public class App implements ActionListener {
 
 		String passwordType = sourceOrgProperties.getProperty("passwordType");
 		String passwd = null;
+		String sessionId = null;
 		switch(passwordType) {
-		case "encrypted":
+		case "sessionId":
+			String encryptedSessionId = sourceOrgProperties.getProperty("sf.sessionId");
+			sessionId = this.appKsManager.readPasswordFromKeyStore(selectedSourceOrg + ".sessionId", encryptedSessionId);
+			break;
+		case "password":
 			String encriptedPassword = sourceOrgProperties.getProperty("sf.password");
 			passwd = this.appKsManager.readPasswordFromKeyStore(selectedSourceOrg + ".password", encriptedPassword);
 			break;
@@ -548,8 +560,10 @@ public class App implements ActionListener {
 		String targetPackageName = this.jSalesforceMigrationToolProperties.getProperty("selectedTargetPackage");
 		
 		AutomationManager automationManager = new AutomationManager(
+				passwordType,
 				username,
 				passwd,
+				sessionId,
 				sourceOrgProperties.getProperty("sf.serverurl"),
 				"." + fileSeparator,
 				"." + fileSeparator + "etc" + fileSeparator + "packages"  + fileSeparator + sourcePackageName,
@@ -601,13 +615,21 @@ public class App implements ActionListener {
 		try (FileInputStream configFile = new FileInputStream(sourceOrgPropertiesFile)) {
 			sourceOrgProperties.load(configFile);
 		}
-
+		
+		RetrieveTask retrieveTask = new RetrieveTask();
 		String passwordType = sourceOrgProperties.getProperty("passwordType");
 		String passwd = null;
+		String sessionId = null;
 		switch(passwordType) {
-		case "encrypted":
+		case "sessionId":
+			String encryptedSessionId = sourceOrgProperties.getProperty("sf.sessionId");
+			sessionId = this.appKsManager.readPasswordFromKeyStore(selectedSourceOrg + ".sessionId", encryptedSessionId);
+			retrieveTask.setSessionId(sessionId);
+			break;
+		case "password":
 			String encriptedPassword = sourceOrgProperties.getProperty("sf.password");
 			passwd = this.appKsManager.readPasswordFromKeyStore(selectedSourceOrg + ".password", encriptedPassword);
+			retrieveTask.setPassword(passwd);
 			break;
 		case "oneTimePassword":
 			PasswordPanel passwordPanel = new PasswordPanel();
@@ -615,6 +637,7 @@ public class App implements ActionListener {
 			if(option == JOptionPane.OK_OPTION) { // pressing OK button
 				char[] passwdChr = passwordPanel.getPasswordField().getPassword();
 				passwd = new String(passwdChr);
+				retrieveTask.setPassword(passwd);
 			} else {
 				logger.traceExit();
 				return;
@@ -622,13 +645,12 @@ public class App implements ActionListener {
 			break;
 		}
 
-		RetrieveTask retrieveTask = new RetrieveTask();
 		Project retrieveTaskProject = new Project();
 		retrieveTaskProject.setBasedir(".");
 		retrieveTask.setProject(retrieveTaskProject);
 		String username = sourceOrgProperties.getProperty("sf.username");
 		retrieveTask.setUsername(username);
-		retrieveTask.setPassword(passwd);
+		
 		if(sourceOrgProperties.containsKey("sf.serverurl")) {
 			retrieveTask.setServerURL(sourceOrgProperties.getProperty("sf.serverurl"));
 		}
@@ -664,13 +686,21 @@ public class App implements ActionListener {
 		try (FileInputStream configFile = new FileInputStream(sourceOrgPropertiesFile)) {
 			targetOrgProperties.load(configFile);
 		}
-
+		
+		DeployTask deployTask = new DeployTask();
 		String passwordType = targetOrgProperties.getProperty("passwordType");
 		String passwd = null;
+		String sessionId = null;
 		switch(passwordType) {
-		case "encrypted":
+		case "sessionId":
+			String encryptedSessionId = targetOrgProperties.getProperty("sf.sessionId");
+			sessionId = this.appKsManager.readPasswordFromKeyStore(targetOrgProperties + ".sessionId", encryptedSessionId);
+			deployTask.setSessionId(sessionId);
+			break;
+		case "password":
 			String encriptedPassword = targetOrgProperties.getProperty("sf.password");
 			passwd = this.appKsManager.readPasswordFromKeyStore(selectedTargetOrg + ".password", encriptedPassword);
+			deployTask.setPassword(passwd);
 			break;
 		case "oneTimePassword":
 			PasswordPanel passwordPanel = new PasswordPanel();
@@ -678,6 +708,7 @@ public class App implements ActionListener {
 			if(option == JOptionPane.OK_OPTION) { // pressing OK button
 				char[] passwdChr = passwordPanel.getPasswordField().getPassword();
 				passwd = new String(passwdChr);
+				deployTask.setPassword(passwd);
 			} else {
 				logger.traceExit();
 				return;
@@ -685,14 +716,12 @@ public class App implements ActionListener {
 			break;
 		}
 
-		DeployTask deployTask = new DeployTask();
-
 		Project deployTaskProject = new Project();
 		deployTaskProject.setBasedir(".");
 		deployTask.setProject(deployTaskProject);
 		String username = targetOrgProperties.getProperty("sf.username");
 		deployTask.setUsername(username);
-		deployTask.setPassword(passwd);
+		
 		if(targetOrgProperties.containsKey("sf.serverurl")) {
 			deployTask.setServerURL(targetOrgProperties.getProperty("sf.serverurl"));
 		}
