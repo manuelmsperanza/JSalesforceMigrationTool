@@ -84,10 +84,10 @@ public class AutomationManager {
 		retrieveTask.setProject(retrieveTaskProject);
 		
 		
-		retrieveTask.setUsername(this.username);
 		if("sessionId".equals(this.passwordType)) {
 			retrieveTask.setSessionId(this.sessionId);
 		} else {
+			retrieveTask.setUsername(this.username);
 			retrieveTask.setPassword(this.passwd);
 		}
 		if(this.serverUrl != null && this.serverUrl.length() > 0) {
@@ -119,11 +119,11 @@ public class AutomationManager {
 		Project deployTaskProject = new Project();
 		deployTaskProject.setBasedir(this.baseDir);
 		deployTask.setProject(deployTaskProject);
-		deployTask.setUsername(this.username);
 		
 		if("sessionId".equals(this.passwordType)) {
 			deployTask.setSessionId(this.sessionId);
 		} else {
+			deployTask.setUsername(this.username);
 			deployTask.setPassword(this.passwd);
 		}
 		

@@ -617,6 +617,7 @@ public class App implements ActionListener {
 		}
 		
 		RetrieveTask retrieveTask = new RetrieveTask();
+		String username = sourceOrgProperties.getProperty("sf.username");
 		String passwordType = sourceOrgProperties.getProperty("passwordType");
 		String passwd = null;
 		String sessionId = null;
@@ -629,6 +630,7 @@ public class App implements ActionListener {
 		case "password":
 			String encriptedPassword = sourceOrgProperties.getProperty("sf.password");
 			passwd = this.appKsManager.readPasswordFromKeyStore(selectedSourceOrg + ".password", encriptedPassword);
+			retrieveTask.setUsername(username);
 			retrieveTask.setPassword(passwd);
 			break;
 		case "oneTimePassword":
@@ -637,6 +639,7 @@ public class App implements ActionListener {
 			if(option == JOptionPane.OK_OPTION) { // pressing OK button
 				char[] passwdChr = passwordPanel.getPasswordField().getPassword();
 				passwd = new String(passwdChr);
+				retrieveTask.setUsername(username);
 				retrieveTask.setPassword(passwd);
 			} else {
 				logger.traceExit();
@@ -648,8 +651,6 @@ public class App implements ActionListener {
 		Project retrieveTaskProject = new Project();
 		retrieveTaskProject.setBasedir(".");
 		retrieveTask.setProject(retrieveTaskProject);
-		String username = sourceOrgProperties.getProperty("sf.username");
-		retrieveTask.setUsername(username);
 		
 		if(sourceOrgProperties.containsKey("sf.serverurl")) {
 			retrieveTask.setServerURL(sourceOrgProperties.getProperty("sf.serverurl"));
@@ -688,6 +689,7 @@ public class App implements ActionListener {
 		}
 		
 		DeployTask deployTask = new DeployTask();
+		String username = targetOrgProperties.getProperty("sf.username");
 		String passwordType = targetOrgProperties.getProperty("passwordType");
 		String passwd = null;
 		String sessionId = null;
@@ -700,6 +702,7 @@ public class App implements ActionListener {
 		case "password":
 			String encriptedPassword = targetOrgProperties.getProperty("sf.password");
 			passwd = this.appKsManager.readPasswordFromKeyStore(selectedTargetOrg + ".password", encriptedPassword);
+			deployTask.setUsername(username);
 			deployTask.setPassword(passwd);
 			break;
 		case "oneTimePassword":
@@ -708,6 +711,7 @@ public class App implements ActionListener {
 			if(option == JOptionPane.OK_OPTION) { // pressing OK button
 				char[] passwdChr = passwordPanel.getPasswordField().getPassword();
 				passwd = new String(passwdChr);
+				deployTask.setUsername(username);
 				deployTask.setPassword(passwd);
 			} else {
 				logger.traceExit();
@@ -719,8 +723,7 @@ public class App implements ActionListener {
 		Project deployTaskProject = new Project();
 		deployTaskProject.setBasedir(".");
 		deployTask.setProject(deployTaskProject);
-		String username = targetOrgProperties.getProperty("sf.username");
-		deployTask.setUsername(username);
+		
 		
 		if(targetOrgProperties.containsKey("sf.serverurl")) {
 			deployTask.setServerURL(targetOrgProperties.getProperty("sf.serverurl"));
