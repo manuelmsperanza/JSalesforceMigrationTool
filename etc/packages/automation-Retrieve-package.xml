@@ -64,5 +64,5 @@
 	<types><members>*</members><name>ApexTrigger</name></types>
 	<types><members>*</members><name>FlowDefinition</name></types>
 	<types><members>*</members><name>Workflow</name></types>
-	<version>56.0</version>
+	<version>57.0</version>
 </Package>

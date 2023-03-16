@@ -139,6 +139,7 @@
 		<members>InvoiceLine</members>
 		<members>Lead</members>
 		<members>LegalEntity</members>
+		<members>LiveChatTranscript</members>
 		<members>Location</members>
 		<members>Opportunity</members>
 		<members>OpportunityCompetitor</members>
@@ -347,5 +348,5 @@
 	<types><members>*</members><name>CallCoachingMediaProvider</name></types>
 	<types><members>*</members><name>PlatformEventSubscriberConfig</name></types>
 	<types><members>*</members><name>Settings</name></types>
-    <version>56.0</version>
+    <version>57.0</version>
 </Package>
