@@ -4,7 +4,7 @@
 
 	<groupId>com.hoffnungland</groupId>
 	<artifactId>jsalesforcemigrationtool</artifactId>
-	<version>56.0.28</version>
+	<version>56.0.29-SNAPSHOT</version>
 
 	<name>JSalesforceMigrationTool</name>
 	<url>http://hoffnungland.com</url>
