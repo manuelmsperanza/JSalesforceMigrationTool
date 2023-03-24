@@ -4,7 +4,7 @@
 
 	<groupId>com.hoffnungland</groupId>
 	<artifactId>jsalesforcemigrationtool</artifactId>
-	<version>56.0.28-SNAPSHOT</version>
+	<version>56.0.28</version>
 
 	<name>JSalesforceMigrationTool</name>
 	<url>http://hoffnungland.com</url>
@@ -21,7 +21,7 @@
 	<scm>
 		<connection>scm:git:https://github.com/manuelmsperanza/JSalesforceMigrationTool.git</connection>
 		<developerConnection>scm:git:git@github.com:manuelmsperanza/JSalesforceMigrationTool.git</developerConnection>
-		<tag>HEAD</tag>
+		<tag>jsalesforcemigrationtool-56.0.28</tag>
 	</scm>
 	<issueManagement>
 		<system>GitHub</system>
