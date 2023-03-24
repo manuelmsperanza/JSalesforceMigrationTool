@@ -2,7 +2,7 @@
 <Configuration status="WARN" monitorInterval="15">
 	<Properties>
 		<Property name="activeProfile">stdout</Property>
-		<Property name="activeLevel">DEBUG</Property>
+		<Property name="activeLevel">INFO</Property>
 		<Property name="rollingFilename">JSalesforceMigrationTool</Property>
 	</Properties>
 	<Appenders>
