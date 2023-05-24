@@ -6,12 +6,18 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.hoffnungland.xpath.XmlExtractorBinding;
 
 import net.sf.saxon.s9api.QName;
@@ -146,6 +152,8 @@ public class OrgMetadataToExcel {
 									List<String> columnsList = new ArrayList<String>();
 									columnsList.add("filename");
 									
+									SortedSet<String> pivotColumnList = new TreeSet<String>();
+									
 									String[] orgXlsFields = null;
 									if(orgXlsProperties.containsKey("fields")) {
 										orgXlsFields = orgXlsProperties.getProperty("fields").split(",");
@@ -153,6 +161,12 @@ public class OrgMetadataToExcel {
 											columnsList.add(curFieldName);
 										}
 									}
+									
+									String pivotField = orgXlsProperties.getProperty("pivotField");
+									String pivotValue = orgXlsProperties.getProperty("pivotValue");
+									
+									JsonArray pivotArray = new JsonArray();
+									
 									
 									List<String[]> data = new ArrayList<String[]>();
 									for(File curOrgXmlFile : orgXlsFolder.listFiles()) {
@@ -162,6 +176,7 @@ public class OrgMetadataToExcel {
 											String[] rowData = null;
 											if(orgXlsProperties.containsKey("baseXpath")) {									
 												String orgXlsBaseXpath = orgXlsProperties.getProperty("baseXpath");
+												JsonObject pivotRowValue = new JsonObject();
 												
 												xmlExtractorBinding.init(curOrgXmlFile, "xmlns=\"http://soap.sforce.com/2006/04/metadata\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"", qNameList);
 												XdmValue countItemsNode = extractNode("count(" + orgXlsBaseXpath +")", xmlExtractorBinding, qNameList, listBindingValuesFields);
@@ -169,16 +184,34 @@ public class OrgMetadataToExcel {
 												
 												for (int nodeIdx = 0; nodeIdx < countItems; nodeIdx++){
 													
-													rowData = new String[columnsList.size()];			
-													rowData[0] = fileName;
 													listBindingValuesFields[0] = new XdmAtomicValue(nodeIdx+1);
-													int columnIdx = 1;
-													for(String curFieldName : orgXlsFields) {
-														String fieldNameXPath = orgXlsProperties.getProperty(curFieldName+".xpath", curFieldName + "/text()");
-														rowData[columnIdx] = extractNode("(" + orgXlsBaseXpath + ")[$nodeIdx]/" + fieldNameXPath, xmlExtractorBinding, qNameList, listBindingValuesFields).toString();
-														columnIdx++;
+													if(orgXlsFields != null) {
+														rowData = new String[columnsList.size()];			
+														rowData[0] = fileName;
+														int columnIdx = 1;
+														for(String curFieldName : orgXlsFields) {
+															String fieldNameXPath = orgXlsProperties.getProperty(curFieldName+".xpath", curFieldName + "/text()");
+															rowData[columnIdx] = extractNode("(" + orgXlsBaseXpath + ")[$nodeIdx]/" + fieldNameXPath, xmlExtractorBinding, qNameList, listBindingValuesFields).toString();
+															columnIdx++;
+														}
+														data.add(rowData);
 													}
+													
+													if(pivotField != null && pivotValue != null) {
+														
+														String fieldName = extractNode("(" + orgXlsBaseXpath + ")[$nodeIdx]/" + pivotField + "/text()", xmlExtractorBinding, qNameList, listBindingValuesFields).toString();
+														pivotColumnList.add(fieldName);
+														String fieldValue = extractNode("(" + orgXlsBaseXpath + ")[$nodeIdx]/" + pivotValue, xmlExtractorBinding, qNameList, listBindingValuesFields).toString();
+														pivotRowValue.addProperty(fieldName, fieldValue);
+														
+													}
+												}
+												
+												if(pivotField != null && pivotValue != null) {
+													rowData = new String[1];
+													rowData[0] = fileName;
 													data.add(rowData);
+													pivotArray.add(pivotRowValue);
 												}
 												
 											} else {
@@ -188,8 +221,8 @@ public class OrgMetadataToExcel {
 											}
 										}
 									}
-									if(data.size() > 0) {							
-										xlsMng.createSheetList(sheetName, columnsList.toArray(new String[columnsList.size()]), data);
+									if(data.size() > 0) {
+										xlsMng.createSheetList(sheetName, columnsList.toArray(new String[columnsList.size()]), data, pivotColumnList, pivotArray);
 									}
 								}					
 							}

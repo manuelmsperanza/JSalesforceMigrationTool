@@ -2,12 +2,16 @@ package com.hoffnungland.jSFDCMigrTool;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.hoffnungland.poi.corner.dbxlsreport.ExcelManager;
 
 public class OrgXlsMgr extends ExcelManager {
@@ -109,17 +113,31 @@ public class OrgXlsMgr extends ExcelManager {
 		
 	}
 
-	public void createSheetList(String sheetName, String[] columnsList, List<String[]> data) {
+	public void createSheetList(String sheetName, String[] columnsList, List<String[]> data, Set<String> pivotColumnList, JsonArray jsonArray) {
 		logger.traceEntry();
 		org.apache.poi.xssf.usermodel.XSSFSheet workSheet = this.wb.createSheet(sheetName);
 		
-		this.createMetadataHeader(workSheet, "Metadata " + sheetName, columnsList.length, 0, 0);
-		this.createSheetHeader(workSheet, columnsList, 1, 0);
-		int rowId = 2;
+		int columnListSize = columnsList.length;
+		String[] columnListJoin = null;
+		if(pivotColumnList != null && pivotColumnList.size() > 0) {
+			columnListSize += pivotColumnList.size();
+			columnListJoin = new String[columnListSize];
+			int columnIdx = columnsList.length;
+			for(String curPivotColumnValue : pivotColumnList) {
+				columnListJoin[columnIdx++] =  curPivotColumnValue;
+			}
+		} else {
+			columnListJoin = columnsList;
+		}
+		
+		this.createMetadataHeader(workSheet, "Metadata " + sheetName, columnListSize, 0, 0);
+		this.createSheetHeader(workSheet, columnListJoin, 1, 0);
+		int rowOffset = 2;
+		int rowId = 0;
 		for(String[] row : data) {
-			org.apache.poi.xssf.usermodel.XSSFRow bodyRow = workSheet.getRow(rowId);
+			org.apache.poi.xssf.usermodel.XSSFRow bodyRow = workSheet.getRow(rowOffset + rowId);
 			if(bodyRow == null) {
-				bodyRow = workSheet.createRow(rowId);
+				bodyRow = workSheet.createRow(rowOffset + rowId);
 			}
 			int cellIdx = 0;
 			for(String cell : row) {
@@ -133,6 +151,27 @@ public class OrgXlsMgr extends ExcelManager {
 				bundleNameCell.setCellStyle(this.defaultCellStyle);
 				bundleNameCell.setCellValue(cell);
 				cellIdx++;
+			}
+			
+			if(pivotColumnList != null && pivotColumnList.size() > 0) {
+				
+				JsonObject pivotRow = (JsonObject) jsonArray.get(rowId);
+				
+				for(String curPivotColumnValue : pivotColumnList) {
+					
+					org.apache.poi.xssf.usermodel.XSSFCell bundleNameCell = bodyRow.getCell(cellIdx);
+					
+					if(bundleNameCell == null) {
+						bundleNameCell = bodyRow.createCell(cellIdx);
+					}
+					
+					bundleNameCell.setCellStyle(this.defaultCellStyle);
+					JsonElement pivotRowElement = pivotRow.get(curPivotColumnValue);
+					if(pivotRowElement != null) {						
+						bundleNameCell.setCellValue(pivotRowElement.getAsString());
+					}
+					cellIdx++;
+				}
 			}
 			
 			rowId++;
