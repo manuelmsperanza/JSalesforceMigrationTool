@@ -489,8 +489,8 @@ public class App implements ActionListener {
 				JOptionPane.showMessageDialog(this.frame, "Metadata update is completed", "Update completed", JOptionPane.INFORMATION_MESSAGE);
 				break;
 			case "Excel Org Info":
-				String sourceOrg = this.jSalesforceMigrationToolProperties.getProperty("selectedSourceOrg");
-				new OrgMetadataToExcel().generateExcel(sourceOrg);
+				String excelName = this.jSalesforceMigrationToolProperties.getProperty("selectedSourceOrg") + " - " + this.jSalesforceMigrationToolProperties.getProperty("selectedSourcePackage");
+				new OrgMetadataToExcel().generateExcel(excelName);
 				this.postActionClearMetadataDir("Excel ready");
 				break;
 			case "Clear Metadata":
