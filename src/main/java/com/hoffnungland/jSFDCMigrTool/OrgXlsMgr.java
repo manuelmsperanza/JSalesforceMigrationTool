@@ -122,7 +122,10 @@ public class OrgXlsMgr extends ExcelManager {
 		if(pivotColumnList != null && pivotColumnList.size() > 0) {
 			columnListSize += pivotColumnList.size();
 			columnListJoin = new String[columnListSize];
-			int columnIdx = columnsList.length;
+			int columnIdx = 0;
+			for(String curColumnValue : columnsList) {
+				columnListJoin[columnIdx++] =  curColumnValue;
+			}
 			for(String curPivotColumnValue : pivotColumnList) {
 				columnListJoin[columnIdx++] =  curPivotColumnValue;
 			}
