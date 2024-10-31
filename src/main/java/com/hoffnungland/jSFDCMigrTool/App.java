@@ -181,7 +181,7 @@ public class App implements ActionListener {
 
 			JPanel commandPanelRetrieve = new JPanel();
 			springLayout.putConstraint(SpringLayout.NORTH, commandPanelRetrieve, 0, SpringLayout.NORTH, frame.getContentPane());
-			springLayout.putConstraint(SpringLayout.SOUTH, commandPanelRetrieve, 550, SpringLayout.NORTH, frame.getContentPane());
+			springLayout.putConstraint(SpringLayout.SOUTH, commandPanelRetrieve, 300, SpringLayout.NORTH, frame.getContentPane());
 			springLayout.putConstraint(SpringLayout.EAST, commandPanelRetrieve, 500, SpringLayout.WEST, frame.getContentPane());
 			commandPanelRetrieve.setMaximumSize(new Dimension(500, 200));
 			springLayout.putConstraint(SpringLayout.WEST, commandPanelRetrieve, 0, SpringLayout.WEST, frame.getContentPane());
@@ -231,8 +231,8 @@ public class App implements ActionListener {
 			JPanel commandPanelDeploy = new JPanel();
 			springLayout.putConstraint(SpringLayout.NORTH, commandPanelDeploy, 0, SpringLayout.NORTH, frame.getContentPane());
 			springLayout.putConstraint(SpringLayout.WEST, commandPanelDeploy, 0, SpringLayout.EAST, commandPanelRetrieve);
-			springLayout.putConstraint(SpringLayout.SOUTH, commandPanelDeploy, 550, SpringLayout.NORTH, frame.getContentPane());
-			springLayout.putConstraint(SpringLayout.EAST, commandPanelDeploy, 500, SpringLayout.EAST, commandPanelRetrieve);
+			springLayout.putConstraint(SpringLayout.SOUTH, commandPanelDeploy, 300, SpringLayout.NORTH, frame.getContentPane());
+			springLayout.putConstraint(SpringLayout.EAST, commandPanelDeploy, 6, SpringLayout.EAST, frame.getContentPane());
 			frame.getContentPane().add(commandPanelDeploy);
 			SpringLayout sl_commandPanelDeploy = new SpringLayout();
 			commandPanelDeploy.setLayout(sl_commandPanelDeploy);
@@ -292,8 +292,8 @@ public class App implements ActionListener {
 			frame.getContentPane().add(progressLabel);
 			
 			JButton btnExcelMetadataButton = new JButton("Excel Org Info");
-			springLayout.putConstraint(SpringLayout.NORTH, btnExcelMetadataButton, 10, SpringLayout.SOUTH, commandPanelRetrieve);
-			springLayout.putConstraint(SpringLayout.WEST, btnExcelMetadataButton, 10, SpringLayout.WEST, commandPanelRetrieve);
+			springLayout.putConstraint(SpringLayout.NORTH, btnExcelMetadataButton, 30, SpringLayout.SOUTH, commandPanelRetrieve);
+			springLayout.putConstraint(SpringLayout.WEST, btnExcelMetadataButton, 10, SpringLayout.WEST, frame.getContentPane());
 			btnExcelMetadataButton.addActionListener(this);
 			frame.getContentPane().add(btnExcelMetadataButton);
 			
@@ -333,6 +333,13 @@ public class App implements ActionListener {
 			springLayout.putConstraint(SpringLayout.SOUTH, btnUnblockAutomation, 0, SpringLayout.SOUTH, btnBlockAutomation);
 			btnUnblockAutomation.addActionListener(this);
 			frame.getContentPane().add(btnUnblockAutomation);
+			
+			JPanel loggerPanel = new JPanel();
+			springLayout.putConstraint(SpringLayout.WEST, loggerPanel, 0, SpringLayout.WEST, frame.getContentPane());
+			springLayout.putConstraint(SpringLayout.NORTH, loggerPanel, 10, SpringLayout.SOUTH, btnBlockAutomation);
+			springLayout.putConstraint(SpringLayout.SOUTH, loggerPanel, -10, SpringLayout.NORTH, progressLabel);
+			springLayout.putConstraint(SpringLayout.EAST, loggerPanel, 0, SpringLayout.EAST, frame.getContentPane());
+			frame.getContentPane().add(loggerPanel);
 
 			
 
