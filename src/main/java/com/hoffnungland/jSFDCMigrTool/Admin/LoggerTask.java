@@ -12,13 +12,11 @@ import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.BasicHttpClientResponseHandler;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.poi.ddf.EscherColorRef.SysIndexProcedure;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -206,7 +204,8 @@ public class LoggerTask {
 	    	
 	    	loggerTask.clearAllLogs();
 	    	System.out.print("Please press Enter to enable log");
-	        String userInput = scanner.nextLine();
+	        @SuppressWarnings("unused")
+			String userInput = scanner.nextLine();
 	        
 	       
 	    	loggerTask.enableLog(traceFlag);

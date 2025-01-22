@@ -4,8 +4,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.tools.ant.BuildException;
 
-import com.salesforce.ant.ConnectionFactory;
-import com.sforce.soap.apex.SoapConnection;
 import com.sforce.soap.partner.CallOptions_element;
 import com.sforce.soap.partner.Connector;
 import com.sforce.soap.partner.IGetUserInfoResult;
@@ -55,7 +53,7 @@ public class LoginAntTask {
 	}
 
 	LoginResult doLogin() {
-
+		logger.traceEntry();
 		ConnectorConfig config = new ConnectorConfig();
 
 		String serverEndpoint = this.server + "/services/Soap/u/" + this.apiVersion;
@@ -82,7 +80,7 @@ public class LoginAntTask {
 				lResult.setUserInfo((IGetUserInfoResult) partnerConnection.getUserInfo());
 				return lResult;
 			}
-			return partnerConnection.login(this.username, this.password);
+			return logger.traceExit(partnerConnection.login(this.username, this.password));
 		} catch (LoginFault lf) {
 			throw new BuildException(lf.getExceptionMessage(), lf);
 		} catch (ConnectionException ce) {
